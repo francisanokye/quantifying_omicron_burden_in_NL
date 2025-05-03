@@ -42,14 +42,7 @@ git clone https://github.com/francisanokye/quantifying_omicron_burden_in_NL.git
 cd quantifying_omicron_burden_in_NL
 ```
 
-#### Step-by-Step Pipeline (Makefile Targets)
-
-1. **Prepare model parameters and key dates**  
-   These load and process the baseline parameters:
-
-   ```bash
-   make params.Rout keydates.Rout
-   ```
+The script folder should contain the following files in the table
 
 | Script File                        | Purpose                                                    | 
 | ---------------------------------- | ---------------------------------------------------------- | 
