@@ -1,0 +1,11 @@
+# Ignore R output and data files
+*.Rlog
+*.rda
+*.Rout
+*.rds
+*.args
+*.Rlog
+*.rda
+*.Rout
+*.rds
+*.args
