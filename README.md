@@ -55,7 +55,8 @@ The script folder should contain the following files in the table
 | `calibrate.R`                      | Calibrates the model to data                               | 
 | `calibrate_plot.R`                 | Plots model fit to data                                    | 
 | `extract_beta.R`                   | Extracts fitted β(t) or other parameters                   | 
-| `simulate.R`                       | Simulates using estimated parameters                       |
+| `counterfact_sim.R`                | Updates reporting prob & simulates cases                   |
+| `allscenarios.R`                   | Combines all the case scenarios                            |
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results  |
 
 #### Step-by-Step Pipeline (Makefile Targets)
@@ -81,3 +82,17 @@ The script folder should contain the following files in the table
    ```bash
    make eligfrac3.extract_beta.Rout.pdf.go   
    ```
+
+- **Counterfactual with RT-PCR estimated reporting probabilities**  
+Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot
+
+```bash
+make eligfrac3.counterfact_sim.Rout.pdf.go   
+```
+
+- **All scenario plot**  
+Combines reported cases, true estimated infections and the counterfactual with RT-PCR reporting probabilities to generate figure 5.
+
+```bash
+make eligfrac3.allscenarios.Rout.pdf.go   
+```
