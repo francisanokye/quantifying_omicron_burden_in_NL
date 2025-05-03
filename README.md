@@ -66,13 +66,13 @@ The script folder should contain the following files in the table
 
    ```bash
    make eligfrac3.timevar_spec.Rout
-   ```
+   
 
 **Load saved output object from the model calibration step and plots**  
    It restores the fitted model from calibrate.R, including the estimated parameters and then generates a PDF visualization from the calibration plot
 
    ```bash
    make eligfrac3.calibrate_plot.Rout.pdf.go   
-   ```
+   
 
 
