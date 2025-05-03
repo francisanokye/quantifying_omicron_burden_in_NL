@@ -16,21 +16,43 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 
 [3] [GovNL_2021_1215](https://www.gov.nl.ca/releases/2021/health/1215n04/), [4] [GovNL_2022_0103](https://www.gov.nl.ca/releases/2022/health/0103n02/), [5] [GovNL_2022_0124](https://www.gov.nl.ca/releases/2022/health/0124n05/), [6] [GovNL_2022_0225](https://www.gov.nl.ca/releases/2022/health/0309n02/), [7] [GovNL_2022_0317](https://www.gov.nl.ca/releases/2022/health/0317n11/)
 
-## ▶️ Reproducing the Results from the Paper
+### Reproducing the Results from the Paper
 
-This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis.
-
-To generate all results, including calibration, simulations, and plots, follow the steps below.
+This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all results, including calibration, simulations, and plots, follow the steps below.
 
 ---
 
-### 🧩 Step-by-Step Pipeline (Makefile Targets)
+#### Setup Instructions
+
+Before reproducing the results, follow these steps to set up your environment:
+
+##### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/your-epidemic-model.git
+cd your-epidemic-model
+
+
+#### 🧩 Step-by-Step Pipeline (Makefile Targets)
 
 1. **Prepare model parameters and key dates**  
    These load and process the baseline parameters:
 
    ```bash
    make params.Rout keydates.Rout
+
+| Script File                        | Purpose                                                    | 
+| ---------------------------------- | ---------------------------------------------------------- | 
+| `params.R`                         | Defines model parameter values                             | 
+| `keydates.R`                       | Defines key policy/intervention dates                      |
+| `flows.R`                          | Computes compartmental flows                               | 
+| `spec.R`                           | Builds model specifications                                | 
+| `timevar_spec.R`                   | Defines time-varying parameters (e.g., beta, report\_prob) | 
+| `seroprevdata.R`                   | Loads or processes seroprevalence data                     | 
+| `calibrate.R`                      | Calibrates the model to data                               | 
+| `calibrate_plot.R`                 | Plots model fit to data                                    | 
+| `extract_beta.R`                   | Extracts fitted β(t) or other parameters                   | 
+| `simulate.R`                       | Simulates using estimated parameters                       |
 
 
 
