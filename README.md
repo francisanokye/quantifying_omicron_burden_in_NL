@@ -26,8 +26,9 @@ This project uses a `Makefile`-based pipeline to ensure fully reproducible analy
 
 Before reproducing the results, follow these steps to set up your environment:
 
--- install [macpan2](https://canmod.github.io/macpan2/index.html)
--- install [makestuff](https://github.com/dushoff/makestuff)
+- install [macpan2](https://canmod.github.io/macpan2/index.html)
+
+- install [makestuff](https://github.com/dushoff/makestuff)
 
 
 ```bash
