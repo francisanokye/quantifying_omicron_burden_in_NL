@@ -30,10 +30,9 @@ Before reproducing the results, follow these steps to set up your environment:
 
 - install [makestuff](https://github.com/dushoff/makestuff)
 
-
+Install these required packages
 ```bash
-install.packages(c("tidyverse", "broom.mixed", "conflicted", "ggthemes", "yaml", "lubridate", "here", "testthat"))
-remotes::install_github("macpan2/macpan2")  # if using macpan2
+install.packages(c("tidyverse", "ggthemes", "broom.mixed", "conflicted","dplyr", "gridExtra", "grid", "gtable", "zoo", "ggplot2", "patchwork"))
 ```
 
 ##### 1. Clone the Repository
