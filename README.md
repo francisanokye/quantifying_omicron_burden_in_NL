@@ -8,21 +8,13 @@ The Omicron variant of the SARS-CoV-2 virus was highly transmissible and caused 
 The .R files contain the code to recreate the figures and main statistical analyses. All the codes were written in the R programming language using the [macpan2](https://github.com/canmod/macpan2) package on 1.6 GHz Dual-Core Intel Core i5, 8 GB memory MacBook Air computer. All other packages used in this work can be installed by running the requirement.txt file.
 
 ### Data
-Omicron-reported case data for NL were obtained through a data-sharing agreement with the Newfoundland and Labrador Centre for Health Information (NLCHI, now part of NL Health Services – Digital Health) under Health Research Ethics Board approval (2021.013). Information on the RT-PCR testing eligibility criteria was obtained from the public advisory notifications on the Government of Newfoundland and Labrador website [1-5]. The infection-induced seroprevalence data were obtained from the COVID-19 Immunity Task Force (CITF) website and these studies \citep{swail2023sars,murphy2023evolution}.
+Omicron-reported case data for NL were obtained through a data-sharing agreement with the Newfoundland and Labrador Centre for Health Information (NLCHI, now part of NL Health Services – Digital Health) under Health Research Ethics Board approval (2021.013). The infection-induced seroprevalence data were obtained from the COVID-19 Immunity Task Force (CITF) website and these studies [1,2]. Information on the RT-PCR testing eligibility criteria was obtained from the public advisory notifications on the Government of Newfoundland and Labrador website [3-7]. 
 
 [1] Murphy, T. J., Swail, H., Jain, J., Anderson, M., Awadalla, P., Behl, L., ... & Buckeridge, D. L. (2023). The evolution of SARS-CoV-2 seroprevalence in Canada: a time-series study, 2020–2023. Cmaj, 195(31), E1030-E1037.
 
 [2] COVID-19 Immunity Task Force. (2023). Seroprevalence of SARS-CoV-2 in Canada: National and regional trends. Government of Canada. https://www.covid19immunitytaskforce.ca/
 
-[3] [GovNL_2021_1215](https://www.gov.nl.ca/releases/2021/health/1215n04/)
-
-[4] [GovNL_2022_0103](https://www.gov.nl.ca/releases/2022/health/0103n02/)
-
-[5] [GovNL_2022_0124](https://www.gov.nl.ca/releases/2022/health/0124n05/)
-
-[6] [GovNL_2022_0225](https://www.gov.nl.ca/releases/2022/health/0309n02/)
-
-[7] [GovNL_2022_0317](https://www.gov.nl.ca/releases/2022/health/0317n11/)
+[3] [GovNL_2021_1215](https://www.gov.nl.ca/releases/2021/health/1215n04/), [4] [GovNL_2022_0103](https://www.gov.nl.ca/releases/2022/health/0103n02/), [5] [GovNL_2022_0124](https://www.gov.nl.ca/releases/2022/health/0124n05/), [6] [GovNL_2022_0225](https://www.gov.nl.ca/releases/2022/health/0309n02/), [7] [GovNL_2022_0317](https://www.gov.nl.ca/releases/2022/health/0317n11/)
 
 
 
