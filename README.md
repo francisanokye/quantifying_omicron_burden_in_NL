@@ -39,7 +39,7 @@ install.packages(c("tidyverse", "ggthemes", "broom.mixed", "conflicted","dplyr",
 
 ```bash
 git clone https://github.com/francisanokye/quantifying_omicron_burden_in_NL.git
-cd quantifying_omicron_burden_in_NL
+cd quantifying_omicron_burden_in_NL/scripts
 ```
 
 The script folder should contain the following files in the table
