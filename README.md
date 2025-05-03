@@ -29,17 +29,18 @@ Before reproducing the results, follow these steps to set up your environment:
 ##### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/your-epidemic-model.git
-cd your-epidemic-model
+git clone https://github.com/francisanokye/quantifying_omicron_burden_in_NL.git
+cd quantifying_omicron_burden_in_NL
+```
 
-
-#### 🧩 Step-by-Step Pipeline (Makefile Targets)
+#### Step-by-Step Pipeline (Makefile Targets)
 
 1. **Prepare model parameters and key dates**  
    These load and process the baseline parameters:
 
    ```bash
    make params.Rout keydates.Rout
+   ```
 
 | Script File                        | Purpose                                                    | 
 | ---------------------------------- | ---------------------------------------------------------- | 
