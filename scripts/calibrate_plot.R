@@ -93,5 +93,8 @@ pp <- pp + geom_vline(data = fitted_data_others, aes(xintercept = as.Date("2021-
            geom_vline(data = fitted_data_others, aes(xintercept = as.Date("2022-03-14")), colour = "gold4", linetype = 1, linewidth = 1) 
 print(pp)
 
+png("../figures/calibrate_plot.png", width = 2600, height = 1800, res = 300, bg = "white", type = "cairo")
+final_combined_plot
+dev.off()
 #ggsave("eligfra3_plot.png", plot = pp, width = 12, height = 6, dpi = 300)
 

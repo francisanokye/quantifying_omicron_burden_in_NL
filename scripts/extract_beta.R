@@ -91,5 +91,6 @@ combined_plot <- (betaplot | alert_errorplot) +
 # Print the final combined plot
 print(combined_plot)
 
-ggsave("extract_beta.png", plot = combined_plot, width = 12, height = 6, dpi = 300)
-
+png("../figures/beta_plot.png", width = 2600, height = 1800, res = 300, bg = "white", type = "cairo")
+final_combined_plot
+dev.off()

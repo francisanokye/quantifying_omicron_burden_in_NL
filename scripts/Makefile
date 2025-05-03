@@ -43,8 +43,8 @@ seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv
 %.extract_beta.Rout: extract_beta.R  %.calibrate.rds seroprevdata.rds keydates.rda params.R
         $(pipeR)
 
-%.counterfact_sim.Rout: counterfact_sim.R %.timevar_spec.rds ../data/rp_%.csv seroprevdata.rds keydates.rda params.rda timevar_spec.R    
-	$(pipeRcall)
+%.counterfact_sim.Rout: counterfact_sim.R %.calibrate.rds  %.timevar_spec.rds ../data/rp_%.csv seroprevdata.rds keydates.rda params.rda timevar_spec.R  
+	$(pipeR)
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff
