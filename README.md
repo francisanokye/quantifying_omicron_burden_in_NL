@@ -26,6 +26,15 @@ This project uses a `Makefile`-based pipeline to ensure fully reproducible analy
 
 Before reproducing the results, follow these steps to set up your environment:
 
+-- install [macpan2](https://canmod.github.io/macpan2/index.html)
+-- install [makestuff](https://github.com/dushoff/makestuff)
+
+
+```bash
+install.packages(c("tidyverse", "broom.mixed", "conflicted", "ggthemes", "yaml", "lubridate", "here", "testthat"))
+remotes::install_github("macpan2/macpan2")  # if using macpan2
+```
+
 ##### 1. Clone the Repository
 
 ```bash
