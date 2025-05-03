@@ -65,23 +65,23 @@ The script folder should contain the following files in the table
    These load and process the baseline parameters:
    Load baseline model specification and parameters and applies the custom reporting fractions in rp_eligfrac3.csv to generates a time-varying spec.
 
-   ```bash
-   make eligfrac3.timevar_spec.Rout
-   ```
+```bash
+make eligfrac3.timevar_spec.Rout
+```
 
 - **Load saved output object from the model calibration step and plots**  
    It restores the fitted model from calibrate.R, including the estimated parameters and then generates a PDF visualization from the calibration plot
 
-   ```bash
-   make eligfrac3.calibrate_plot.Rout.pdf.go   
-   ```
+```bash
+make eligfrac3.calibrate_plot.Rout.pdf.go   
+```
 
 - **Load saved output object from the model calibration and summarize the parameter estimates**  
    Extracts the estimated time-varying transmission rate from the calibrated model saved in *.calibrate.rds and generates a plot
 
-   ```bash
-   make eligfrac3.extract_beta.Rout.pdf.go   
-   ```
+```bash
+make eligfrac3.extract_beta.Rout.pdf.go   
+```
 
 - **Counterfactual with RT-PCR estimated reporting probabilities**  
 Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot.
