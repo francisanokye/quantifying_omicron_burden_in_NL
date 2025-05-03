@@ -69,7 +69,14 @@ The script folder should contain the following files in the table
 make eligfrac3.timevar_spec.Rout
 ```
 
-- **Load saved output object from the model calibration step and plots**  
+- **Run the model calibration**  
+   This fits the SEARCH-ID model in the timevar_spec to the data and saves the output
+
+```bash
+make eligfrac3.calibrate.Rout   
+```
+
+- **Load saved output object from the model calibration step and plot**  
    It restores the fitted model from calibrate.R, including the estimated parameters and then generates a PDF visualization from the calibration plot
 
 ```bash
