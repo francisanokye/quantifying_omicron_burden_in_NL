@@ -84,15 +84,16 @@ The script folder should contain the following files in the table
    ```
 
 - **Counterfactual with RT-PCR estimated reporting probabilities**  
-Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot
+Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot.
+Here the eligibility fraction data used is eligfrac2.
 
 ```bash
-make eligfrac3.counterfact_sim.Rout.pdf.go   
+make eligfrac2.counterfact_sim.Rout.pdf.go   
 ```
 
 - **All scenario plot**  
 Combines reported cases, true estimated infections and the counterfactual with RT-PCR reporting probabilities to generate figure 5.
 
 ```bash
-make eligfrac3.allscenarios.Rout.pdf.go   
+make allscenarios.Rout.pdf.go   
 ```
