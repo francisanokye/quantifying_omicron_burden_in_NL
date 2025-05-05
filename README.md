@@ -76,11 +76,12 @@ make eligfrac3.timevar_spec.Rout
 make eligfrac3.calibrate.Rout   
 ```
 
+
 - **Load saved output object from the model calibration step and plot**  
-   It restores the fitted model from calibrate.R, including the estimated parameters and then generates a PDF visualization from the calibration plot
+   It restores the fitted model from calibrate.rds, including the estimated parameters, generates a plot and saves in figures folder.
 
 ```bash
-make eligfrac3.calibrate_plot.Rout.pdf.go   
+make plot_true_infections.Rout 
 ```
 
 - **Loads saved model fit output and summarizes the transmission parameter estimates**  
@@ -91,15 +92,14 @@ make extract_beta.Rout
 ```
 
 - **Counterfactual with RT-PCR estimated reporting probabilities**  
-Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot.
-Here, the eligibility fraction data used is eligfrac2.
+First updates the reporting probabilities with eligfrac2 in the timevar_spec model specification for the counterfactual scenario and generates a plot which is saved in the figures folder.
 
 ```bash
-make eligfrac2.counterfact_sim.Rout.pdf.go   
+make eligfrac2.counterfact_sim.Rout   
 ```
 
 - **All scenario plot**  
-Combines reported cases, true estimated infections and the counterfactual with RT-PCR reporting probabilities to generate figure 5.
+Combines reported cases,  estimated true infections and the counterfactual predicted reported with RT-PCR reporting probabilities to generate figure 5.
 
 ```bash
 make allscenarios.Rout.pdf.go   
