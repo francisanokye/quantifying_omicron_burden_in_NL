@@ -83,16 +83,16 @@ make eligfrac3.calibrate.Rout
 make eligfrac3.calibrate_plot.Rout.pdf.go   
 ```
 
-- **Load saved output object from the model calibration and summarize the parameter estimates**  
-   Extracts the estimated time-varying transmission rate from the calibrated model saved in *.calibrate.rds and generates a plot
+- **Loads saved model fit output and summarizes the transmission parameter estimates**  
+   Extracts the estimated time-varying transmission rate from the calibrated model saved in *.calibrate.rds and generates a plot which gets saved in the figures folder
 
 ```bash
-make eligfrac3.extract_beta.Rout.pdf.go   
+make extract_beta.Rout   
 ```
 
 - **Counterfactual with RT-PCR estimated reporting probabilities**  
 Updates calibrated model specification with RT-PCR testing eligibility estimated reporting probabilities to plot counterfactual cases and generates a plot.
-Here the eligibility fraction data used is eligfrac2.
+Here, the eligibility fraction data used is eligfrac2.
 
 ```bash
 make eligfrac2.counterfact_sim.Rout.pdf.go   
