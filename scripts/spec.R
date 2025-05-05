@@ -37,7 +37,7 @@ spec <- mp_tmb_model_spec(
 )
 
 ## What is this?
-
+## It allows the model specification to be updated with the model parameters which were not initially included in the timevar_spec
 newspec <- mp_tmb_update(spec
 			 , default = list(kappa1 = kappa1, kappa2 = kappa2, kappa3 = kappa3, gamma = gamma, sigma = sigma, mu = mu,
               zeta = zeta, v2 = v2, v3 = v3, xi1 = xi1, xi2 = xi2, xi3 = xi3, eta1 = eta1, eta2 = eta2, eta3 = eta3,

@@ -10,38 +10,43 @@ set.seed(2024)
 beta <- 0.035
 report_prob = 0.99
 
-## MLi: HERE
+## infectivity reduction due to vaccine 
 kappa1 = 1 
 kappa2 = 0.91 
 kappa3 = 0.3
-## MLi: HERE
-gamma = 1/10 
-## MLi: HERE
-sigma = 1/3
-## MLi: HERE
-mu = 0.324  
-## MLi: HERE
-zeta = 0.75 
-## MLi: HERE
-v2 = 1/21# (0.047) #0.2828 
-v3 = 1/154 #(0.006) #0.1359
 
-## MLi: HERE
-xi1 <- xi2 <- xi3 <- 0.009 #0.015 
+## Recovery rate for asymptomatic individuals
+gamma = 1/10 
+
+## Mean days from exposure to symptom onset
+sigma = 1/3
+
+## Proportion of asymptomatic infections
+mu = 0.324  
+
+## Reduction in viral transmission due to asymptomatic case contact
+zeta = 0.75
+
+## Rate at which people took second and booster doses
+v2 = 1/21 
+v3 = 1/154 
+
+## Proportion of symptomatic individuals hospitalized across cohorts
+xi1 <- xi2 <- xi3 <- 0.009 
             
-## MLi: HERE
+## Mean days from ICU to recovery
 eta1 <- eta2 <- eta3 <-  1/5.5 
 
-## MLi: HERE
+## Median time to hospitalization for symptomatic individuals across cohorts
 phi1 <- phi2 <- phi3 <- 1/5 
 
-## MLi: HERE
+## Proportion of hospitalized individuals admitted to ICU across cohorts
 theta1 <- theta2 <- theta3 <- 0.005 #0.025
                
-## MLi: HERE
+## Recovery rate of hospitalized infections
 omega1 <- omega2 <- omega3 <- 1/7 
 
-## MLi: HERE
+## Proportion of ICU patients progressing to death
 lambda1 = 0.25 
 lambda2 = 0.156 
 lambda3 = 0.150
@@ -79,7 +84,7 @@ S10 = S0prop * N  - (E10 - A10 - R10 - C10 - H10 - I10 -D10)
 V20 = V2prop * N  - (E20 - A20 - R20 - C20 - H20 - I20 -D20)
 V30 = V3prop * N  - (E30 - A30 - R30 - C30 - H30 - I30 -D30) 
 
-## MLi: HERE
+## offset
 off <- 20
 
 # params = list(beta_baseline = beta_baseline, beta_deviation = beta_deviation
@@ -92,7 +97,7 @@ params = list(beta= beta
 	, sigma = sigma
 	, mu = mu
 	, zeta = zeta
-	## MLi: HERE
+	## cohort-specific parameters
 	, v2 = v2
 	, v3 = v3
 	, xi1 = xi1
