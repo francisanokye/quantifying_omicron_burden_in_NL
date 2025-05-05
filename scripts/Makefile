@@ -28,15 +28,18 @@ flows.Rout: flows.R params.rda
 spec.Rout: spec.R params.rda flows.rda
 	$(pipeR)
 
+# eligfrac2.timevar_spec.Rout: timevar_spec.R ../data/rp_eligfrac2.csv
 %.timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_%.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv    
 	$(pipeR)
 
+# eligfrac2.calibrate.Rout: calibrate.R
 %.calibrate.Rout: calibrate.R %.timevar_spec.rds seroprevdata.rds params.rda keydates.rda timevar_spec.R
 	$(pipeR)
 
+# eligfrac2.calibrate_plot.Rout: calibrate_plot.R
 %.calibrate_plot.Rout: calibrate_plot.R %.calibrate.rds seroprevdata.rds keydates.rda params.rda
 	$(pipeR)
 
