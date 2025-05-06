@@ -10,3 +10,4 @@
 *.rds
 *.args
 scripts/makestuff/
+.DS_Store
