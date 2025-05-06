@@ -39,14 +39,17 @@ seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv
 %.calibrate.Rout: calibrate.R %.timevar_spec.rds seroprevdata.rds params.rda keydates.rda timevar_spec.R
 	$(pipeR)
 
-# eligfrac2.calibrate_plot.Rout: calibrate_plot.R
-%.calibrate_plot.Rout: calibrate_plot.R %.calibrate.rds seroprevdata.rds keydates.rda params.rda
+plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda
 	$(pipeR)
 
-%.extract_beta.Rout: extract_beta.R  %.calibrate.rds seroprevdata.rds keydates.rda params.R
-        $(pipeR)
+# eligfrac2.calibrate_plot.Rout: calibrate_plot.R
+plot_true_infections.Rout: plot_true_infections.R ../data/true_infections_data.csv seroprevdata.rds keydates.rda params.rda
+	$(pipeR)
 
-%.counterfact_sim.Rout: counterfact_sim.R %.calibrate.rds  %.timevar_spec.rds ../data/rp_%.csv seroprevdata.rds keydates.rda params.rda timevar_spec.R  
+beta_plot.Rout: beta_plot.R ../data/true_infections_data.csv
+	$(pipeR)
+
+%.counterfact_sim.Rout: counterfact_sim.R %.timevar_spec.rds seroprevdata.rds keydates.rda params.rda timevar_spec.R  
 	$(pipeR)
 
 Ignore += makestuff

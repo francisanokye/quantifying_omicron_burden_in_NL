@@ -14,8 +14,26 @@ set.seed(2025)
 loadEnvironments()
 
 seroprevdata <- rdsRead("seroprevdata.rds")
+spec <- rdsRead("timevar_spec.rds")
+calibrator <- readRDS("eligfrac3.calibrate.rds")
 
-calibrator <- rdsRead("calibrate.rds")
+# extract estimated best time-varying betas
+beta_weights <- mp_tmb_coef(calibrator) |> 
+	dplyr::filter(mat == "time_var_beta") |> 
+	pull(estimate)
+
+# make a copy of the model spec
+newspec <- spec 
+
+newspec$time_var_beta <- mp_rbf("beta", 6)
+
+newspec$time_var_beta$weights <- beta_weights
+
+print(newspec)
+
+
+quit()
+
 
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 

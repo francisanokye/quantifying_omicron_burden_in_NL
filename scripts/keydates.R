@@ -1,5 +1,5 @@
 library(shellpipes)
-set.seed(2024)
+set.seed(2025)
 
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"

@@ -15,26 +15,15 @@ loadEnvironments()
 
 seroprevdata <- rdsRead("seroprevdata.rds")
 
-population = 510550
-
-calibrator <- rdsRead("calibrate.rds")
-print(calibrator)
-
-fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
-
-fitted_data <- (fitted_data
-	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
-	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
-	|> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
-)
-# save model output for the perfect reporting probability (report prob = 1) 
-write.csv(fitted_data, "../data/true_infections_data.csv", row.names = FALSE)
+# load true infections data from model estimation
+true_infections <- read.csv("../data/true_infections_data.csv")
+true_infections <- true_infections |> mutate(dates = as.Date(dates))
 
 # subset data for "report_prob"
-fitted_data_report_prob <- dplyr::filter(fitted_data, matrix == "report_prob")
+fitted_data_report_prob <- dplyr::filter(true_infections, matrix == "report_prob")
 
 # subset data without "report_prob"
-fitted_data_others <- dplyr::filter(fitted_data, matrix != "report_prob")
+fitted_data_others <- dplyr::filter(true_infections, matrix != "report_prob")
 
 # plot setup 
 pp <- (ggplot(data = fitted_data_others, aes(x = dates, y = value))
@@ -49,6 +38,7 @@ pp <- (ggplot(data = fitted_data_others, aes(x = dates, y = value))
        + geom_smooth(data = fitted_data_others, aes(x = dates, y = value,color = matrix), span = 0.15, alpha = 0.85, linewidth = 1.0)
        # Use geom_line instead for "report_prob" to ensure it remains in the plot
        + geom_line(data = fitted_data_report_prob, aes(color = matrix), linewidth = 1.0)
+       + scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d")
        + scale_fill_manual(labels = c("reported","estimated"), values = c("green","steelblue1"))
        + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Value", title = "Estimated Cases Under RT-PCR Eligibility Criteria Changes", color = "") 
        + scale_color_manual(labels = c("beta", "case_fit", "data","report_prob", "serop_fit"), values = c("blue","#E31f26", "black", "red", "#00BFC4")) 
@@ -93,8 +83,8 @@ pp <- pp + geom_vline(data = fitted_data_others, aes(xintercept = as.Date("2021-
            geom_vline(data = fitted_data_others, aes(xintercept = as.Date("2022-03-14")), colour = "gold4", linetype = 1, linewidth = 1) 
 print(pp)
 
-png("../figures/calibrate_plot.png", width = 2600, height = 1800, res = 300, bg = "white", type = "cairo")
-final_combined_plot
+png("../figures/true_infection_plot.png", width = 2600, height = 1800, res = 300, bg = "white", type = "cairo")
+pp
 dev.off()
 #ggsave("eligfra3_plot.png", plot = pp, width = 12, height = 6, dpi = 300)
 

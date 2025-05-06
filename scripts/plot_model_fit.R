@@ -9,17 +9,36 @@ library(ggthemes)
 library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
+library(shellpipes)
+library(tidyverse)
+library(macpan2)
 
-# load true infections data from model estimation
-true_infections <- read.csv("../data/true_infections_data.csv")
-serop_case_true <- read.csv("../data/serop_avgcase_data.csv")
+loadEnvironments()
+
+set.seed(2025)
+
+calibrator <- readRDS("eligfrac3.calibrate.rds")
+
+# load reported cases
+serop_case_true <- csvRead()
 serop_case_true$date <- as.Date(serop_case_true$date, format = "%Y-%m-%d")
 
 serop_case_true <- serop_case_true |>
   drop_na()
 
+# model simulation with calibrated parameters
+fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
+
+fitted_data <- (fitted_data
+                |> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
+                |> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
+                |> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
+)
+# save model output for the perfect reporting probability (report prob = 1) 
+write.csv(fitted_data, "../data/true_infections_data.csv", row.names = FALSE)
+
 # convert matrix values into columns
-true_infections <- true_infections |>
+true_infections <- fitted_data |>
   select(-any_of(c("row", "col"))) |>
   pivot_wider(names_from = matrix, values_from = value) |>
   group_by(dates) |>
@@ -71,6 +90,6 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
                         +guides(color = guide_legend(), fill = guide_legend())
 )
 
-png("../figures/model_fit.png", width = 2400, height = 1800, res = 300, bg = "white", type = "cairo")
+png("../figures/model_fit5.png", width = 2400, height = 1800, res = 300, bg = "white", type = "cairo")
 seroprevalence_plot
 dev.off()

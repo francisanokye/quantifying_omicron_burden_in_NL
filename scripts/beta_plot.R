@@ -9,9 +9,13 @@ library(ggthemes)
 library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
+library(shellpipes)
+library(tidyverse)
 
-# load true infections data from model estimation
-true_infections <- read.csv("../data/true_infections_data.csv")
+loadEnvironments()
+
+# load true infections data 
+true_infections <- csvRead()  
 
 # convert matrix values into columns
 true_infections <- true_infections |>
@@ -69,7 +73,7 @@ beta_errorplot <- ggplot(beta_summary, aes(x = alert_level, y = mean_value, colo
     plot.background = element_blank()
   )
 
-png("../figures/beta_plot.png", width = 1600, height = 1000, res = 300, bg = "white", type = "cairo")
+png("../figures/beta_plot.png", width = 1600, height = 1000, res = 300, bg = "white")
 beta_errorplot
 dev.off()
 
