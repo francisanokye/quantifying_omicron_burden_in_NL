@@ -76,8 +76,14 @@ make eligfrac3.timevar_spec.Rout
 make eligfrac3.calibrate.Rout   
 ```
 
+- **Plot model fit with calibrated parameters**  
+   Plots the model to the seroprevalence and saves in the figures folder. 
 
-- **Load saved output object from the model calibration step and plot**  
+```bash
+make plot_model_fit.Rout 
+```
+
+- **Use estimated model parameters to estimate the true infections**  
    It restores the fitted model from calibrate.rds, including the estimated parameters, generates a plot and saves in figures folder.
 
 ```bash
@@ -88,7 +94,7 @@ make plot_true_infections.Rout
    Extracts the estimated time-varying transmission rate from the calibrated model saved in *.calibrate.rds and generates a plot which gets saved in the figures folder
 
 ```bash
-make extract_beta.Rout   
+make beta_plot.Rout   
 ```
 
 - **Counterfactual with RT-PCR estimated reporting probabilities**  
