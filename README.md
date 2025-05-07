@@ -101,12 +101,12 @@ make beta_plot.Rout
 First updates the reporting probabilities with eligfrac2 in the timevar_spec model specification for the counterfactual scenario and generates a plot which is saved in the figures folder.
 
 ```bash
-make eligfrac2.counterfact_sim.Rout   
+make counterfact_plot.Rout   
 ```
 
 - **All scenario plot**  
 Combines reported cases,  estimated true infections and the counterfactual predicted reported with RT-PCR reporting probabilities to generate figure 5.
 
 ```bash
-make allscenarios.Rout.pdf.go   
+make allscenarios.Rout   
 ```
