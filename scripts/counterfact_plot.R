@@ -14,30 +14,42 @@ set.seed(2025)
 loadEnvironments()
 
 seroprevdata <- rdsRead("seroprevdata.rds")
-spec <- rdsRead("timevar_spec.rds")
-calibrator <- readRDS("eligfrac3.calibrate.rds")
 
-# extract estimated best time-varying betas
-beta_weights <- mp_tmb_coef(calibrator) |> 
-	dplyr::filter(mat == "time_var_beta") |> 
-	pull(estimate)
+# load true infections data from model estimation
+true_infections <- csvRead("true_infections_data")
+true_infections <- true_infections |> mutate(dates = as.Date(dates))
 
-# make a copy of the model spec
-newspec <- spec 
+# counterfactual reporting fractions based on calculated RT-PCR testing eligibility: 
+elig_report_probs <- csvRead("rp_eligfrac2") |>
+  mutate(Date = as.Date(Date)) |>
+  arrange(Date)
 
-newspec$time_var_beta <- mp_rbf("beta", 6)
+# build date intervals
+last_date <- as.Date(last_date)
+elig_report_probs <- elig_report_probs |> 
+  mutate(end = lead(Date, default = last_date + 1) - 1)
 
-newspec$time_var_beta$weights <- beta_weights
+# expand into daily rows
+elig_report_probs <- elig_report_probs |> 
+  rowwise() |> 
+  mutate(dates = list(seq(Date, end, by = "day"))) |> 
+  unnest(cols = c(dates)) |> 
+  select(dates, report_prob = prob)
 
-print(newspec)
 
+# replace the cases
+predicted_reported <- true_infections |>
+  left_join(elig_report_probs |> rename(report_prob_new = report_prob), by = "dates") |>
+  mutate(
+    # replace report_prob row values
+    value = if_else(matrix == "report_prob", report_prob_new, value),
+    # update cases row values by multiplying with matched report_prob
+    value = if_else(matrix == "cases", value * report_prob_new, value)
+  ) #|>
+  #select(-report_prob_new)
 
-quit()
-
-
-fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
-
-fitted_data <- (fitted_data
+# filter from the predicted reported data the beta, cases, report_prob and serop
+predicted_reported <- (predicted_reported
 	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
 	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
 	|> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
@@ -46,10 +58,10 @@ fitted_data <- (fitted_data
 write.csv(fitted_data, "../data/eligibility_adjusted_cases.csv", row.names = FALSE)
 
 # subset data for "report_prob"
-fitted_data_report_prob <- dplyr::filter(fitted_data, matrix == "report_prob")
+fitted_data_report_prob <- dplyr::filter(predicted_reported, matrix == "report_prob")
 
 # subset data without "report_prob"
-fitted_data_others <- dplyr::filter(fitted_data, matrix != "report_prob")
+fitted_data_others <- dplyr::filter(predicted_reported, matrix != "report_prob")
 
 # plot setup 
 pp <- (ggplot(data = fitted_data_others, aes(x = dates, y = value))
@@ -60,7 +72,7 @@ pp <- (ggplot(data = fitted_data_others, aes(x = dates, y = value))
        + geom_bar(data = seroprevdata%>%dplyr::filter(matrix %in% c("cases")), aes(x = dates, y = value, fill = "reported"),
 		  stat = "identity", position = "stack", width = 0.25, alpha = 1, show.legend = FALSE) 
        + geom_line(data = seroprevdata, aes(x = dates, y = value, color = "data"), linewidth = 1.0)  
-       + geom_ribbon(data = fitted_data_others, aes(ymin = conf.low, ymax = conf.high), fill = "gray", alpha = 0.5)
+       # + geom_ribbon(data = fitted_data_others, aes(ymin = conf.low, ymax = conf.high), fill = "gray", alpha = 0.5)
        + geom_smooth(data = fitted_data_others, aes(x = dates, y = value,color = matrix), span = 0.15, alpha = 0.85, linewidth = 1.0)
        # Use geom_line instead for "report_prob" to ensure it remains in the plot
        + geom_line(data = fitted_data_report_prob, aes(color = matrix), linewidth = 1.0)

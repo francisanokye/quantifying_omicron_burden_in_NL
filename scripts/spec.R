@@ -38,14 +38,13 @@ spec <- mp_tmb_model_spec(
 
 ## What is this?
 ## It allows the model specification to be updated with the model parameters which were not initially included in the timevar_spec
-newspec <- mp_tmb_update(spec
-			 , default = list(kappa1 = kappa1, kappa2 = kappa2, kappa3 = kappa3, gamma = gamma, sigma = sigma, mu = mu,
+newspec <- mp_tmb_update(spec, default = list(kappa1 = kappa1, kappa2 = kappa2, kappa3 = kappa3, gamma = gamma, sigma = sigma, mu = mu,
               zeta = zeta, v2 = v2, v3 = v3, xi1 = xi1, xi2 = xi2, xi3 = xi3, eta1 = eta1, eta2 = eta2, eta3 = eta3,
               phi1 = phi1, phi2 = phi2, phi3 = phi3, theta1 = theta1, theta2 = theta2, theta3 = theta3,
               omega1 = omega1, omega2 = omega2, omega3 = omega3, lambda1 = lambda1, lambda2 = lambda2, lambda3 = lambda3
-				  , S0prop = S0prop
-				  , V2prop = V2prop
-				  , V3prop = V3prop
+	      , S0prop = S0prop
+	      , V2prop = V2prop
+	      , V3prop = V3prop
 	      , N = N
 	      , log_E10 = log(E10)
 	      , log_A10 = log(A10)

@@ -90,6 +90,8 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
                         +guides(color = guide_legend(), fill = guide_legend())
 )
 
+print(seroprevalence_plot)
+
 png("../figures/model_fit5.png", width = 2400, height = 1800, res = 300, bg = "white", type = "cairo")
 seroprevalence_plot
 dev.off()

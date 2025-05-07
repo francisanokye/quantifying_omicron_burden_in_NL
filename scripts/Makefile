@@ -49,7 +49,10 @@ plot_true_infections.Rout: plot_true_infections.R ../data/true_infections_data.c
 beta_plot.Rout: beta_plot.R ../data/true_infections_data.csv
 	$(pipeR)
 
-%.counterfact_sim.Rout: counterfact_sim.R %.timevar_spec.rds seroprevdata.rds keydates.rda params.rda timevar_spec.R  
+counterfact_plot.Rout: counterfact_plot.R ../data/true_infections_data.csv ../data/rp_eligfrac2.csv seroprevdata.rds keydates.rda params.rda
+	$(pipeR)
+
+allscenarios.Rout: allscenarios.R ../data/serop_avgcase_data.csv ../data/true_infections_data.csv ../data/eligibility_adjusted_cases.csv
 	$(pipeR)
 
 Ignore += makestuff

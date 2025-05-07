@@ -73,6 +73,8 @@ beta_errorplot <- ggplot(beta_summary, aes(x = alert_level, y = mean_value, colo
     plot.background = element_blank()
   )
 
+print(beta_errorplot)
+
 png("../figures/beta_plot.png", width = 1600, height = 1000, res = 300, bg = "white")
 beta_errorplot
 dev.off()

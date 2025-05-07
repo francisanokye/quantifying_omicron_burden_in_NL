@@ -10,15 +10,18 @@ library(ggthemes)
 library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
+library(shellpipes)
 
-# load true infections data from model estimation
-true_infections <- read.csv("../data/true_infections_data.csv")
-eligibility_adjusted_cases <- read.csv("../data/eligibility_adjusted_cases.csv")
-reported_cases <- read.csv("../data/serop_avgcase_data.csv")
+# load reported data
+reported_cases <- csvRead("serop_avgcase_data")
 reported_cases$date <- as.Date(reported_cases$date, format = "%Y-%m-%d")
-
 reported_cases <- reported_cases |>
   drop_na()
+
+# load the saved estimated true infections
+true_infections <- csvRead("true_infections_data")
+# load the estimated predicted reported based on the RT-PCR eligibility fractions
+eligibility_adjusted_cases <- csvRead("eligibility_adjusted_cases")
 
 # convert matrix values into columns
 true_infections <- true_infections |>
@@ -148,6 +151,9 @@ const_cum <- ggplot(const_final_totals, aes(x = Group, y = Total_Cases, fill = G
 final_combined_plot <- ggdraw() +
   draw_plot(combined_case_plot, 0, 0, 1, 1) +
   draw_plot(const_cum, 0.23, 0.66, 0.3, 0.28)
+
+
+print(final_combined_plot)
 
 png("../figures/allscenarios.png", width = 2600, height = 1800, res = 300, bg = "white", type = "cairo")
 final_combined_plot

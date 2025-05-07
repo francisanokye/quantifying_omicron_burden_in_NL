@@ -16,7 +16,7 @@ loadEnvironments()
 seroprevdata <- rdsRead("seroprevdata.rds")
 
 # load true infections data from model estimation
-true_infections <- read.csv("../data/true_infections_data.csv")
+true_infections <- csvRead()
 true_infections <- true_infections |> mutate(dates = as.Date(dates))
 
 # subset data for "report_prob"
