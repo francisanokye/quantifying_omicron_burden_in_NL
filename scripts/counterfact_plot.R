@@ -36,8 +36,7 @@ elig_report_probs <- elig_report_probs |>
   unnest(cols = c(dates)) |> 
   select(dates, report_prob = prob)
 
-
-# replace the cases
+# update the estimated true infections in-place by multiplying the cases by the RT-PCR eligible fraction 
 predicted_reported <- true_infections |>
   left_join(elig_report_probs |> rename(report_prob_new = report_prob), by = "dates") |>
   mutate(
