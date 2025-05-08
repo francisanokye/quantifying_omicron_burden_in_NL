@@ -122,7 +122,7 @@ tot_piecewise <- allcases %>% filter(type == "elig_adj_cases") %>% summarise(tot
 tot_const <- allcases %>% filter(type == "true_infections") %>% summarise(total = sum(cases)) %>% pull(total)
 
 # data for bar plot
-const_final_totals <- data.frame(Group = c("Reported\nCases", "PCR-Elig.\nAdjusted Cases", "True\nInfections"),Total_Cases = c(tot_obs, tot_piecewise, tot_const))
+const_final_totals <- data.frame(Group = c("Reported\nCases", "Predicted\nReported", "True\nInfections"),Total_Cases = c(tot_obs, tot_piecewise, tot_const))
 
 # reorder the groups from smallet to largest
 const_final_totals <- const_final_totals %>%
@@ -133,7 +133,7 @@ const_final_totals <- const_final_totals %>%
 const_cum <- ggplot(const_final_totals, aes(x = Group, y = Total_Cases, fill = Group)) +
   geom_col(width = 0.6, alpha = 0.35, color = "black", show.legend = FALSE) +
   geom_text(aes(label = Total_Cases), vjust = 2.0, size = 2.5) +
-  scale_fill_manual(values = c("Reported\nCases" = "darkgreen", "PCR-Elig.\nAdjusted Cases" = "red", "True\nInfections" = "blue")) +
+  scale_fill_manual(values = c("Reported\nCases" = "darkgreen", "Predicted\nReported" = "red", "True\nInfections" = "blue")) +
   labs(title = "Total Infections: Reported vs Estimated", x = NULL, y = "Total Cases") +
   theme_clean() +
   theme(

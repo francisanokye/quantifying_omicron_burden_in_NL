@@ -17,7 +17,7 @@ reporting_probs = (csvRead()
 
 report_prob_ts <- reporting_probs$prob
 report_prob_cp = as.integer(reporting_probs$Date - as.Date(start_date))
-print(report_prob_cp)
+
 nspec <- rdsRead()
 
 timevar_spec <- mp_tmb_insert(nspec

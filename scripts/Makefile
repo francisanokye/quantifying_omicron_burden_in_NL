@@ -55,6 +55,9 @@ counterfact_plot.Rout: counterfact_plot.R ../data/true_infections_data.csv ../da
 allscenarios.Rout: allscenarios.R ../data/serop_avgcase_data.csv ../data/true_infections_data.csv ../data/eligibility_adjusted_cases.csv
 	$(pipeR)
 
+eff_Rt.Rout: eff_Rt.R ../data/true_infections_data.csv
+	$(pipeR)
+
 Ignore += makestuff
 msrepo = https://github.com/dushoff
 

@@ -1,6 +1,6 @@
 library(macpan2)
 library(shellpipes)
-
+# This decribes the model flow of how individuals transiton across comaprtments and cohorts
 flows = list(
 #    beta ~ beta_baseline * beta_deviation
   foi ~  beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N

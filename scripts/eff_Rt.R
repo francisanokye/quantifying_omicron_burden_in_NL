@@ -12,8 +12,8 @@ library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
 
-# load true infections data from model estimation
-true_infections <- read.csv("../data/true_infections_data.csv")
+# load true infections data to estimate the effective reproduction number
+true_infections <- csvRead()
 
 # convert matrix values into columns
 true_infections <- true_infections |>
