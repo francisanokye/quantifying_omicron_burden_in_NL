@@ -13,11 +13,12 @@ library(shellpipes)
 library(tidyverse)
 library(macpan2)
 
+options(macpan2_log_dir = ".")
 loadEnvironments()
 
 set.seed(2025)
 
-calibrator <- readRDS("eligfrac3.calibrate.rds")
+calibrator <- rdsRead()
 
 # load reported cases
 serop_case_true <- csvRead()
@@ -26,14 +27,21 @@ serop_case_true$date <- as.Date(serop_case_true$date, format = "%Y-%m-%d")
 serop_case_true <- serop_case_true |>
   drop_na()
 
+
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
+
+quit()
+
 
 fitted_data <- (fitted_data
                 |> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
                 |> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
                 |> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
 )
+
+print(fitted_data)
+
 # save model output for the perfect reporting probability (report prob = 1) 
 write.csv(fitted_data, "../data/true_infections_data.csv", row.names = FALSE)
 
@@ -92,6 +100,6 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
 
 print(seroprevalence_plot)
 
-png("../figures/model_fit5.png", width = 2400, height = 1800, res = 300, bg = "white", type = "cairo")
-seroprevalence_plot
-dev.off()
+#png("../figures/model_fit5.png", width = 2400, height = 1800, res = 300, bg = "white", type = "cairo")
+#seroprevalence_plot
+#dev.off()
