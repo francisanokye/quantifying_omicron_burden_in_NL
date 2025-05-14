@@ -28,8 +28,9 @@ flows.Rout: flows.R params.rda
 spec.Rout: spec.R params.rda flows.rda
 	$(pipeR)
 
-# eligfrac3.timevar_spec.Rout: timevar_spec.R ../data/rp_eligfrac2.csv
-%.timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_%.csv params.rda
+## Are we even using other reporting fractions? If not, then we need to delete the ones we don't use.
+
+timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_eligfrac3.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv    

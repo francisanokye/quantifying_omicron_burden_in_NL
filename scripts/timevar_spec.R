@@ -20,6 +20,8 @@ report_prob_cp = as.integer(reporting_probs$Date - as.Date(start_date))
 
 nspec <- rdsRead()
 
+## Why do we need reporting for the calibration?
+
 timevar_spec <- mp_tmb_insert(nspec
 	, expression = list(report_prob ~ time_var(report_prob_ts, report_prob_cp))
 	, phase = "during", at = 1L
