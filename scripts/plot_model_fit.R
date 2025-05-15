@@ -31,19 +31,16 @@ serop_case_true <- serop_case_true |>
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 
-quit()
-
-
 fitted_data <- (fitted_data
-                |> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
-                |> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
-                |> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
+	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
+	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
+	|> dplyr::filter(matrix %in% c("beta", "inc","report_prob","serop"))
 )
 
 print(fitted_data)
 
 # save model output for the perfect reporting probability (report prob = 1) 
-write.csv(fitted_data, "../data/true_infections_data.csv", row.names = FALSE)
+write.csv(fitted_data, "../outputs/true_infections_data.csv", row.names = FALSE)
 
 # convert matrix values into columns
 true_infections <- fitted_data |>
@@ -54,8 +51,8 @@ true_infections <- fitted_data |>
   ungroup() |>
   distinct(dates, .keep_all = TRUE) |>
   drop_na() |>
-  select(c(dates, cases, serop, beta, report_prob, conf.low, conf.high)) |>
-  mutate(dates = as.Date(dates), cases = as.integer(cases))
+  select(c(dates, serop, beta, report_prob, conf.low, conf.high)) |>
+  mutate(dates = as.Date(dates), inc = as.integer(inc))
 
 
 seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+

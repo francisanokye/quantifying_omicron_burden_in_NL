@@ -4,7 +4,8 @@ library(shellpipes)
 flows = list(
 #    beta ~ beta_baseline * beta_deviation
   foi ~  beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
-  , mp_per_capita_flow("S1", "E1", exposure1 ~ kappa1 * foi)
+  ## do we still do it this way?
+  , mp_per_capita_flow("S1", "E1", "kappa1 * foi", "incS")
   , mp_per_capita_flow("E1", "I1", infect_symp1 ~ sigma * mu)
   , mp_per_capita_flow("E1", "A1", infect_asymp1 ~ sigma * (1-mu))
   , mp_per_capita_flow("A1", "R1", asymp_recov1 ~ gamma)
@@ -16,7 +17,7 @@ flows = list(
   , mp_per_capita_flow("C1", "D1", icu_dead1 ~ eta1 * lambda1)
   , mp_per_capita_flow("S1", "V2", s1_v2 ~ v2)
   
-  , mp_per_capita_flow("V2", "E2", exposure2 ~ kappa2 * foi)
+  , mp_per_capita_flow("V2", "E2", "kappa2 * foi","incv2")
   , mp_per_capita_flow("E2", "I2", infect_symp2 ~ sigma * mu)
   , mp_per_capita_flow("E2", "A2", infect_asymp2 ~ sigma * (1-mu))
   , mp_per_capita_flow("A2", "R2", asymp_recov2 ~ gamma)
@@ -28,7 +29,7 @@ flows = list(
   , mp_per_capita_flow("C2", "D2", icu_dead2 ~ eta2 * lambda2)
   , mp_per_capita_flow("V2", "V3", v2_v3 ~ v3)
   
-  , mp_per_capita_flow("V3", "E3", exposure3 ~ kappa3 * foi)
+  , mp_per_capita_flow("V3", "E3", "kappa3 * foi","incv3")
   , mp_per_capita_flow("E3", "I3", infect_symp3 ~ sigma * mu)
   , mp_per_capita_flow("E3", "A2", infect_asymp3 ~ sigma * (1-mu))
   , mp_per_capita_flow("A3", "R3", asymp_recov3 ~ gamma)
@@ -49,7 +50,7 @@ flows = list(
   , I ~ I1 + I2 + I3
   , D ~ D1 + D2 + D3
  
-  , exposure ~ exposure1 + exposure2 + exposure3
+  , inc ~ incS + incv2 + incv3
 )
 
 saveVars(flows)

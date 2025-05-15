@@ -14,7 +14,7 @@ timevar_spec <- rdsRead("timevar_spec.rds")
 
 seroprevdata <- rdsRead("seroprevdata.rds")
 
-outputs = c("S", "E", "A", "R", "C", "H", "I", "D","cases", "beta", "serop", "report_prob")
+outputs = c("S", "E", "A", "R", "C", "H", "I", "D","inc", "beta", "serop", "report_prob")
 
 seroprevdata <- (seroprevdata
 	|> dplyr:::filter(matrix == "serop", time <=80)
@@ -24,7 +24,6 @@ calibrator <- mp_tmb_calibrator(
     spec = timevar_spec |> mp_hazard()
   , data = seroprevdata
   , traj = list(
-#    cases = mp_neg_bin(disp = mp_nofit(1.5)),
     serop = mp_normal(sd = mp_fit(0.5))
   )
   , outputs = c(outputs)
