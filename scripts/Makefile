@@ -30,17 +30,16 @@ spec.Rout: spec.R params.rda flows.rda
 
 ## Are we even using other reporting fractions? If not, then we need to delete the ones we don't use.
 
-timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_eligfrac3.csv params.rda
+timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_base.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv    
 	$(pipeR)
 
-# eligfrac3.calibrate.Rout: calibrate.R
-%.calibrate.Rout: calibrate.R %.timevar_spec.rds seroprevdata.rds params.rda keydates.rda timevar_spec.R
+calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda keydates.rda timevar_spec.R
 	$(pipeR)
 
-plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda eligfrac3.calibrate.rds
+plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
 	$(pipeR)
 
 # eligfrac2.calibrate_plot.Rout: calibrate_plot.R

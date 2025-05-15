@@ -20,7 +20,7 @@ true_infections <- csvRead("true_infections_data")
 true_infections <- true_infections |> mutate(dates = as.Date(dates))
 
 # counterfactual reporting fractions based on calculated RT-PCR testing eligibility: 
-elig_report_probs <- csvRead("rp_eligfrac2") |>
+elig_report_probs <- csvRead("rp_eligfrac") |>
   mutate(Date = as.Date(Date)) |>
   arrange(Date)
 
