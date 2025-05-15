@@ -77,14 +77,14 @@ The script folder should contain the following files in the table
    Load baseline model specification and parameters and applies the custom reporting fractions in rp_eligfrac3.csv to generates a time-varying spec.
 
 ```bash
-make eligfrac3.timevar_spec.Rout
+make timevar_spec.Rout
 ```
 
 - **Run the model calibration**  
    This fits the SEARCH-ID model in the timevar_spec to the data and saves the output
 
 ```bash
-make eligfrac3.calibrate.Rout   
+make calibrate.Rout   
 ```
 
 - **Plot model fit with calibrated parameters**  
