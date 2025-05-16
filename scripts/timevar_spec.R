@@ -33,10 +33,10 @@ if(reporting_delay){
 
 timevar_spec = mp_tmb_insert_reports(nspec
   , incidence_name = "inc"
-  , report_prob = 0.5
+  , report_prob = 1.0
   , mean_delay = 11
   , cv_delay = 0.95
-  , reports_name = "serop"
+  , reports_name = "inc"
   , report_prob_name = "report_prob"
 )
 

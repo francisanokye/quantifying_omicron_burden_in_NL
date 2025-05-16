@@ -43,19 +43,19 @@ plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rd
 	$(pipeR)
 
 # eligfrac2.calibrate_plot.Rout: calibrate_plot.R
-plot_true_infections.Rout: plot_true_infections.R ../data/true_infections_data.csv seroprevdata.rds keydates.rda params.rda
+plot_true_infections.Rout: plot_true_infections.R ../outputs/true_infections_data.csv seroprevdata.rds keydates.rda params.rda
 	$(pipeR)
 
-beta_plot.Rout: beta_plot.R ../data/true_infections_data.csv
+beta_plot.Rout: beta_plot.R ../outputs/true_infections_data.csv
 	$(pipeR)
 
-counterfact_plot.Rout: counterfact_plot.R ../data/true_infections_data.csv ../data/rp_eligfrac2.csv seroprevdata.rds keydates.rda params.rda
+counterfact_plot.Rout: counterfact_plot.R ../outputs/true_infections_data.csv ../data/rp_eligfrac.csv seroprevdata.rds keydates.rda params.rda
 	$(pipeR)
 
-allscenarios.Rout: allscenarios.R ../data/serop_avgcase_data.csv ../data/true_infections_data.csv ../data/eligibility_adjusted_cases.csv
+allscenarios.Rout: allscenarios.R ../data/serop_avgcase_data.csv ../outputs/true_infections_data.csv ../outputs/eligibility_adjusted_cases.csv
 	$(pipeR)
 
-eff_Rt.Rout: eff_Rt.R ../data/true_infections_data.csv
+eff_Rt.Rout: eff_Rt.R ../outputs/true_infections_data.csv
 	$(pipeR)
 
 Ignore += makestuff

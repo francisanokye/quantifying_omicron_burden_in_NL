@@ -26,8 +26,8 @@ true_infections <- true_infections |>
   ungroup() |>
   distinct(dates, .keep_all = TRUE) |>
   drop_na() |>
-  select(c(dates, cases, serop, beta, report_prob, conf.low, conf.high)) |>
-  mutate(dates = as.Date(dates), cases = as.integer(cases))
+  select(c(dates, inc, serop, beta, report_prob, conf.low, conf.high)) |>
+  mutate(dates = as.Date(dates), inc = as.integer(inc))
 
 true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 15, 30, 35, 73))
 

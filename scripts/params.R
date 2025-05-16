@@ -27,9 +27,11 @@ mu = 0.324
 ## Reduction in viral transmission due to asymptomatic case contact
 zeta = 0.75
 
-## Rate at which people took second and booster doses
-v2 = 1/21 
-v3 = 1/154 
+## vac rate and vaccine carrying capacity at which people took second and booster doses
+v2 = 0.09 
+v3 = 0.189
+v2_max = 485088
+v3_max = 287467
 
 ## Proportion of symptomatic individuals hospitalized across cohorts
 xi1 <- xi2 <- xi3 <- 0.009 
@@ -100,6 +102,8 @@ params = list(beta= beta
 	## cohort-specific parameters
 	, v2 = v2
 	, v3 = v3
+	, v2_max = v2_max
+	, v3_max = v3_max
 	, xi1 = xi1
 	, xi2 = xi2
 	, xi3 = xi3

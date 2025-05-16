@@ -18,7 +18,7 @@ seroprevdata <- rdsRead("seroprevdata.rds")
 # load true infections data from model estimation
 true_infections <- csvRead()
 true_infections <- true_infections |> mutate(dates = as.Date(dates))
-
+print(true_infections)
 # subset data for "report_prob"
 fitted_data_report_prob <- dplyr::filter(true_infections, matrix == "report_prob")
 
@@ -41,7 +41,7 @@ pp <- (ggplot(data = fitted_data_others, aes(x = dates, y = value))
        + scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d")
        + scale_fill_manual(labels = c("reported","estimated"), values = c("green","steelblue1"))
        + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Value", title = "Estimated Cases Under RT-PCR Eligibility Criteria Changes", color = "") 
-       + scale_color_manual(labels = c("beta", "case_fit", "data","report_prob", "serop_fit"), values = c("blue","#E31f26", "black", "red", "#00BFC4")) 
+       + scale_color_manual(labels = c("beta","inc","case_fit","report_prob", "serop_fit"), values = c("blue","black", "#E31f26", "red", "#00BFC4")) 
        + theme_clean()
        + theme(axis.text.x = element_text(size = 8, angle = 45, hjust = 0.5),
         axis.title.x = element_text(size = 10, color = "black", face = "bold"),

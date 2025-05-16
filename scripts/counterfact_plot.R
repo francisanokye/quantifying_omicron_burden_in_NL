@@ -51,10 +51,10 @@ predicted_reported <- true_infections |>
 predicted_reported <- (predicted_reported
 	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
 	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
-	|> dplyr::filter(matrix %in% c("beta","cases", "report_prob","serop"))
+	|> dplyr::filter(matrix %in% c("beta","inc", "report_prob","serop"))
 )
 # save simulation output for adjusted infections using eligibility reporting probability 
-write.csv(fitted_data, "../data/eligibility_adjusted_cases.csv", row.names = FALSE)
+write.csv(predicted_reported, "../outputs/eligibility_adjusted_cases.csv", row.names = FALSE)
 
 # subset data for "report_prob"
 fitted_data_report_prob <- dplyr::filter(predicted_reported, matrix == "report_prob")

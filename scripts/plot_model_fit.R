@@ -51,9 +51,10 @@ true_infections <- fitted_data |>
   ungroup() |>
   distinct(dates, .keep_all = TRUE) |>
   drop_na() |>
-  select(c(dates, serop, beta, report_prob, conf.low, conf.high)) |>
+  select(c(dates, serop, beta, report_prob, conf.low, conf.high, inc)) |>
   mutate(dates = as.Date(dates), inc = as.integer(inc))
 
+print(true_infections)
 
 seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+
                           geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.35), 
