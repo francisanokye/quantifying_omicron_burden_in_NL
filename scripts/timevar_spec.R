@@ -10,9 +10,7 @@ reporting_delay <- TRUE
 
 ## offset hack step
 reporting_probs = (csvRead()
-	%>% mutate(Date = ifelse(Date > as.Date(start_date),Date + off,Date)
-		, Date = as.Date(Date)
-	)
+	%>% mutate(Date = ifelse(Date > as.Date(start_date),Date + off,Date), Date = as.Date(Date))
 )
 
 report_prob_ts <- reporting_probs$prob
@@ -20,21 +18,12 @@ report_prob_cp = as.integer(reporting_probs$Date - as.Date(start_date))
 
 nspec <- rdsRead()
 
-## Why do we need reporting for the calibration?
-
-#timevar_spec <- mp_tmb_insert(nspec
-#	, expression = list(report_prob ~ time_var(report_prob_ts, report_prob_cp))
-#	, phase = "during", at = 1L
-#	, default = list(report_prob_ts = report_prob_ts)
-#	, integers = list(report_prob_cp = report_prob_cp)
-#)
-
 if(reporting_delay){
 
 timevar_spec = mp_tmb_insert_reports(nspec
   , incidence_name = "inc"
   , report_prob = 1.0
-  , mean_delay = 11
+  , mean_delay = 14
   , cv_delay = 0.95
   , reports_name = "inc"
   , report_prob_name = "report_prob"

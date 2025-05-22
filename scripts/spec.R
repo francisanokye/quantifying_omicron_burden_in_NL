@@ -4,7 +4,7 @@ loadEnvironments()
 
 spec <- mp_tmb_model_spec(
   before = list(
-      N ~ N
+     N ~ N 
     , E1 ~ exp(log_E10)
     , A1 ~ exp(log_A10)
     , R1 ~ exp(log_R10)
@@ -31,7 +31,7 @@ spec <- mp_tmb_model_spec(
 
     , S1  ~ S0prop * N  - (E1 - A1 - R1 - C1 - H1 - I1 - D1)
     , V2  ~ V2prop * N  - (E2 - A2 - R2 - C2 - H2 - I2 - D2)
-    , V3  ~ V3prop * N  - (E3 - A3 - R3 - C3 - H3 - I3 - D3))
+    , V3  ~ V3prop * N  - (E3 - A3 - R3 - C3 - H3 - I3 - D3)) 
   , during = flows
   , default = c(params)
 )

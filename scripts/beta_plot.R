@@ -17,18 +17,6 @@ loadEnvironments()
 # load true infections data 
 true_infections <- csvRead()  
 
-# convert matrix values into columns
-true_infections <- true_infections |>
-  select(-any_of(c("row", "col"))) |>
-  pivot_wider(names_from = matrix, values_from = value) |>
-  group_by(dates) |>
-  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
-  ungroup() |>
-  distinct(dates, .keep_all = TRUE) |>
-  drop_na() |>
-  select(c(dates, inc, serop, beta, report_prob, conf.low, conf.high)) |>
-  mutate(dates = as.Date(dates), inc = as.integer(inc))
-
 true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 15, 30, 35, 73))
 
 true_infections <- true_infections %>%

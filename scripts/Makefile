@@ -28,8 +28,6 @@ flows.Rout: flows.R params.rda
 spec.Rout: spec.R params.rda flows.rda
 	$(pipeR)
 
-## Are we even using other reporting fractions? If not, then we need to delete the ones we don't use.
-
 timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_base.csv params.rda
 	$(pipeR)
 
@@ -42,21 +40,20 @@ calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda keydate
 plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
 	$(pipeR)
 
-# eligfrac2.calibrate_plot.Rout: calibrate_plot.R
-plot_true_infections.Rout: plot_true_infections.R ../outputs/true_infections_data.csv seroprevdata.rds keydates.rda params.rda
+symps.Rout: symps.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
 	$(pipeR)
 
 beta_plot.Rout: beta_plot.R ../outputs/true_infections_data.csv
 	$(pipeR)
 
-counterfact_plot.Rout: counterfact_plot.R ../outputs/true_infections_data.csv ../data/rp_eligfrac.csv seroprevdata.rds keydates.rda params.rda
-	$(pipeR)
-
-allscenarios.Rout: allscenarios.R ../data/serop_avgcase_data.csv ../outputs/true_infections_data.csv ../outputs/eligibility_adjusted_cases.csv
+true_vs_reported_plot.Rout: true_vs_reported_plot.R ../data/serop_avgcase_data.csv ../outputs/true_infections_data.csv 
 	$(pipeR)
 
 eff_Rt.Rout: eff_Rt.R ../outputs/true_infections_data.csv
 	$(pipeR)
+
+wallinga.Rout: wallinga.R ../outputs/true_infections_data.csv
+        $(pipeR)
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff

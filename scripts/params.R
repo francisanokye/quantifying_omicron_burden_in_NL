@@ -1,13 +1,10 @@
 library(shellpipes)
 set.seed(2024)
 
-### Why do you need so many boxes?
-
-#beta_baseline = 0.28 # baseline transmission rate
-#beta_deviation = 1   # multiplicative deviation from baseline transmission rate 
-## MLi: Comment on what the parameters represent
-
+# initial transmission rate which gets overwritten
 beta <- 0.035
+
+# reporting probability
 report_prob = 0.99
 
 ## infectivity reduction due to vaccine 
@@ -28,10 +25,10 @@ mu = 0.324
 zeta = 0.75
 
 ## vac rate and vaccine carrying capacity at which people took second and booster doses
-v2 = 0.09 
-v3 = 0.189
-v2_max = 485088
-v3_max = 287467
+v2 = 0.09 # vaccination rate of 2 doses 
+v3 = 0.189 # vaccination rate of booster doses
+v2_max = 485088 # carrying capacity of 2 doses
+v3_max = 287467 # carrying capacity of booster doses
 
 ## Proportion of symptomatic individuals hospitalized across cohorts
 xi1 <- xi2 <- xi3 <- 0.009 
@@ -43,48 +40,45 @@ eta1 <- eta2 <- eta3 <-  1/5.5
 phi1 <- phi2 <- phi3 <- 1/5 
 
 ## Proportion of hospitalized individuals admitted to ICU across cohorts
-theta1 <- theta2 <- theta3 <- 0.005 #0.025
+theta1 <- theta2 <- theta3 <- 0.13 
                
 ## Recovery rate of hospitalized infections
 omega1 <- omega2 <- omega3 <- 1/7 
 
 ## Proportion of ICU patients progressing to death
-lambda1 = 0.25 
-lambda2 = 0.156 
-lambda3 = 0.150
+lambda1 <- lambda2 <- lambda3 <- 0.22
 
+# Total population proportions based on vaccination coverage
+#N1 = 76583 # 15% (0 or 1 dose)
+#N2 = 306329 # 60% (2 doses only)
+#N3 = 127638 # 25% (booster)
+
+V2prop = 0.30 # 85% (60% 2 doses only, i.e minus booster)
+V3prop = 0.25 # 25% (booster)
+S0prop = 0.45 # remainder of population either unvaccinated
+
+# Total population
 N = 510550
-E10 = 0 
-A10 = 1 
-R10 = 0 
-C10 = 0 
-H10 = 0 
-I10 = 0 
-D10 = 0  
 
-E20 = 0 
-A20 = 1 
-R20 = 0
-C20 = 0 
-H20 = 0 
-I20 = 0 
-D20 = 0 
+# Initial non-susceptibles
+# Unvaccinated (group 1)
+E10 = 0;  A10 = 150; I10 = 1; R10 = 0; C10 = 1; H10 = 0; D10 = 0
+# 2-dose (group 2)
+E20 = 0;  A20 = 50; I20 = 0;  R20 = 0; C20 = 0; H20 = 0; D20 = 0
+# Booster (group 3)
+E30 = 0;  A30 = 10;  I30 = 0;   R30 = 0; C30 = 0; H30 = 0; D30 = 0
 
-E30 = 0 
-A30 = 1 
-R30 = 0 
-C30 = 0 
-H30 = 0 
-I30 = 0 
-D30 = 0
 
-S0prop = 0.15
-V2prop = 0.3
-V3prop = 0.56
+# Compute group totals
+N3 <- floor(V3prop * N)
+N2 <- floor(V2prop * N)
+N1 <- N - N3 - N2  
 
-S10 = S0prop * N  - (E10 - A10 - R10 - C10 - H10 - I10 -D10)
-V20 = V2prop * N  - (E20 - A20 - R20 - C20 - H20 - I20 -D20)
-V30 = V3prop * N  - (E30 - A30 - R30 - C30 - H30 - I30 -D30) 
+
+# Compute initial susceptibles from their group subpopulations
+S10 = N1  - (E10 - A10 - R10 - C10 - H10 - I10 -D10)
+V20 = N2  - (E20 - A20 - R20 - C20 - H20 - I20 -D20)
+V30 = N3  - (E30 - A30 - R30 - C30 - H30 - I30 -D30)
 
 ## offset
 off <- 20
@@ -100,8 +94,8 @@ params = list(beta= beta
 	, mu = mu
 	, zeta = zeta
 	## cohort-specific parameters
-	, v2 = v2
-	, v3 = v3
+	, v2 = r2
+	, v3 = r3
 	, v2_max = v2_max
 	, v3_max = v3_max
 	, xi1 = xi1
