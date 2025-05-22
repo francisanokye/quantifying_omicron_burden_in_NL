@@ -40,7 +40,7 @@ calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda keydate
 plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
 	$(pipeR)
 
-symps.Rout: symps.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
+prevalence_plot.Rout: prevalence_plot.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
 	$(pipeR)
 
 beta_plot.Rout: beta_plot.R ../outputs/true_infections_data.csv
@@ -51,9 +51,6 @@ true_vs_reported_plot.Rout: true_vs_reported_plot.R ../data/serop_avgcase_data.c
 
 eff_Rt.Rout: eff_Rt.R ../outputs/true_infections_data.csv
 	$(pipeR)
-
-wallinga.Rout: wallinga.R ../outputs/true_infections_data.csv
-        $(pipeR)
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff
