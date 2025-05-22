@@ -11,3 +11,5 @@
 *.args
 scripts/makestuff/
 *.DS_Store
+*.pdf.icloud
+*.args.icloud
