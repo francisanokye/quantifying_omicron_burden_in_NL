@@ -30,9 +30,9 @@ calibrator <- mp_tmb_calibrator(
   , outputs = c(outputs)
   , par = "beta"
   , tv = mp_rbf("beta", 4, sparse_tol = 0.0)
-  , time = mp_sim_bounds(-off, 100-off, "daily")
+#  , time = mp_sim_bounds(-off, 100-off, "daily")
   # doesn't work
-  #  , time = mp_sim_offset(off, 0, "steps")
+    , time = mp_sim_offset(off, 0, "steps")
 )
 
 mp_optimize(calibrator)
