@@ -8,14 +8,6 @@ effprop <- 0.9
 
 reporting_delay <- TRUE
 
-## offset hack step
-reporting_probs = (csvRead()
-	%>% mutate(Date = ifelse(Date > as.Date(start_date),Date + off,Date), Date = as.Date(Date))
-)
-
-report_prob_ts <- reporting_probs$prob
-report_prob_cp = as.integer(reporting_probs$Date - as.Date(start_date))
-
 nspec <- rdsRead()
 
 if(reporting_delay){
@@ -30,4 +22,6 @@ timevar_spec = mp_tmb_insert_reports(nspec
 )
 
 }
+
 rdsSave(timevar_spec)
+

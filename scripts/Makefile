@@ -28,7 +28,7 @@ flows.Rout: flows.R params.rda
 spec.Rout: spec.R params.rda flows.rda
 	$(pipeR)
 
-timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda ../data/rp_base.csv params.rda
+timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv    

@@ -94,8 +94,8 @@ params = list(beta= beta
 	, mu = mu
 	, zeta = zeta
 	## cohort-specific parameters
-	, v2 = r2
-	, v3 = r3
+	, v2 = v2
+	, v3 = v3
 	, v2_max = v2_max
 	, v3_max = v3_max
 	, xi1 = xi1
