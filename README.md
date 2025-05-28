@@ -81,7 +81,7 @@ make timevar_spec.Rout
 ```
 
 - **Run the model calibration**  
-   This fits the SEARCH-ID model in the timevar_spec to the data and saves the output
+   This fits the SEAIR model in the timevar_spec to the data and saves the output
 
 ```bash
 make calibrate.Rout   
