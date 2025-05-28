@@ -108,16 +108,9 @@ make plot_true_infections.Rout
 make beta_plot.Rout   
 ```
 
-- **Counterfactual with RT-PCR estimated reporting probabilities**  
-First updates the reporting probabilities with eligfrac2 in the timevar_spec model specification for the counterfactual scenario and generates a plot which is saved in the figures folder.
+- **True infections vrs reported cases plot**  
+Plots estimated true infections and the reported cases on the same figure.
 
 ```bash
-make counterfact_plot.Rout   
-```
-
-- **All scenario plot**  
-Combines reported cases,  estimated true infections and the counterfactual predicted reported with RT-PCR reporting probabilities to generate figure 5.
-
-```bash
-make allscenarios.Rout   
+make true_vs_reported_plot.Rout   
 ```
