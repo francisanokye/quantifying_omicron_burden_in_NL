@@ -34,7 +34,7 @@ d2 <- true_infections[c("dates","cases")]
 d2$type <- "true_infections"
 allcases <- rbind(d1,d2)
 
-# data prep ---
+# data prep
 allcases <- allcases %>%
   mutate(type = factor(type, levels = c("reported", "true_infections")))
 
@@ -43,7 +43,6 @@ combined_case_plot <- ggplot(allcases, aes(x = dates)) +
   geom_bar(data = filter(allcases, type == "true_infections"), aes(y = cases), fill = "blue", stat = "identity", position = "stack",width = 0.25, alpha = 1) +
   geom_bar(data = filter(allcases, type == "reported"), aes(y = cases), fill = "darkgreen", stat = "identity",position = "stack", width = 0.25, alpha = 1) +
   geom_ribbon(data = filter(allcases, type == "true_infections"), aes(ymin = pmax(0, cases - 0.25 * sd(cases)),ymax = cases + 0.25 * sd(cases)), fill = "grey", alpha = 0.5)+
-  #geom_smooth(data = filter(allcases, type == "true_infections"), aes(y = inc, color = "True Infections"),se = FALSE, span = 0.15, linewidth = 1.5) +
   geom_line(data = filter(allcases, type == "true_infections"), aes(y = cases, color = "True Infections"),linewidth = 1.5) +
   geom_line(data = filter(allcases, type == "reported"), aes(y = cases, color = "Reported Cases"),linewidth = 1.5) +
   scale_color_manual(name = NULL,values = c("Reported Cases" = "darkgreen", "True Infections" = "blue")) +
@@ -79,7 +78,7 @@ const_final_totals <- data.frame(Group = c("Reported\nCases", "True\nInfections"
 
 # reorder the groups from smallet to largest
 const_final_totals <- const_final_totals %>%
-  mutate(Group = fct_reorder(Group, -Total_Cases))  # shortest to tallest
+  mutate(Group = fct_reorder(Group, -Total_Cases))  
 
 # inset plot
 const_cum <- ggplot(const_final_totals, aes(x = Group, y = Total_Cases, fill = Group)) +

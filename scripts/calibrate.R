@@ -14,30 +14,37 @@ timevar_spec <- rdsRead("timevar_spec.rds")
 
 seroprevdata <- rdsRead("seroprevdata.rds")
 
-outputs = c("S1","V2","V3","S", "E", "A", "R", "C", "H", "I", "D",
-	    "inc_symp1","inc_symp2","inc_symp3",
-	    "inc_asymp1","inc_asymp2","inc_asymp3", "inc", 
-	    "beta", "serop", "double_vac","booster_shot","report_prob")
+outputs = c("S","E","A","I","R",
+	    "S1","E1","A1","I1","R1",
+            "V2","E2","A2","I2","R2",
+            "V3","E3","A3","I3","R3", 
+	    "serop", "beta","inc"
+	   )
 
 seroprevdata <- (seroprevdata
 	|> dplyr:::filter(matrix == "serop")
 )
 
-calibrator <- mp_tmb_calibrator(
-    spec = timevar_spec |> mp_hazard()
+calibrator = mp_tmb_calibrator(
+    spec = timevar_spec
   , data = seroprevdata
-  , traj = list(serop = mp_normal(sd = mp_fit(0.5)))
   , outputs = c(outputs)
-  , par = "beta"
-  , tv = mp_rbf("beta", 4, sparse_tol = 0.0)
-#  , time = mp_sim_bounds(-off, 100-off, "daily")
-  # doesn't work
-    , time = mp_sim_offset(off, 0, "steps")
+  , traj = list(serop = mp_normal(sd = mp_fit(0.015)))
+  , tv = mp_rbf("beta", 5)
+  , par = c("beta")
 )
 
 mp_optimize(calibrator)
 
+model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
+print(model_estimates, digits = 3)
+
 rdsSave(calibrator)
+
+
+
+
+
 
 
 

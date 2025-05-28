@@ -12,12 +12,14 @@ library(fuzzyjoin)
 library(shellpipes)
 library(tidyverse)
 library(macpan2)
-
+set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
 
-set.seed(2025)
 pop = 510550
+
+start_date <- "2021-12-15"
+last_date <-"2022-05-26"
 
 calibrator <- rdsRead()
 
@@ -31,7 +33,7 @@ serop_case_true <- serop_case_true |>
 
 # compute the daily increase in seroprevalence 
 serop_case_true <- serop_case_true |>
-  dplyr::mutate(serop_diff = c(NA, diff(seroprevalence)))
+  dplyr::mutate(serop_diff = c(diff(seroprevalence)[1], diff(seroprevalence)))
 
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
@@ -54,11 +56,10 @@ true_infections <- fitted_data |>
   select(c(dates, serop, beta, conf.low, conf.high, inc)) |>
   mutate(dates = as.Date(dates), inc = as.integer(inc))
 
-
 # compute the daily increase in seroprevalence 
 true_infections <- true_infections |>
-  dplyr::mutate(serop_diff = c(diff(serop)[1], diff(serop))) |>
-  dplyr::mutate(true_inf = as.integer(serop_diff * pop))
+  dplyr::mutate(serop_diff = c(diff(serop)[1], diff(serop)), true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)))
+# true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)
 
 # save model output for the perfect reporting probability (report prob = 1) 
 write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)
@@ -66,7 +67,7 @@ write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FA
 seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+
                           geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.35), 
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) 
-                        + geom_point(data = serop_case_true, aes(x = date, y = seroprevalence, color = "seroprevalence estimate"), linewidth = 2)
+                        + geom_point(data = serop_case_true, aes(x = date, y = seroprevalence, color = "seroprevalence estimate"), size = 2)
                         + geom_ribbon(data = true_infections, aes(ymin = pmax(0, serop - 0.25 * sd(serop)),ymax = serop + 0.25 * sd(serop)), fill = "gray70", alpha = 0.75)
 			+ geom_line(data = true_infections, aes(x = dates, y = serop, color = "model fit"), span = 0.10, alpha = 0.7, linewidth = 1)
                         + scale_color_manual(labels = c("model fit","seroprevalence estimate"), values = c("#00BFC4","black"))

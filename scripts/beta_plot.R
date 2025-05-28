@@ -17,12 +17,11 @@ loadEnvironments()
 # load true infections data 
 true_infections <- csvRead()  
 
-true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 15, 30, 35, 73))
+true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
 
 true_infections <- true_infections %>%
-  select(dates, alert_level, beta)
+  select(dates, alert_level, beta) 
 
-#alert_colors <- c("No-ALS" = "darkgray", "ALS-2" = "brown", "ALS-3" = "#009E73", "Mod-ALS-3" = "orange", "ALS-4" = "steelblue")
 alert_colors <- c(
   "No-ALS"      = "#D3D3D3",  
   "ALS-2"       = "#D98880", 
@@ -66,4 +65,9 @@ print(beta_errorplot)
 png("../figures/beta_plot.png", width = 1600, height = 1000, res = 300, bg = "white")
 beta_errorplot
 dev.off()
+
+
+
+
+
 

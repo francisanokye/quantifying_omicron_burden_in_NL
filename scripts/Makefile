@@ -19,28 +19,25 @@ Sources += $(wildcard *.R)
 params.Rout: params.R
 	$(pipeR)
 
-keydates.Rout: keydates.R 
-	$(pipeR)
+#keydates.Rout: keydates.R 
+#	$(pipeR)
 
 flows.Rout: flows.R params.rda
 	$(pipeR)
 
-spec.Rout: spec.R params.rda flows.rda
+timevar_spec.Rout: timevar_spec.R flows.rda params.rda 
 	$(pipeR)
 
-timevar_spec.Rout: timevar_spec.R spec.rds keydates.rda params.rda
+seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    
 	$(pipeR)
 
-seroprevdata.Rout: seroprevdata.R keydates.rda ../data/serop_avgcase_data.csv    
+calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda timevar_spec.R
 	$(pipeR)
 
-calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda keydates.rda timevar_spec.R
+plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv params.rda calibrate.rds
 	$(pipeR)
 
-plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
-	$(pipeR)
-
-prevalence_plot.Rout: prevalence_plot.R ../data/serop_avgcase_data.csv keydates.rda params.rda calibrate.rds
+prevalence_plot.Rout: prevalence_plot.R ../data/serop_avgcase_data.csv params.rda calibrate.rds
 	$(pipeR)
 
 beta_plot.Rout: beta_plot.R ../outputs/true_infections_data.csv

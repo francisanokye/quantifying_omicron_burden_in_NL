@@ -16,7 +16,9 @@ library(shellpipes)
 # load true infections data to estimate the effective reproduction number
 true_infections <- csvRead()
 
-true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 15, 30, 35, 73))
+true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
+true_infections <- true_infections |>
+	drop_na()
 
 # Estimate Effective Reproductive (Rt) and the average case-weighted Rt period ALS period
 # Omicron's  serial interval distribution is 3.5 and that the SD is 2.4 using an estimate 
@@ -25,9 +27,13 @@ incidence_df <- data.frame(date = true_infections$dates, I = true_infections$tru
 
 # estimate Rt using EpiEstim
 n_days <- length(incidence_df$date)
+
+# uncommenting and using these time window estimates the Rt for each window separately
+#t_start <- c( 2, 11, 21, 55, 90 )
+#t_end   <- c(10, 20, 54, 89, 162)
+
 t_start <- seq(2, n_days - 6)
 t_end <- seq(8, n_days)
-
 config <- make_config(list(
 			   t_start = t_start,
 			   t_end = t_end,
@@ -85,7 +91,7 @@ Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
             fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2022-03-14'), xmax = ymd('2022-05-26'), ymin = -Inf, ymax = Inf), 
             fill = adjustcolor("#D3D3D3", alpha = 0.03), alpha = 0.05) +
-  geom_rect(aes(xmin=ymd('2021-12-15'), xmax = ymd('2021-12-24'), ymin = -Inf, ymax = Inf), 
+  geom_rect(aes(xmin=ymd('2021-12-21'), xmax = ymd('2021-12-24'), ymin = -Inf, ymax = Inf), 
             fill = adjustcolor("#D98880", alpha = 0.03), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2021-12-24'), xmax = ymd('2022-01-08'), ymin = -Inf, ymax = Inf), 
             fill = adjustcolor("#66D1B5", alpha = 0.03), alpha = 0.05) +
@@ -112,13 +118,13 @@ Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
   geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-03-14"), colour = "black", linetype = 1, size = 1)  +
-  annotate("text", x = as.Date("2021-12-18"), y = 1.45, label = expression(R[t[2]] == 1.51),size = 4,angle = 90, hjust = 1, color = "black")+
-  annotate("text", x = as.Date("2022-01-02"), y = 1.45, label = expression(R[t[3]] == 1.18),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-02-02"), y = 1.45, label = expression(R[t[4]]== 1.06),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
-  annotate("text", x = as.Date("2022-03-06"), y = 1.3, label = expression(R[t[3][m]] == 1.02),size = 4,angle = 0, hjust = 1, color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2021-12-18"), y = 1.28, label = expression(R[t[2]] == 1.33),size = 4,angle = 90, hjust = 1, color = "black")+
+  annotate("text", x = as.Date("2022-01-02"), y = 1.28, label = expression(R[t[3]] == 1.06),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2022-02-02"), y = 1.25, label = expression(R[t[4]]== 1.04),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
+  annotate("text", x = as.Date("2022-03-06"), y = 1.25, label = expression(R[t[3][m]] == 1.04),size = 4,angle = 0, hjust = 1, color = "black", alpha = 1)+
   annotate("text", x = as.Date("2022-05-01"), y = 1.25, label = expression(R[t[0]] == 1.02),size = 4, hjust = 1, color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-03-02"), y = 1.60, label = "Pre-Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1, color = "black")+
-  annotate("text", x = as.Date("2022-05-18"), y = 1.60, label = "Post Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1,color = "black")+
+  annotate("text", x = as.Date("2022-03-02"), y = 1.50, label = "Pre-Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1, color = "black")+
+  annotate("text", x = as.Date("2022-05-18"), y = 1.50, label = "Post Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1,color = "black")+
   ggtitle(label = expression("Estimated Time-varying " * R[t] * " Across Intervention Periods in NL", subtitle = "")) +
   labs(x = "Dates (Dec 15, 2021 -- May 26, 2022)", y =  expression("" * R[t] * " "))
 )
