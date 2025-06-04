@@ -18,7 +18,7 @@ outputs = c("S","E","A","I","R",
 	    "S1","E1","A1","I1","R1",
             "V2","E2","A2","I2","R2",
             "V3","E3","A3","I3","R3", 
-	    "serop", "beta","inc"
+	    "serop", "beta","inc","double_vac"
 	   )
 
 seroprevdata <- (seroprevdata

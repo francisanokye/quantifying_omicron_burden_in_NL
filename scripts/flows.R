@@ -6,13 +6,13 @@ library(shellpipes)
 flows <- list(
   N ~ N1 + N2 + N3
   , foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
-  #, double_vac ~ v2 * (1 - S1 / v2_max)
-  , double_vac ~ ((K2 - L2) * r2 * exp((mid2 - t) * r2)) / (1 + exp((mid2 - t) * r2))^2
+  , double_vac ~ v2 * (1 - S1 / v2_max)
+  #, double_vac ~ ((K2 - L2) * r2 * exp((mid2 - time_step(0)) * r2)) / (1 + exp((mid2 - time_step(0)) * r2))^2
   , booster_shot ~ v3 * (1 - V2 / v3_max)
 
-  , mp_per_capita_flow("S1", "E1", "kappa1 * foi", "incS")
+  #, mp_per_capita_flow("S1", "E1", "kappa1 * foi", "incS")
+  , mp_absolute_flow("S1", "V2", "double_vac", "s1_v2")
   #, mp_per_capita_flow("S1", "V2", "double_vac", "s1_v2")
-  , mp_per_capita_flow("S1", "V2", "double_vac", "s1_v2")
   , mp_per_capita_flow("E1", "I1", "sigma * mu", "inc_symp1")
   , mp_per_capita_flow("E1", "A1", "sigma * (1-mu)", "inc_asymp1")
   , mp_per_capita_flow("A1", "R1", "gamma_a", "asymp_recov1")

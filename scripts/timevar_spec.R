@@ -19,6 +19,7 @@ spec <- mp_tmb_model_spec(
   , default = c(params)
 )
 
+
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(spec
 					     , incidence_name = "inc"
