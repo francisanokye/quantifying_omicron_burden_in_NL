@@ -19,13 +19,10 @@ Sources += $(wildcard *.R)
 params.Rout: params.R
 	$(pipeR)
 
-#keydates.Rout: keydates.R 
-#	$(pipeR)
-
 flows.Rout: flows.R params.rda
 	$(pipeR)
 
-timevar_spec.Rout: timevar_spec.R flows.rda params.rda 
+timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv ../data/daily_booster_rate.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    
