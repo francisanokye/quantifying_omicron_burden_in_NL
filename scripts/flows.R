@@ -1,13 +1,17 @@
+
 library(macpan2)
 library(shellpipes)
 # This decribes the model flow of how individuals transiton across comaprtments and cohorts
 
 flows <- list(
-  foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) /  (N1 + N2 + N3)
-  , double_vac ~ v2 * (1 - S1 / v2_max) 
+  N ~ N1 + N2 + N3
+  , foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
+  #, double_vac ~ v2 * (1 - S1 / v2_max)
+  , double_vac ~ ((K2 - L2) * r2 * exp((mid2 - t) * r2)) / (1 + exp((mid2 - t) * r2))^2
   , booster_shot ~ v3 * (1 - V2 / v3_max)
 
   , mp_per_capita_flow("S1", "E1", "kappa1 * foi", "incS")
+  #, mp_per_capita_flow("S1", "V2", "double_vac", "s1_v2")
   , mp_per_capita_flow("S1", "V2", "double_vac", "s1_v2")
   , mp_per_capita_flow("E1", "I1", "sigma * mu", "inc_symp1")
   , mp_per_capita_flow("E1", "A1", "sigma * (1-mu)", "inc_asymp1")
@@ -20,21 +24,21 @@ flows <- list(
   , mp_per_capita_flow("E2", "A2", "sigma * (1-mu)", "inc_asymp2")
   , mp_per_capita_flow("A2", "R2", "gamma_a", "asymp_recov2")
   , mp_per_capita_flow("I2", "R2", "gamma_i", "symp_recov2")
-  
+
   , mp_per_capita_flow("V3", "E3", "kappa3 * foi","incv3")
   , mp_per_capita_flow("E3", "I3", "sigma * mu", "inc_symp3")
   , mp_per_capita_flow("E3", "A2", "sigma * (1-mu)", "inc_asymp3")
   , mp_per_capita_flow("A3", "R3", "gamma_a", "asymp_recov3")
   , mp_per_capita_flow("I3", "R3", "gamma_i", "symp_recov3")
-  
+
   , S ~ S1 + V2 + V3
   , E ~ E1 + E2 + E3
   , A ~ A1 + A2 + A3
   , I ~ I1 + I2 + I3
   , R ~ R1 + R2 + R3
-  
+
   , inc ~ incS + incv2 + incv3
-  , serop ~ (R1 + R2 + R3)/ (N1+N2+N3)
+  , serop ~ R/N
 )
 
 saveVars(flows)
