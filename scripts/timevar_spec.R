@@ -41,7 +41,6 @@ timevar_spec <- spec |> mp_tmb_insert(
     , integers = list(double_vac_changepoints = double_vac_changepoints, booster_vac_changepoints = booster_vac_changepoints)
 )
 
-
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(timevar_spec
 					     , incidence_name = "inc"

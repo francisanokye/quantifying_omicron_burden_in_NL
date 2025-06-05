@@ -59,7 +59,6 @@ true_infections <- fitted_data |>
 # compute the daily increase in seroprevalence 
 true_infections <- true_infections |>
   dplyr::mutate(serop_diff = c(diff(serop)[1], diff(serop)), true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)))
-# true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)
 
 # save model output for the perfect reporting probability (report prob = 1) 
 write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)

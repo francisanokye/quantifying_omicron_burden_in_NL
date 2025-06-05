@@ -31,8 +31,8 @@ calibrator = mp_tmb_calibrator(
   , data = seroprevdata
   , time = mp_sim_offset(0, 30, "steps")
   , outputs = c(outputs)
-  , traj = list(serop = mp_normal(sd = mp_fit(0.015)))
-  , tv = mp_rbf("beta", 5)
+  , traj = list(serop = mp_normal(sd = mp_fit(0.01))) # 0.015
+  , tv = mp_rbf("beta", 7)
   , par = c("beta")
 )
 
