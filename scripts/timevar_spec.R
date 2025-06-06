@@ -6,7 +6,9 @@ loadEnvironments()
 
 double_daily_vac= csvRead("daily_2vac_rate")
 
-booster_daily_vac = csvRead("daily_booster_rate")
+booster_daily_vac = csvRead("vacdat")
+
+print(booster_daily_vac)
 
 reporting_delay <- TRUE
 
