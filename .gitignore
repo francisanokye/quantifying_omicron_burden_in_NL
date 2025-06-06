@@ -13,3 +13,4 @@ scripts/makestuff/
 *.DS_Store
 *.pdf.icloud
 *.args.icloud
+.Rproj.user

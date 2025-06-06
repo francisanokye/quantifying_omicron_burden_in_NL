@@ -3,7 +3,7 @@ library(shellpipes)
 
 dat <- csvRead()
 
-day0 <- as.Date("2021-12-15")
+day0 <- as.Date("2021-12-17")
 
 nl <- (dat
 	|> filter(grepl("ewfoundland",prename)) 
