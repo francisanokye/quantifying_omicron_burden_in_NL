@@ -14,17 +14,16 @@ print(booster_daily_vac)
 reporting_delay <- TRUE
 
 spec <- mp_tmb_model_spec(
-  before = list(N ~ N1 + N2 + N3
+	before = list(N ~ N1 + N2 + N3
 		, A1 ~ A10, E1 ~ E10, I1 ~ I10, R1 ~ R10
 		, A2 ~ A20, E2 ~ E20, I2 ~ I20, R2 ~ R20
 		, A3 ~ A30, E3 ~ E30, I3 ~ I30, R3 ~ R30
 		, S1 ~ N1 - (E10 + A10 + I10 + R10)  
 		, V2 ~ N2 - (E20 + A20 + I20 + R20) 
-		, V3 ~ N3 - (E30 + A30 + I30 + R30)
-  )
-  , during = flows
-  , default = c(params)
-)
+		, V3 ~ N3 - (E30 + A30 + I30 + R30)) 
+	, during = flows
+  	, default = c(params)
+	)
 # we create a piecewise time-varying vaccination rate based on true data
 double_vac_changepoints = double_daily_vac$days - 1 
 double_vac_values = double_daily_vac$double_daily_rate

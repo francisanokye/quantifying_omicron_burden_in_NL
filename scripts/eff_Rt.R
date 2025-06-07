@@ -118,9 +118,9 @@ Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
   geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-03-14"), colour = "black", linetype = 1, size = 1)  +
-  annotate("text", x = as.Date("2021-12-18"), y = 1.24, label = expression(R[t[2]] == 1.31),size = 4,angle = 90, hjust = 1, color = "black")+
-  annotate("text", x = as.Date("2022-01-02"), y = 1.24, label = expression(R[t[3]] == 1.05),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-02-02"), y = 1.2, label = expression(R[t[4]]== 1.05),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
+  annotate("text", x = as.Date("2021-12-18"), y = 1.24, label = expression(R[t[2]] == 1.33),size = 4,angle = 90, hjust = 1, color = "black")+
+  annotate("text", x = as.Date("2022-01-02"), y = 1.24, label = expression(R[t[3]] == 1.08),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2022-02-02"), y = 1.2, label = expression(R[t[4]]== 1.04),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
   annotate("text", x = as.Date("2022-03-06"), y = 1.2, label = expression(R[t[3][m]] == 1.04),size = 4,angle = 0, hjust = 1, color = "black", alpha = 1)+
   annotate("text", x = as.Date("2022-05-01"), y = 1.2, label = expression(R[t[0]] == 1.02),size = 4, hjust = 1, color = "black", alpha = 1)+
   annotate("text", x = as.Date("2022-03-02"), y = 1.45, label = "Pre-Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1, color = "black")+

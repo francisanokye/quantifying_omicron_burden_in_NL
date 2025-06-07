@@ -28,7 +28,7 @@ seroprevdata <- (seroprevdata
 )
 
 calibrator = mp_tmb_calibrator(
-    spec = timevar_spec
+    spec = timevar_spec |> mp_hazard()
   , data = seroprevdata
   , time = mp_sim_offset(0, 30, "steps")
   , outputs = c(outputs)
