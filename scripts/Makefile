@@ -25,7 +25,7 @@ flows.Rout: flows.R params.rda
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
-timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv vacdat.Rout.csv params.rda
+timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv ../data/vacdat.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    
