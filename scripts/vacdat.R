@@ -14,14 +14,6 @@ nl <- (dat
 	|> pivot_longer(-week_end,names_to="type",values_to="value")
 )
 
-gg <- (ggplot(nl,aes(week_end,value))
-	+ geom_point()
-	+ facet_wrap(~type,scale="free")
-	+ xlim(c(as.Date("2022-01-01"),as.Date("2022-06-01")))
-)
-
-print(gg)
-
 nl_additional <- (nl
 	|> filter(type == "numtotal_additional")
 	|> mutate(value = ifelse(week_end == as.Date("2021-12-18"),10,value))
@@ -35,8 +27,6 @@ nl_additional <- (nl
 	|> filter(days < 159)
 
 )
-
-print(nl_additional,n=Inf)
 
 csvSave(nl_additional)
 

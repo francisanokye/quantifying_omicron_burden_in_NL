@@ -31,8 +31,8 @@ double_vac_values = double_daily_vac$double_daily_rate
 booster_vac_changepoints = booster_daily_vac$days - 1
 booster_vac_values = booster_daily_vac$booster_daily_rate
 
-expr2 = list(v2 ~ time_var(double_vac_values, double_vac_changepoints))
-expr3 = list(v3 ~ time_var(booster_vac_values, booster_vac_changepoints))
+expr2 = list(vac2 ~ time_var(double_vac_values, double_vac_changepoints))
+expr3 = list(vac3 ~ time_var(booster_vac_values, booster_vac_changepoints))
 
 # update model specification to reflect the vaccination rates from data
 timevar_spec <- spec |> mp_tmb_insert(
