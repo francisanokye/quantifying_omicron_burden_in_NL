@@ -23,8 +23,8 @@ true_infections <- true_infections %>%
   select(dates, alert_level, beta) 
 
 alert_colors <- c(
-  "No-ALS"      = "#D3D3D3",  
-  "ALS-2"       = "#D98880", 
+  "No-ALS"      = "#F7E2E2",  
+  "ALS-2"       = "#D3D3D3", 
   "ALS-3"       = "#66D1B5",  
   "Mod-ALS-3"   = "#FFD580",  
   "ALS-4"       = "#87CEFA"   

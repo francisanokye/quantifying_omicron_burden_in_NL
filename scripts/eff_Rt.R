@@ -89,10 +89,8 @@ Rt_df$period <- factor(Rt_df$period, levels = names(alert_colors))
 Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
   geom_rect(aes(xmin=ymd('2022-03-14'), xmax = ymd('2022-05-26'), ymin = -Inf, ymax = Inf), 
             fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) +
-  geom_rect(aes(xmin=ymd('2022-03-14'), xmax = ymd('2022-05-26'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#D3D3D3", alpha = 0.03), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2021-12-21'), xmax = ymd('2021-12-24'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#D98880", alpha = 0.03), alpha = 0.05) +
+            fill = adjustcolor("#D3D3D3", alpha = 0.03), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2021-12-24'), xmax = ymd('2022-01-08'), ymin = -Inf, ymax = Inf), 
             fill = adjustcolor("#66D1B5", alpha = 0.03), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2022-02-07'), xmax = ymd('2022-03-14'), ymin = -Inf, ymax = Inf), 

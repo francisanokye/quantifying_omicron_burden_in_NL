@@ -64,7 +64,7 @@ true_infections <- true_infections |>
 write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)
 
 seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+
-                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.35), 
+                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.37), 
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) 
                         + geom_point(data = serop_case_true, aes(x = date, y = seroprevalence, color = "seroprevalence estimate"), size = 2)
                         + geom_ribbon(data = true_infections, aes(ymin = pmax(0, serop - 0.25 * sd(serop)),ymax = serop + 0.25 * sd(serop)), fill = "gray70", alpha = 0.75)
@@ -103,7 +103,7 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
 
 
 diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
-                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.0035),
+                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = min(true_infections$serop_diff), ymax = max(true_infections$serop_diff)),
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05)
                         + geom_point(data = serop_case_true, aes(x = date, y = serop_diff, color = "seroprevalence estimate"),
                                      span = 0.50, size = 2)
@@ -112,7 +112,8 @@ diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
                         + scale_color_manual(labels = c("model","daily seropositive rate"), values = c("red","black"))
                         + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Seroincidence Proportion",
                                title = "Daily Seroincidence Proportions", color = "")
-                        + theme_clean()
+			+ ylim(min(true_infections$serop_diff),max(true_infections$serop_diff))
+			+ theme_clean()
                         + geom_vline(xintercept = as.Date("2021-12-24"), colour = "gold4", linetype = 2, size = 1)
                         + geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)
                         + geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)

@@ -43,8 +43,10 @@ combined_case_plot <- ggplot(allcases, aes(x = dates)) +
   geom_bar(data = filter(allcases, type == "true_infections"), aes(y = cases), fill = "blue", stat = "identity", position = "stack",width = 0.25, alpha = 1) +
   geom_bar(data = filter(allcases, type == "reported"), aes(y = cases), fill = "darkgreen", stat = "identity",position = "stack", width = 0.25, alpha = 1) +
   geom_ribbon(data = filter(allcases, type == "true_infections"), aes(ymin = pmax(0, cases - 0.25 * sd(cases)),ymax = cases + 0.25 * sd(cases)), fill = "grey", alpha = 0.5)+
-  geom_line(data = filter(allcases, type == "true_infections"), aes(y = cases, color = "True Infections"),linewidth = 1.5) +
-  geom_line(data = filter(allcases, type == "reported"), aes(y = cases, color = "Reported Cases"),linewidth = 1.5) +
+  geom_point(data = filter(allcases, type == "true_infections"), aes(y = cases, color = "True Infections"),size = 1.0) +
+  geom_line(data = filter(allcases, type == "true_infections"), aes(y = cases, color = "True Infections"),linewidth = 0.5) +
+  geom_point(data = filter(allcases, type == "reported"), aes(y = cases, color = "Reported Cases"),size = 1.0) +
+  geom_line(data = filter(allcases, type == "reported"), aes(y = cases, color = "Reported Cases"),linewidth = 0.5) +
   scale_color_manual(name = NULL,values = c("Reported Cases" = "darkgreen", "True Infections" = "blue")) +
   labs(x = "Date (Dec 15, 2021 - May 26, 2022)",y = "Number of Cases",title = "Reported vrs Estimated True Omicron Infections") +
   geom_segment(aes(x = as.Date("2021-12-24"), y = 0, yend = Inf),linetype = "dashed",color = "gold4",linewidth = 1) +
