@@ -4,8 +4,8 @@ library(shellpipes)
 # This decribes the model flow of how individuals transiton across comaprtments and cohorts
 
 flows <- list(
-  N ~ N1 + N2 + N3
-  , foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
+
+  foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
   
   , mp_per_capita_flow("S1", "E1", "kappa1 * foi", "incS")
   , mp_absolute_flow("S1", "V2", "vac2", "double_vac")
@@ -23,7 +23,7 @@ flows <- list(
 
   , mp_per_capita_flow("V3", "E3", "kappa3 * foi","incv3")
   , mp_per_capita_flow("E3", "I3", "sigma * mu", "inc_symp3")
-  , mp_per_capita_flow("E3", "A2", "sigma * (1-mu)", "inc_asymp3")
+  , mp_per_capita_flow("E3", "A3", "sigma * (1-mu)", "inc_asymp3")
   , mp_per_capita_flow("A3", "R3", "gamma_a", "asymp_recov3")
   , mp_per_capita_flow("I3", "R3", "gamma_i", "symp_recov3")
 

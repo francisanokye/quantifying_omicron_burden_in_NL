@@ -103,7 +103,7 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
 
 
 diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
-                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = min(true_infections$serop_diff), ymax = max(true_infections$serop_diff)),
+                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = max(true_infections$serop_diff)),
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05)
                         + geom_point(data = serop_case_true, aes(x = date, y = serop_diff, color = "seroprevalence estimate"),
                                      span = 0.50, size = 2)
