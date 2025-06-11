@@ -16,9 +16,24 @@ serodat <- (sero
         %>% select(dates, seroprevalence, cases)	
 	%>% mutate(time = seq_along(dates))
         %>% pivot_longer(cols = c( seroprevalence,cases),names_to = "matrix",values_to = "value")
-        %>% mutate(matrix = recode(matrix,"seroprevalence" = "serop")) 
+      %>% mutate(matrix = recode(matrix,"seroprevalence" = "serop")) 
 	%>% arrange(matrix)
 )
+
+print(serodat)
+
+gg <- (ggplot(serodat,aes(dates,value))
+	+ geom_point()
+)
+
+print(gg)
+
+serodat <- (serodat
+	|> filter(matrix == "cases")
+	|> mutate(matrix = "inc")
+)
+
+print(serodat,n=Inf)
 
 rdsSave(serodat)
 

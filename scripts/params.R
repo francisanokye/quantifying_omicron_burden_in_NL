@@ -1,7 +1,8 @@
 library(shellpipes)
 set.seed(2024)
 
-params <- c(beta = 1.4419624, kappa1 = 1, kappa2 = 0.91, kappa3 = 0.3,
+#params <- c(beta = 1.4419624, kappa1 = 1, kappa2 = 0.91, kappa3 = 0.3,
+params <- c(beta = 0.1, kappa1 = 1, kappa2 = 0.91, kappa3 = 0.3,
             sigma  =  1/3, gamma_a  =  1/10, gamma_i  =  1/7, mu = 0.324,
             zeta  =  0.75, vac2 = 0.09, vac3 = 0.0189,
             N2 = 434968, N = 510550, 

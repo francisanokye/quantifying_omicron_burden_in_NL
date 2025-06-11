@@ -34,7 +34,8 @@ flows <- list(
   , R ~ R1 + R2 + R3
 
   , inc ~ incS + incv2 + incv3
-  , serop ~ R/N
+#  , serop ~ R/N
+ # , serop ~ inc
 )
 
 saveVars(flows)

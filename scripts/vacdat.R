@@ -14,6 +14,13 @@ nl <- (dat
 	|> pivot_longer(-week_end,names_to="type",values_to="value")
 )
 
+gg <- (ggplot(nl,aes(week_end,value))
+	+ geom_point()
+	+ facet_wrap(~type,scale="free")
+)
+
+print(gg)
+
 nl_additional <- (nl
 	|> filter(type == "numtotal_additional")
 	|> mutate(value = ifelse(week_end == as.Date("2021-12-18"),10,value))

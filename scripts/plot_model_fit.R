@@ -44,6 +44,17 @@ fitted_data <- (fitted_data
 	|> dplyr::filter(matrix %in% c("beta", "inc","serop"))
 )
 
+print(fitted_data)
+
+gg <- (ggplot(fitted_data,aes(time,value))
+	+ geom_point()
+	+ facet_wrap(~matrix,scale="free")
+)
+
+print(gg)
+
+quit()
+
 # convert matrix values into columns
 true_infections <- fitted_data |>
   select(-any_of(c("row", "col"))) |>
