@@ -32,20 +32,29 @@ print(seroprevdata, n=Inf)
 
 calibrator = mp_tmb_calibrator(
     spec = timevar_spec |> mp_hazard()
-  , data = seroprevdata
+  , data = seroprevdata |> select(-dates)
   , time = mp_sim_offset(0, 30, "steps")
   , outputs = c(outputs)
 #  , traj = list(serop = mp_normal(sd = mp_fit(0.01))) # 0.015
-  , traj = list(inc = mp_normal(sd = mp_fit(0.01))) # 0.015
-  , tv = mp_rbf("beta", 7)
+  , traj = list(inc = mp_neg_bin(disp = mp_fit(0.01))) # 0.015
+  , tv = mp_rbf("beta", 5)
   , par = c("beta")
 )
 
+if (interactive()) {
+new_spec = mp_optimized_spec(calibrator, spec_structure = "modified")
+sim = mp_simulator(new_spec, 162, c("beta", "inc"))
+(sim |> mp_trajectory() |> ggplot()
+  + geom_line(aes(time, value))
+  + geom_point(aes(time, value), data = seroprevdata, colour = "red")
+  + facet_wrap(~matrix, scales = "free")
+)
+}
 
 mp_optimize(calibrator)
 
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
-print(model_estimates, digits = 3)
+print(model_estimates, digits = 2)
 
 rdsSave(calibrator)
 

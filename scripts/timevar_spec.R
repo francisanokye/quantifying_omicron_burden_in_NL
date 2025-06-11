@@ -48,7 +48,7 @@ timevar_spec <- spec |> mp_tmb_insert(
 
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(timevar_spec
-					     , incidence_name = "inc"
+					     , incidence_name = "inc_total"
 					     , report_prob = 1.0
 					     , mean_delay = 14
 					     , cv_delay = 0.95

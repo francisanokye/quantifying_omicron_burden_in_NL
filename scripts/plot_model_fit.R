@@ -51,8 +51,8 @@ gg <- (ggplot(fitted_data,aes(time,value))
 	+ facet_wrap(~matrix,scale="free")
 )
 
-print(gg)
 
+print(gg)
 quit()
 
 # convert matrix values into columns

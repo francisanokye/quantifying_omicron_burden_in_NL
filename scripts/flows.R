@@ -33,7 +33,7 @@ flows <- list(
   , I ~ I1 + I2 + I3
   , R ~ R1 + R2 + R3
 
-  , inc ~ incS + incv2 + incv3
+  , inc_total ~ incS + incv2 + incv3
 #  , serop ~ R/N
  # , serop ~ inc
 )
