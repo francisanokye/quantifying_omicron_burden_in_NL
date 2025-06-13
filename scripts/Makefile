@@ -22,6 +22,7 @@ params.Rout: params.R
 flows.Rout: flows.R params.rda
 	$(pipeR)
 
+## Vaccination data from CITF
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
