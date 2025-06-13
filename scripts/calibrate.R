@@ -34,7 +34,7 @@ calibrator = mp_tmb_calibrator(
     spec = timevar_spec |> mp_hazard()
   , data = seroprevdata |> select(-dates)
 #  , time = mp_sim_offset(0, 30, "steps")
-  , time = mp_sim_offset(30, 30, "steps")
+  , time = mp_sim_offset(0, 30, "steps")
   , outputs = c(outputs)
 #  , traj = list(serop = mp_normal(sd = mp_fit(0.01))) # 0.015
   , traj = list(inc = mp_neg_bin(disp = mp_fit(0.01))) # 0.015
@@ -62,8 +62,8 @@ model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
 print(model_estimates, digits = 2)
 
 
-beta_changepoints <- c(0,c(25,50,85))
-beta_change <- c(0.1,0.1,0.1)
+beta_changepoints <- c(0)
+beta_change <- c(0.1)
 
 newspecs <- (timevar_spec 
   |> mp_tmb_insert(phase = "during"
@@ -109,7 +109,7 @@ print(calibrator2)
 model_estimates = mp_tmb_coef(calibrator2, conf.int = TRUE)
 print(model_estimates)
 
-rdsSave(calibrator)
+rdsSave(calibrator2)
 
 
 

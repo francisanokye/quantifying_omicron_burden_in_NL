@@ -3,6 +3,8 @@ library(zoo)
 library(tidyverse)
 loadEnvironments()
 
+
+
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
 
@@ -28,13 +30,26 @@ gg <- (ggplot(serodat,aes(dates,value))
 
 print(gg)
 
-serodat <- (serodat
+serodat2 <- (serodat
 	|> filter(matrix == "cases")
 	|> mutate(matrix = "inc")
 )
 
-print(serodat,n=Inf)
+print(serodat2,n=Inf)
 
-rdsSave(serodat)
+serodat3 <- (serodat
+	|> filter(matrix == "serop")
+	|> mutate(value = value * 510550
+		, value = diff(c(value,NA))
+	)
+	|> mutate(matrix = "inc")
+	|> filter(!is.na(value))
+)
+
+print(serodat3)
+
+print(ggplot(serodat3,aes(dates,value))+geom_point())
+
+rdsSave(serodat3)
 
 
