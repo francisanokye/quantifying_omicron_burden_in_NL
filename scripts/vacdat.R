@@ -22,18 +22,22 @@ gg <- (ggplot(nl,aes(week_end,value))
 print(gg)
 
 nl_additional <- (nl
-	|> filter(type == "numtotal_additional")
+	|> filter(type %in% c("numtotal_additional","numtotal_fully"))
 	|> mutate(value = ifelse(week_end == as.Date("2021-12-18"),10,value))
 	|> filter(!is.na(value))
+	|> arrange(type)
+	|> group_by(type)
 	|> mutate(daydiff = diff(c(week_end,0))
-		, boosterdiff = diff(c(value,0))
+		, boosterdiff = diff(c(abs(value),0))
 		, booster_daily_rate = boosterdiff/as.numeric(daydiff)
 		, days = as.numeric(week_end - day0)
 	)
 	|> select(days,booster_daily_rate)
-	|> filter(days < 159)
+#	|> filter(between(days,0,159))
+	|> filter(between(days,-20,159))
 
 )
 
+print(nl_additional,n=Inf)
 csvSave(nl_additional)
 

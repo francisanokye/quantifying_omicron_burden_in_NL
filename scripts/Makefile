@@ -22,11 +22,12 @@ params.Rout: params.R
 flows.Rout: flows.R params.rda
 	$(pipeR)
 
-## Vaccination data from CITF
+## Vaccination data from PHAC
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
-timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv ../data/vacdat.csv params.rda
+## Where is the data for this? 
+timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv vacdat.Rout.csv params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    

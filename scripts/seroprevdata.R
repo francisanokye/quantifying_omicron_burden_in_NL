@@ -3,10 +3,10 @@ library(zoo)
 library(tidyverse)
 loadEnvironments()
 
-
-
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
+
+## Need the script for seroprevdata
 
 sero <- (csvRead() 
 	|> mutate(dates = as.Date(date,format = "%Y-%m-%d"))
