@@ -31,7 +31,7 @@ timevar_spec.Rout: timevar_spec.R flows.rda vacdat.Rout.csv params.rda
 	$(pipeR)
 
 ## Need to redo this part with CITF data
-seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    
+seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv    
 	$(pipeR)
 
 calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda timevar_spec.R
