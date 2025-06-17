@@ -35,7 +35,7 @@ seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv
 	$(pipeR)
 
 calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda timevar_spec.R
-	$(pipeR)
+	$(pipeRcall)
 
 plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv params.rda calibrate.rds
 	$(pipeR)
