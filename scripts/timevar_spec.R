@@ -5,11 +5,11 @@ library(shellpipes)
 rpcall("timevar_spec.Rout timevar_spec.R flows.rda ../data/daily_2vac_rate.csv vacdat.Rout.csv params.rda")
 loadEnvironments()
 
-double_daily_vac= csvRead("daily_2vac_rate")
+dat <- csvRead()
 
-booster_daily_vac = csvRead("vacdat")
+double_daily_vac = dat |> filter(type == "numtotal_fully")
+booster_daily_vac = dat |> filter(type == "numtotal_additional")
 
-print(booster_daily_vac)
 
 reporting_delay <- TRUE
 
@@ -29,10 +29,10 @@ spec <- mp_tmb_model_spec(
 
 # we create a piecewise time-varying vaccination rate based on true data
 double_vac_changepoints = double_daily_vac$days - 1 
-double_vac_values = double_daily_vac$double_daily_rate
+double_vac_values = double_daily_vac$daily_rate
 
 booster_vac_changepoints = booster_daily_vac$days - 1
-booster_vac_values = booster_daily_vac$booster_daily_rate
+booster_vac_values = booster_daily_vac$daily_rate
 
 expr2 = list(vac2 ~ time_var(double_vac_values, double_vac_changepoints))
 expr3 = list(vac3 ~ time_var(booster_vac_values, booster_vac_changepoints))

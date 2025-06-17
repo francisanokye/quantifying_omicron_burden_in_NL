@@ -27,9 +27,10 @@ vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
 ## Where is the data for this? 
-timevar_spec.Rout: timevar_spec.R flows.rda ../data/daily_2vac_rate.csv vacdat.Rout.csv params.rda
+timevar_spec.Rout: timevar_spec.R flows.rda vacdat.Rout.csv params.rda
 	$(pipeR)
 
+## Need to redo this part with CITF data
 seroprevdata.Rout: seroprevdata.R ../data/serop_avgcase_data.csv    
 	$(pipeR)
 
