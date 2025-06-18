@@ -31,7 +31,7 @@ flows <- list(
   , E ~ E1 + E2 + E3
   , A ~ A1 + A2 + A3
   , I ~ I1 + I2 + I3
-  , R ~ R1 + R2 + R3
+  , R ~ R1 + R2 + R3 + R_offset
 
   , inc ~ incS + incv2 + incv3
   , serop_total ~ R/N

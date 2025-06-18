@@ -11,7 +11,7 @@ double_daily_vac = dat |> filter(type == "numtotal_fully")
 booster_daily_vac = dat |> filter(type == "numtotal_additional")
 
 
-reporting_delay <- TRUE
+reporting_delay <- FALSE
 
 initialize_state = list(
     V2 ~ (N2 - A2 - E2 - I2 - R2)
@@ -60,6 +60,11 @@ if(reporting_delay){
 					     , reports_name = "serop"
 					     , report_prob_name = "report_prob"
 	)
+} else {
+  timevar_spec = mp_tmb_insert(timevar_spec
+    , at = Inf
+    , expressions = list(serop ~ serop_total)
+  )
 }
 
 print(timevar_spec)
