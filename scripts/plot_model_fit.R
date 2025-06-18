@@ -52,9 +52,6 @@ gg <- (ggplot(fitted_data,aes(time,value))
 )
 
 
-print(gg)
-quit()
-
 # convert matrix values into columns
 true_infections <- fitted_data |>
   select(-any_of(c("row", "col"))) |>
