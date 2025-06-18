@@ -41,7 +41,7 @@ calibrator = mp_tmb_calibrator(
 )
 
 mp_optimize(calibrator)
-if (interactive()) {
+#if (interactive()) {
 new_spec = mp_optimized_spec(calibrator, spec_structure = "modified")
 sim = mp_simulator(new_spec, 162, c("beta", "serop"))
 # sim = mp_simulator(new_spec, 162, c("beta", "inc"))
@@ -50,12 +50,13 @@ sim = mp_simulator(new_spec, 162, c("beta", "serop"))
   + geom_point(aes(time, value), data = seroprevdata, colour = "red")
   + facet_wrap(~matrix, scales = "free")
 )
-}
+#}
 
 
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
 print(model_estimates, digits = 2)
 
+quit()
 
 beta_changepoints <- c(0)
 beta_change <- c(0.1)
