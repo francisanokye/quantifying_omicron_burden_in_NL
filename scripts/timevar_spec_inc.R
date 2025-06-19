@@ -10,7 +10,7 @@ double_daily_vac = dat |> filter(type == "numtotal_fully")
 booster_daily_vac = dat |> filter(type == "numtotal_additional")
 
 
-reporting_delay <- FALSE
+reporting_delay <- TRUE
 
 initialize_state = list(
     V2 ~ (N2 - A2 - E2 - I2 - R2)
@@ -52,21 +52,22 @@ timevar_spec <- spec |> mp_tmb_insert(
 
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(timevar_spec
-					     , incidence_name = "serop_total"
+					     , incidence_name = "sero_inc_total"
 					     , report_prob = 1.0
 					     , mean_delay = 14
 					     , cv_delay = 0.95
-					     , reports_name = "serop"
+					     , reports_name = "sero_inc"
 					     , report_prob_name = "report_prob"
 	)
-} else {
+} 
+#else {
   timevar_spec = mp_tmb_insert(timevar_spec
     , at = Inf
-    , expressions = list(sero_inc ~ sero_inc_total
-	 	, serop ~ serop_total
+    , expressions = list(serop ~ serop_total
+#	 , sero_inc ~ sero_inc_total
 		)
   )
-}
+#}
 
 print(timevar_spec)
 timevar_spec$integers$double_vac_changepoints

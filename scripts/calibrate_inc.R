@@ -40,7 +40,7 @@ calibrator = mp_tmb_calibrator(
 #  , traj = list(inc = mp_neg_bin(disp = mp_fit(0.01))) # 0.015
 #  , traj = list(inc = mp_poisson()) # 0.015
 #  , tv = mp_rbf("beta", 5, fit_prior_sd = FALSE, prior_sd = 1)
-  , tv = mp_rbf("beta", 7, sparse_tol = 0)
+  , tv = mp_rbf("beta", 5, sparse_tol = 0)
 
   , par = c("beta", "log_R_offset")
 )
