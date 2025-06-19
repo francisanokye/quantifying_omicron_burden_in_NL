@@ -25,8 +25,13 @@ flows.Rout: flows.R params.rda
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
-## Where is the data for this? 
-timevar_spec.Rout: timevar_spec.R flows.rda vacdat.Rout.csv params.rda
+## This is using serop only
+timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
+	$(pipeR)
+
+## This is using sero_inc
+# timevar_spec_inc.Rout: timevar_spec_inc.R flows.R
+timevar_spec_inc.Rout: timevar_spec_inc.R flows.rda vacdat.rds params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv    
@@ -35,7 +40,10 @@ seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv
 fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
 	$(pipeR)
 
-calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda timevar_spec.R
+calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda
+	$(pipeRcall)
+
+calibrate_inc.Rout: calibrate_inc.R timevar_spec_inc.rds fitsero.rds params.rda
 	$(pipeRcall)
 
 plot_model_fit.Rout: plot_model_fit.R ../data/serop_avgcase_data.csv params.rda calibrate.rds

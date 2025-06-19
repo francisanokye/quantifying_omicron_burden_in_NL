@@ -48,7 +48,7 @@ timevar_spec <- spec |> mp_tmb_insert(
 ## inserting betas?
 
 
-
+## probably don't need the reporting_delay
 
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(timevar_spec
@@ -62,7 +62,8 @@ if(reporting_delay){
 } else {
   timevar_spec = mp_tmb_insert(timevar_spec
     , at = Inf
-    , expressions = list(serop ~ serop_total)
+    , expressions = list(sero_inc ~ sero_inc_total
+	 	, serop ~ serop_total)
   )
 }
 
