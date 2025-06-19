@@ -21,14 +21,7 @@ loadEnvironments()
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
 
-calibrator <- rdsRead()
-
-# load reported cases
-serop_case_true <- csvRead()
-serop_case_true$date <- as.Date(serop_case_true$date, format = "%Y-%m-%d")
-
-serop_case_true <- serop_case_true |>
-  drop_na()
+calibrator <- rdsRead("calibrate_inc.rds") #readRDS("calibrate_inc.rds")
 
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
@@ -76,4 +69,6 @@ print(pp)
 png("../figures/prevalence_plot.png", width = 3600, height = 2400, res = 300, bg = "white", type = "cairo")
 pp
 dev.off()
+
+
 

@@ -11,16 +11,36 @@ library(patchwork)
 library(fuzzyjoin)
 library(shellpipes)
 library(tidyverse)
-
+library(macpan2)
 loadEnvironments()
+set.seed(2025)
 
-# load true infections data 
-true_infections <- csvRead()  
+start_date <- "2021-12-15"
+last_date <-"2022-05-26"
 
-true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
+calibrator <- rdsRead("calibrate_inc.rds")
 
-true_infections <- true_infections %>%
-  select(dates, alert_level, beta) 
+# model simulation with calibrated parameters
+fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
+
+fitted_data <- (fitted_data
+        |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
+        |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
+        |> dplyr::filter(matrix %in% c("date","beta"))
+)
+
+# convert matrix values into columns
+beta_values <- fitted_data |>
+  select(-any_of(c("row", "col"))) |>
+  pivot_wider(names_from = matrix, values_from = value) |>
+  group_by(date) |>
+  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
+  ungroup() |>
+  distinct(date, .keep_all = TRUE) |>
+  drop_na() |>
+  select(c(date, beta))
+
+beta_values$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
 
 alert_colors <- c(
   "No-ALS"      = "#F7E2E2",  
@@ -30,9 +50,9 @@ alert_colors <- c(
   "ALS-4"       = "#87CEFA"   
 )
 
-true_infections$alert_level <- factor(true_infections$alert_level, levels = names(alert_colors))
+beta_values$alert_level <- factor(beta_values$alert_level, levels = names(alert_colors))
 
-beta_summary <- aggregate(beta ~ alert_level, data = true_infections, 
+beta_summary <- aggregate(beta ~ alert_level, data = beta_values, 
                           FUN = function(x) c(mean_value = mean(x), sd_value = sd(x)))
 beta_summary <- do.call(data.frame, beta_summary)
 

@@ -23,69 +23,61 @@ last_date <-"2022-05-26"
 
 calibrator <- rdsRead("calibrate_inc.rds")
 
-# load reported cases
+# load true incidence from seroprevalence estimates
 serop_case_true <- rdsRead("fitsero.rds")
+# convert matrix values into columns
+serop_case_true <- serop_case_true |>
+  pivot_wider(names_from = matrix, values_from = value) |>
+  group_by(date) |>
+  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
+  ungroup() |>
+  distinct(date, .keep_all = TRUE) |>
+  drop_na() 
 
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 
 fitted_data <- (fitted_data
-	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
-	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
-	|> dplyr::filter(matrix %in% c("beta", "sero_inc","serop"))
+	|> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
+	|> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
+	|> dplyr::filter(matrix %in% c("date","sero_inc","serop"))
 )
-
-print(fitted_data)
-
-gg <- (ggplot(fitted_data,aes(time,value))
-	+ geom_line(color="black")
-	+ geom_point(data=serop_case_true,color="red")
-	+ facet_wrap(~matrix,scale="free")
-)
-
-print(gg)
 
 # convert matrix values into columns
 true_infections <- fitted_data |>
   select(-any_of(c("row", "col"))) |>
   pivot_wider(names_from = matrix, values_from = value) |>
-  group_by(dates) |>
+  group_by(date) |>
   mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
   ungroup() |>
-  distinct(dates, .keep_all = TRUE) |>
+  distinct(date, .keep_all = TRUE) |>
   drop_na() |>
-  select(c(dates, serop, beta, conf.low, conf.high,sero_inc)) |>
-  mutate(dates = as.Date(dates), sero_inc = as.integer(sero_inc))
+  select(c(date, serop,sero_inc)) |>
+  mutate(date = as.Date(date), sero_inc = as.integer(sero_inc))
 
-# compute the daily increase in seroprevalence 
-true_infections <- true_infections |>
-  dplyr::mutate(serop_diff = c(diff(serop)[1], diff(serop)), true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)))
-
-# save model output for the perfect reporting probability (report prob = 1) 
-# write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)
-
-seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+
-                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.37), 
+seroprevalence_plot <- (ggplot(data = true_infections, aes(x = date, y = serop))+
+                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.45), 
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) 
-                        + geom_point(data = serop_case_true, aes(x = date, y = seroprevalence, color = "seroprevalence estimate"), size = 2)
-                        + geom_ribbon(data = true_infections, aes(ymin = pmax(0, serop - 0.25 * sd(serop)),ymax = serop + 0.25 * sd(serop)), fill = "gray70", alpha = 0.75)
-			+ geom_line(data = true_infections, aes(x = dates, y = serop, color = "model fit"), span = 0.10, alpha = 0.7, linewidth = 1)
-                        + scale_color_manual(labels = c("model fit","seroprevalence estimate"), values = c("#00BFC4","black"))
+                        + geom_ribbon(data = true_infections, aes(ymin = pmax(0, serop - 0.25 * sd(serop)),
+								  ymax = serop + 0.25 * sd(serop)), fill = "gray70", alpha = 0.75)
+			+ geom_point(data = serop_case_true, aes(x = date, y = serop, color = "seroprevalence"), size = 2.5)
+			+ geom_line(data = true_infections, aes(x = date, y = serop, color = "model fit"), span = 0.10, alpha = 1.0, linewidth = 1)
+                        + scale_color_manual(labels = c("model fit","seroprevalence"), values = c("#00BFC4","black"))
                         + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Seroprevalence Estimate (%)", title = "Seroprevalence Fit", color = "")
                         + theme_clean()
                         + geom_vline(xintercept = as.Date("2021-12-24"), colour = "gold4", linetype = 2, size = 1)  
                         + geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)  
                         + geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)  
                         + geom_vline(xintercept = as.Date("2022-03-14"), colour = "black", linetype = 1, size = 1)  
-                        + annotate("text", x = as.Date("2021-12-18"), y = 0.15, label = "ALS-2",
+                        + annotate("text", x = as.Date("2021-12-18"), y = 0.2, label = "ALS-2",
                                    size = 4,angle = 90, hjust = 1, color = "black")
-                        + annotate("text", x = as.Date("2021-12-28"), y = 0.15, label = "ALS-3",
+                        + annotate("text", x = as.Date("2021-12-28"), y = 0.2, label = "ALS-3",
                                    size = 4,angle = 90, hjust = 1,color = "black")
                         + annotate("text", x = as.Date("2022-02-01"), y = 0.20, label = "ALS-4",
                                    size = 4,angle = 0, hjust = 1, color = "black")
                         + annotate("text", x = as.Date("2022-03-11"), y = 0.20, label = "Mod-ALS-3",
                                    size = 4,angle = 0, hjust = 1, color = "black")
-                        + annotate("text", x = as.Date("2022-04-28"), y = 0.15, label = "No-ALS",
+                        + annotate("text", x = as.Date("2022-04-28"), y = 0.16, label = "No-ALS",
                                    size = 4, hjust = 1, color = "black")
                         + theme(axis.text.x = element_text(size = 14, angle = 0, hjust = 0.5),
                                 axis.title.x = element_text(size = 14, color = "black", face = "bold"),
@@ -103,31 +95,30 @@ seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop)
 )
 
 
-diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
-                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = max(true_infections$serop_diff)),
+seroinc_plot <- (ggplot(data = true_infections, aes(x = date, y = sero_inc))+
+                          geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = max(sero_inc)+150),
                                     fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05)
-                        + geom_point(data = serop_case_true, aes(x = date, y = serop_diff, color = "seroprevalence estimate"),
-                                     span = 0.50, size = 2)
-                        + geom_line(data = true_infections, aes(x = dates, y = serop_diff, color = "model fit"),
-                                      span = 0.10, alpha = 0.7, linewidth = 1)
-                        + scale_color_manual(labels = c("model","daily seropositive rate"), values = c("red","black"))
-                        + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Seroincidence Proportion",
-                               title = "Daily Seroincidence Proportions", color = "")
-			+ ylim(min(true_infections$serop_diff),max(true_infections$serop_diff))
+                        + geom_ribbon(data = true_infections,aes(ymin = pmax(0, sero_inc - 0.25 * sd(sero_inc)),
+								 ymax = sero_inc + 0.25 * sd(sero_inc)), fill = "gray70", alpha = 0.75)
+                        + geom_point(data = serop_case_true, aes(x = date, y = sero_inc, color = "seroincidence"), size = 2.5)
+                        + geom_line(data = true_infections, aes(x = date, y = sero_inc, color = "model fit"), span = 0.10, alpha = 1.0, linewidth = 1)
+                        + scale_color_manual(labels = c("model fit","seroincidence"), values = c("red","black"))
+                        + labs(x = "Date (Dec 15, 2021 - May 26, 2022)", y = "Seroincidence",
+                               title = "Daily Seroincidence", color = "")
 			+ theme_clean()
                         + geom_vline(xintercept = as.Date("2021-12-24"), colour = "gold4", linetype = 2, size = 1)
                         + geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)
                         + geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)
                         + geom_vline(xintercept = as.Date("2022-03-14"), colour = "black", linetype = 1, size = 1)
-                        + annotate("text", x = as.Date("2021-12-18"), y = 0.0025, label = "ALS-2",
+                        + annotate("text", x = as.Date("2021-12-18"), y = 1200, label = "ALS-2",
                                    size = 4,angle = 90, hjust = 1, color = "black")
-                        + annotate("text", x = as.Date("2021-12-28"), y = 0.0025, label = "ALS-3",
+                        + annotate("text", x = as.Date("2021-12-28"), y = 1200, label = "ALS-3",
                                    size = 4,angle = 90, hjust = 1,color = "black")
-                        + annotate("text", x = as.Date("2022-02-01"), y = 0.0025, label = "ALS-4",
+                        + annotate("text", x = as.Date("2022-02-01"), y = 1200, label = "ALS-4",
                                    size = 4,angle = 0, hjust = 1, color = "black")
-                        + annotate("text", x = as.Date("2022-03-11"), y = 0.001, label = "Mod-ALS-3",
+                        + annotate("text", x = as.Date("2022-03-11"), y = 500, label = "Mod-ALS-3",
                                    size = 4,angle = 0, hjust = 1, color = "black")
-                        + annotate("text", x = as.Date("2022-04-28"), y = 0.0015, label = "No-ALS",
+                        + annotate("text", x = as.Date("2022-04-28"), y = 500, label = "No-ALS",
                                    size = 4, hjust = 1, color = "black")
                         + theme(axis.text.x = element_text(size = 14, angle = 0, hjust = 0.5),
                                 axis.title.x = element_text(size = 14, color = "black", face = "bold"),
@@ -135,7 +126,7 @@ diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
                                 axis.title.y = element_text(size = 14, color = "black", face = "bold"),
                                 plot.title = element_text(size = 14, face = "bold", color = "black", hjust = 0.5),
                                 strip.text = element_text(size = 14, face = "bold", color = "black"),
-                                legend.position = c(0.75,0.15),
+                                legend.position = c(0.35,0.75),
                                 legend.title = element_text(size = 0),
                                 legend.text = element_text(size = 12),
                                 legend.background = element_rect(color = NA),
@@ -145,7 +136,7 @@ diff_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop_diff))+
 )
 
 
-combined_plot <- (seroprevalence_plot | diff_plot) + 
+combined_plot <- (seroprevalence_plot | seroinc_plot) + 
                  plot_layout(guides = "collect", widths = c(1, 1)) & 
                  theme(legend.position = "bottom")
 print(combined_plot)

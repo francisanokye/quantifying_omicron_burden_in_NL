@@ -45,11 +45,6 @@ timevar_spec <- spec |> mp_tmb_insert(
     , integers = list(double_vac_changepoints = double_vac_changepoints, booster_vac_changepoints = booster_vac_changepoints)
 )
 
-## inserting betas?
-
-
-## probably don't need the reporting_delay
-
 if(reporting_delay){
 	timevar_spec = mp_tmb_insert_reports(timevar_spec
 					     , incidence_name = "sero_inc_total"
@@ -60,16 +55,12 @@ if(reporting_delay){
 					     , report_prob_name = "report_prob"
 	)
 } 
-#else {
-  timevar_spec = mp_tmb_insert(timevar_spec
-    , at = Inf
-    , expressions = list(serop ~ serop_total
-#	 , sero_inc ~ sero_inc_total
-		)
-  )
-#}
 
-print(timevar_spec)
+timevar_spec = mp_tmb_insert(timevar_spec
+    , at = Inf
+    , expressions = list(serop ~ serop_total)
+  )
+
 timevar_spec$integers$double_vac_changepoints
 
 rdsSave(timevar_spec)

@@ -53,16 +53,16 @@ output.Rout: output.R calibrate_inc.rds
 plot_model_fit.Rout: plot_model_fit.R fitsero.rds params.rda calibrate_inc.rds
 	$(pipeR)
 
-prevalence_plot.Rout: prevalence_plot.R ../data/serop_avgcase_data.csv params.rda calibrate.rds
+prevalence_plot.Rout: prevalence_plot.R params.rda calibrate_inc.rds
 	$(pipeR)
 
-beta_plot.Rout: beta_plot.R ../outputs/true_infections_data.csv
+beta_plot.Rout: beta_plot.R calibrate_inc.rds
 	$(pipeR)
 
-true_vs_reported_plot.Rout: true_vs_reported_plot.R ../data/serop_avgcase_data.csv ../outputs/true_infections_data.csv 
+true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate_inc.rds ../data/serop_avgcase_data.csv #../outputs/true_infections_data.csv 
 	$(pipeR)
 
-eff_Rt.Rout: eff_Rt.R output.rds
+eff_Rt.Rout: eff_Rt.R calibrate_inc.rds #output.rds
 	$(pipeR)
 
 Ignore += makestuff
