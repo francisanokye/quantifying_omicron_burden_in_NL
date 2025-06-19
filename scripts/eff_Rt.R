@@ -14,7 +14,11 @@ library(fuzzyjoin)
 library(shellpipes)
 
 # load true infections data to estimate the effective reproduction number
-true_infections <- csvRead()
+# true_infections <- csvRead()
+
+true_infections <- rdsRead()
+
+start_date <- as.Date("2021-12-14")
 
 true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
 true_infections <- true_infections |>
@@ -23,7 +27,15 @@ true_infections <- true_infections |>
 # Estimate Effective Reproductive (Rt) and the average case-weighted Rt period ALS period
 # Omicron's  serial interval distribution is 3.5 and that the SD is 2.4 using an estimate 
 
-incidence_df <- data.frame(date = true_infections$dates, I = true_infections$true_inf)
+incidence_df <- (true_infections
+	|> filter(matrix == "sero_inc")
+	|> transmute(NULL
+		, date = start_date + time
+		, I = value
+	)
+)
+
+print(incidence_df)
 
 # estimate Rt using EpiEstim
 n_days <- length(incidence_df$date)

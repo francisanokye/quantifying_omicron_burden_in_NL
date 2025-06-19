@@ -21,19 +21,10 @@ pop = 510550
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
 
-calibrator <- rdsRead()
+calibrator <- rdsRead("calibrate_inc.rds")
 
 # load reported cases
-serop_case_true <- csvRead()
-serop_case_true$date <- as.Date(serop_case_true$date, format = "%Y-%m-%d")
-
-# drop all NAs
-serop_case_true <- serop_case_true |>
-  drop_na()
-
-# compute the daily increase in seroprevalence 
-serop_case_true <- serop_case_true |>
-  dplyr::mutate(serop_diff = c(diff(seroprevalence)[1], diff(seroprevalence)))
+serop_case_true <- rdsRead("fitsero.rds")
 
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
@@ -41,16 +32,18 @@ fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 fitted_data <- (fitted_data
 	|> mutate(dates = as.Date(start_date) + as.numeric(time) -1 )
 	|> dplyr::filter(between(dates, as.Date(start_date), as.Date(last_date)))
-	|> dplyr::filter(matrix %in% c("beta", "inc","serop"))
+	|> dplyr::filter(matrix %in% c("beta", "sero_inc","serop"))
 )
 
 print(fitted_data)
 
 gg <- (ggplot(fitted_data,aes(time,value))
-	+ geom_point()
+	+ geom_line(color="black")
+	+ geom_point(data=serop_case_true,color="red")
 	+ facet_wrap(~matrix,scale="free")
 )
 
+print(gg)
 
 # convert matrix values into columns
 true_infections <- fitted_data |>
@@ -61,15 +54,15 @@ true_infections <- fitted_data |>
   ungroup() |>
   distinct(dates, .keep_all = TRUE) |>
   drop_na() |>
-  select(c(dates, serop, beta, conf.low, conf.high, inc)) |>
-  mutate(dates = as.Date(dates), inc = as.integer(inc))
+  select(c(dates, serop, beta, conf.low, conf.high,sero_inc)) |>
+  mutate(dates = as.Date(dates), sero_inc = as.integer(sero_inc))
 
 # compute the daily increase in seroprevalence 
 true_infections <- true_infections |>
   dplyr::mutate(serop_diff = c(diff(serop)[1], diff(serop)), true_inf = if_else(is.na(serop_diff), NA_integer_,as.integer(serop_diff * pop)))
 
 # save model output for the perfect reporting probability (report prob = 1) 
-write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)
+# write.csv(true_infections, "../outputs/true_infections_data.csv", row.names = FALSE)
 
 seroprevalence_plot <- (ggplot(data = true_infections, aes(x = dates, y = serop))+
                           geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-26'), ymin = 0, ymax = 0.37), 
