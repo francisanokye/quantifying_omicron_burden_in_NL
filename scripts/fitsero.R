@@ -134,5 +134,8 @@ serodat <- (daily_seroprev
 	|> arrange(matrix,time)
 )
 
+## trying one data at a time
+#serodat <- filter(serodat, matrix == "sero_inc")
+
 rdsSave(serodat)
 

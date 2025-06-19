@@ -13,7 +13,10 @@ loadEnvironments()
 
 timevar_spec <- rdsRead("timevar_spec_inc.rds")
 
-seroprevdata <- rdsRead("fitsero.rds")
+seroprevdata <- (rdsRead("fitsero.rds")
+ ## hack
+ |> mutate(value = ifelse(is.na(value)&(matrix=="sero_inc"),700,value))
+)
 
 outputs = c("S","E","A","I","R",
 	    "S1","E1","A1","I1","R1",
@@ -31,8 +34,9 @@ calibrator = mp_tmb_calibrator(
 #  , time = mp_sim_offset(0, 30, "steps")
   , time = mp_sim_offset(0, 30, "steps")
   , outputs = c(outputs)
-  , traj = list(sero_inc = mp_normal(sd = mp_fit(0.01))
-                , serop = mp_neg_bin(disp=mp_fit(0.01))) # 0.015
+  , traj = list(sero_inc = mp_neg_bin(disp = mp_fit(0.1))
+                , serop = mp_normal(sd=mp_fit(0.01))
+                ) # 0.015
 #  , traj = list(inc = mp_neg_bin(disp = mp_fit(0.01))) # 0.015
 #  , traj = list(inc = mp_poisson()) # 0.015
 #  , tv = mp_rbf("beta", 5, fit_prior_sd = FALSE, prior_sd = 1)
