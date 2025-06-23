@@ -32,7 +32,7 @@ timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
 ## This is using sero_inc
 # timevar_spec_inc.Rout: timevar_spec_inc.R flows.R
 timevar_spec_inc.Rout: timevar_spec_inc.R flows.rda vacdat.rds params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv    
 	$(pipeR)

@@ -2,13 +2,13 @@ library(macpan2)
 library(dplyr)
 library(zoo)
 library(shellpipes)
+rpcall("timevar_spec_inc.Rout timevar_spec_inc.R flows.rda vacdat.rds params.rda")
 loadEnvironments()
 
 dat <- rdsRead()
 
-double_daily_vac = dat |> filter(type == "numtotal_fully")
-booster_daily_vac = dat |> filter(type == "numtotal_additional")
-
+double_daily_vac = dat |> dplyr::filter(type == "numtotal_fully")
+booster_daily_vac = dat |> dplyr::filter(type == "numtotal_additional")
 
 reporting_delay <- TRUE
 
@@ -26,8 +26,18 @@ spec <- mp_tmb_model_spec(
 	, default = params
 )
 
+
+## time_steps = 159
+## scale = 31.8
+## 5
+
+# rbf(159, 5)
+# sparse_rbf_notation(struc$time_steps_obj$dat_len(), 
+#     tv$dimension, zero_based = TRUE, tol = tv$sparse_tol)
+
+
 # we create a piecewise time-varying vaccination rate based on true data
-double_vac_changepoints = double_daily_vac$days - 1 
+double_vac_changepoints = double_daily_vac$days - 1
 double_vac_values = double_daily_vac$daily_rate
 
 booster_vac_changepoints = booster_daily_vac$days - 1
@@ -54,7 +64,13 @@ if(reporting_delay){
 					     , reports_name = "sero_inc"
 					     , report_prob_name = "report_prob"
 	)
-} 
+} else {
+  timevar_spec = mp_tmb_insert(timevar_spec
+    , at = Inf
+    , expressions = list(sero_inc ~ sero_inc_total)
+  )
+}
+
 
 timevar_spec = mp_tmb_insert(timevar_spec
     , at = Inf

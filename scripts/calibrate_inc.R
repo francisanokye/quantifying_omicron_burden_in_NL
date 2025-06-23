@@ -7,9 +7,19 @@ library(dplyr)
 library(ggthemes)
 library(broom.mixed)
 
+if (packageVersion("macpan2") < "2.5.0") {
+  stop(
+      "Please install a new version of macpan2\n"
+    , "https://canmod.github.io/macpan2/#installation"
+  )
+}
+
 set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
+
+beta_timevar_length = 200
+spline_beta = TRUE
 
 timevar_spec <- rdsRead("timevar_spec_inc.rds")
 
@@ -17,6 +27,40 @@ seroprevdata <- (rdsRead("fitsero.rds")
  ## hack
  |> mutate(value = ifelse(is.na(value)&(matrix=="sero_inc"),700,value))
 )
+
+## The start-date offset is embedded in the seroprev dataset.
+## When generating this dataset, we begin the time column
+## (which aligns observed data with simulation steps) at
+## offset + 1 rather than 1.
+offset = min(seroprevdata$time) - 1
+time_steps = max(seroprevdata$time)
+
+if (spline_beta) {
+  basis_cols = 4
+  basis_rows = beta_timevar_length + offset
+  X = splines::ns(1:basis_rows
+    , basis_cols
+    , intercept = TRUE
+    , Boundary.knots = c(offset, basis_rows)
+  )
+  timevar_spec = mp_tmb_insert_glm_timevar(timevar_spec
+    , parameter_name = "beta"
+    , design_matrix = X
+    , timevar_coef = rep(0, basis_cols)
+    , link_function = mp_log
+  )
+}
+
+shift = function(x, off) c(0, x[-1] + off)
+timevar_spec = (timevar_spec
+  |> mp_tmb_update(
+    integers = within(timevar_spec$integers, {
+        double_vac_changepoints <- shift(double_vac_changepoints, offset)
+        booster_vac_changepoints <- shift(booster_vac_changepoints, offset)
+    })
+  )
+)
+
 
 outputs = c("S","E","A","I","R",
 	    "S1","E1","A1","I1","R1",
@@ -27,28 +71,29 @@ outputs = c("S","E","A","I","R",
 	   )
 
 calibrator = mp_tmb_calibrator(
-    spec = timevar_spec |> mp_hazard()
+    spec = timevar_spec |> mp_euler()
   , data = seroprevdata |> select(-date)
-  , time = mp_sim_offset(0, 30, "steps")
-  , outputs = c(outputs)
-  , traj = list(sero_inc = mp_neg_bin(disp = mp_fit(0.1))
-                , serop = mp_normal(sd=mp_fit(0.01))
-               )
-  , tv = mp_rbf("beta", 5, sparse_tol = 0)
-  , par = c("beta", "log_R_offset")
+  , time = mp_sim_bounds(1, time_steps, "steps")
+  , traj = list(
+        sero_inc = mp_normal(sd = mp_nofit(0.1))
+      , serop = mp_normal(sd = mp_nofit(0.01))
+  )
+  , par = list(
+        log_beta = mp_uniform()
+      , time_var_beta = mp_uniform()
+  )
 )
-
 mp_optimize(calibrator)
 
 new_spec = mp_optimized_spec(calibrator, spec_structure = "modified")
 
 # uncomment codes below to simulate with calibrated parameters to see model fit
-#sim = mp_simulator(new_spec, 162, c("beta","serop","sero_inc"))
-#print(sim |> mp_trajectory() |> ggplot()
-#  + geom_line(aes(time, value))
-#  + geom_point(aes(time, value), data = seroprevdata, colour = "red")
-#  + facet_wrap(~matrix, scales = "free")
-#)
+sim = mp_simulator(new_spec, time_steps, c("beta","serop","sero_inc"))
+print(sim |> mp_trajectory() |> ggplot()
+ + geom_line(aes(time, value), linewidth = 3)
+ + geom_point(aes(time, value), data = seroprevdata, colour = "red")
+ + facet_wrap(~matrix, scales = "free")
+)
 
 # extract fitted coeficients and print out
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
