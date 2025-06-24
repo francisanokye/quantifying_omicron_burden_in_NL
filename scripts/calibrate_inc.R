@@ -37,7 +37,7 @@ time_steps = max(seroprevdata$time)
 
 if (spline_beta) {
   basis_cols = 4
-  basis_rows = beta_timevar_length + offset0
+  basis_rows = time_steps
   X = splines::ns(1:basis_rows
     , basis_cols
     , intercept = TRUE
@@ -75,8 +75,8 @@ calibrator = mp_tmb_calibrator(
   , data = seroprevdata |> select(-date)
   , time = mp_sim_bounds(1, time_steps, "steps")
   , traj = list(
-        sero_inc = mp_normal(sd = mp_nofit(0.1))
-      , serop = mp_normal(sd = mp_nofit(0.01))
+        sero_inc = mp_poisson()
+      , serop = mp_poisson()
   )
   , par = list(
         log_beta = mp_uniform()
@@ -100,18 +100,3 @@ model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
 print(model_estimates, digits = 2)
 
 rdsSave(calibrator)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

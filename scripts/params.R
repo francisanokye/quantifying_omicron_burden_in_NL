@@ -12,7 +12,7 @@ params <- c(beta = 0.1, kappa1 = 1, kappa2 = 0.91, kappa3 = 0.3,
             R_offset = 0
            )
 
-offset0 <- 0
+offset0 <- 120
 
 saveEnvironment()
 

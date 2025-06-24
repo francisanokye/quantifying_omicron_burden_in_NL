@@ -1,11 +1,10 @@
 library(tidyverse)
 library(shellpipes)
+rpcall("vacdat.Rout vacdat.R ../data/vaccination-coverage-map.csv params.rda")
 
 loadEnvironments()
 
 dat <- csvRead()
-print(offset0)
-quit()
 day0 <- as.Date("2021-12-17") - lubridate::days(offset0)
 
 nl <- (dat
@@ -36,7 +35,7 @@ nl_additional <- (nl
 		, days = as.numeric(week_end - day0)
 	)
 	|> select(days,daily_rate)
-	|> filter(between(days,0,159))
+	|> filter(between(days,0,159 + offset0))
 #	|> filter(between(days,-20,159))
 
 )

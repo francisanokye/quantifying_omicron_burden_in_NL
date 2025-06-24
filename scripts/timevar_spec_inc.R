@@ -37,10 +37,10 @@ spec <- mp_tmb_model_spec(
 
 
 # we create a piecewise time-varying vaccination rate based on true data
-double_vac_changepoints = double_daily_vac$days - 1
+double_vac_changepoints = double_daily_vac$days - (offset0 %% 7) - 1
 double_vac_values = double_daily_vac$daily_rate
 
-booster_vac_changepoints = booster_daily_vac$days - 1
+booster_vac_changepoints = booster_daily_vac$days - (offset0 %% 7) - 1
 booster_vac_values = booster_daily_vac$daily_rate
 
 expr2 = list(vac2 ~ time_var(double_vac_values, double_vac_changepoints))
