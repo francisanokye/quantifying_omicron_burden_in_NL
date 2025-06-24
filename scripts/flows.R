@@ -35,7 +35,7 @@ flows <- list(
 
   , inc ~ incS + incv2 + incv3
   , sero_inc_total ~ inc
-  , serop_total ~ (R + R_offset)/N
+  , serop_total ~ (R + R_initial)/N
  # , serop ~ inc
 )
 

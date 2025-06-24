@@ -18,25 +18,19 @@ set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
 
-beta_timevar_length = 200
 spline_beta = TRUE
 
 timevar_spec <- rdsRead("timevar_spec_inc.rds")
 
 seroprevdata <- (rdsRead("fitsero.rds")
  ## hack
- |> mutate(value = ifelse(is.na(value)&(matrix=="sero_inc"),700,value))
+ |> mutate(value = ifelse(is.na(value) & (matrix == "sero_inc"), 700, value))
 )
 
-## The start-date offset is embedded in the seroprev dataset.
-## When generating this dataset, we begin the time column
-## (which aligns observed data with simulation steps) at
-## offset + 1 rather than 1.
-#offset = min(seroprevdata$time) - 1
 time_steps = max(seroprevdata$time)
 
 if (spline_beta) {
-  basis_cols = 4
+  basis_cols = 6
   basis_rows = time_steps
   X = splines::ns(1:basis_rows
     , basis_cols
@@ -50,17 +44,6 @@ if (spline_beta) {
     , link_function = mp_log
   )
 }
-
-# shift = function(x, off) c(0, x[-1] + off)
-# timevar_spec = (timevar_spec
-#   |> mp_tmb_update(
-#     integers = within(timevar_spec$integers, {
-#         double_vac_changepoints <- shift(double_vac_changepoints, offset)
-#         booster_vac_changepoints <- shift(booster_vac_changepoints, offset)
-#     })
-#   )
-# )
-
 
 outputs = c("S","E","A","I","R",
 	    "S1","E1","A1","I1","R1",
@@ -80,20 +63,23 @@ calibrator = mp_tmb_calibrator(
   )
   , par = list(
         log_beta = mp_uniform()
-      , time_var_beta = mp_uniform()
+      , time_var_beta = mp_normal(0, 0.5)
+      , log_R_initial = mp_uniform()
   )
+  , outputs = c("beta","log_serop","log_sero_inc")
 )
 mp_optimize(calibrator)
-
-new_spec = mp_optimized_spec(calibrator, spec_structure = "modified")
-
-# uncomment codes below to simulate with calibrated parameters to see model fit
-sim = mp_simulator(new_spec, time_steps, c("beta","serop","sero_inc"))
-print(sim |> mp_trajectory() |> ggplot()
- + geom_line(aes(time, value), linewidth = 3)
- + geom_point(aes(time, value), data = seroprevdata, colour = "red")
- + facet_wrap(~matrix, scales = "free")
+sims = calibrator |> mp_trajectory_sd(conf.int = TRUE)
+print(ggplot()
+ + geom_point(aes(time, value), data = seroprevdata)
+ #+ geom_line(aes(time, value), linewidth = 1, colour = "red", data = sims)
+ + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, colour = "red", fill = "red", data = sims)
+ + facet_wrap(~matrix, scales = "free", ncol = 1)
+ + scale_y_continuous(name = "")
+ + scale_x_continuous(limits = c(offset0, time_steps))
+ + theme_bw()
 )
+
 
 # extract fitted coeficients and print out
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
