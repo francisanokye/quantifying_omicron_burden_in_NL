@@ -22,8 +22,8 @@ params.Rout: params.R
 flows.Rout: flows.R params.rda
 	$(pipeR)
 
-vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
-	$(pipeR)
+vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv params.rda 
+	$(pipeRcall)
 
 ## This is using serop only
 timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
