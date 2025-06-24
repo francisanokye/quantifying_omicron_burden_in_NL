@@ -54,7 +54,7 @@ outputs = c("S","E","A","I","R",
 	   )
 
 calibrator = mp_tmb_calibrator(
-    spec = timevar_spec |> mp_euler()
+    spec = timevar_spec |> mp_hazard()
   , data = seroprevdata |> select(-date)
   , time = mp_sim_bounds(1, time_steps, "steps")
   , traj = list(
@@ -80,6 +80,18 @@ print(ggplot()
  + theme_bw()
 )
 
+
+print(calibrator
+  |> mp_optimized_spec("modified")
+  |> mp_simulator(time_steps, outputs = mp_state_vars(timevar_spec))
+  |> mp_trajectory()
+  |> ggplot()
+  + aes(time, value)
+  + geom_line()
+  + facet_wrap(~matrix, scales = "free")
+  + scale_x_continuous(limits = c(offset0, time_steps))
+  + theme_bw()
+)
 
 # extract fitted coeficients and print out
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
