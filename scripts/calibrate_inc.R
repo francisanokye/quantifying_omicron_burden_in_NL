@@ -32,16 +32,16 @@ seroprevdata <- (rdsRead("fitsero.rds")
 ## When generating this dataset, we begin the time column
 ## (which aligns observed data with simulation steps) at
 ## offset + 1 rather than 1.
-offset = min(seroprevdata$time) - 1
+#offset = min(seroprevdata$time) - 1
 time_steps = max(seroprevdata$time)
 
 if (spline_beta) {
   basis_cols = 4
-  basis_rows = beta_timevar_length + offset
+  basis_rows = beta_timevar_length + offset0
   X = splines::ns(1:basis_rows
     , basis_cols
     , intercept = TRUE
-    , Boundary.knots = c(offset, basis_rows)
+    , Boundary.knots = c(offset0, basis_rows)
   )
   timevar_spec = mp_tmb_insert_glm_timevar(timevar_spec
     , parameter_name = "beta"
@@ -51,15 +51,15 @@ if (spline_beta) {
   )
 }
 
-shift = function(x, off) c(0, x[-1] + off)
-timevar_spec = (timevar_spec
-  |> mp_tmb_update(
-    integers = within(timevar_spec$integers, {
-        double_vac_changepoints <- shift(double_vac_changepoints, offset)
-        booster_vac_changepoints <- shift(booster_vac_changepoints, offset)
-    })
-  )
-)
+# shift = function(x, off) c(0, x[-1] + off)
+# timevar_spec = (timevar_spec
+#   |> mp_tmb_update(
+#     integers = within(timevar_spec$integers, {
+#         double_vac_changepoints <- shift(double_vac_changepoints, offset)
+#         booster_vac_changepoints <- shift(booster_vac_changepoints, offset)
+#     })
+#   )
+# )
 
 
 outputs = c("S","E","A","I","R",

@@ -13,8 +13,6 @@ library(shellpipes)
 
 loadEnvironments()
 
-offset = 120
-
 # load data and format date column
 seroprevalence <- csvRead()
 seroprevalence <- seroprevalence |>
@@ -134,7 +132,7 @@ serodat <- (daily_seroprev
 	)
 	|> pivot_longer(-c(time,date), names_to = "matrix", values_to = "value")
 	|> arrange(matrix, time)
-	|> mutate(time = time + offset)
+	|> mutate(time = time + offset0)
 )
 
 ## trying one data at a time

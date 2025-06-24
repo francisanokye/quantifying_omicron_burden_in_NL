@@ -4,8 +4,9 @@ library(shellpipes)
 loadEnvironments()
 
 dat <- csvRead()
-
-day0 <- as.Date("2021-12-17")
+print(offset0)
+quit()
+day0 <- as.Date("2021-12-17") - lubridate::days(offset0)
 
 nl <- (dat
 	|> filter(grepl("ewfoundland",prename)) 
