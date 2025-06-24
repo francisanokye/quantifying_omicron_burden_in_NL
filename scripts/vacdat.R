@@ -1,6 +1,8 @@
 library(tidyverse)
 library(shellpipes)
 
+loadEnvironments()
+
 dat <- csvRead()
 
 day0 <- as.Date("2021-12-17")
