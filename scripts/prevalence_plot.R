@@ -66,6 +66,8 @@ pp <- (ggplot(data = fitted_data, aes(x = dates, y = value))
 
 print(pp)
 
+## Don't do this
+
 png("../figures/prevalence_plot.png", width = 3600, height = 2400, res = 300, bg = "white", type = "cairo")
 pp
 dev.off()

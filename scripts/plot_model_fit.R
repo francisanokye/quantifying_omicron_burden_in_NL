@@ -18,7 +18,7 @@ loadEnvironments()
 
 pop = 510550
 
-start_date <- "2021-12-15"
+start_date <- as.Date("2021-12-15") - offset0
 last_date <-"2022-05-26"
 
 calibrator <- rdsRead("calibrate_inc.rds")
