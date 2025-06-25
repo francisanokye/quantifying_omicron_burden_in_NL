@@ -76,7 +76,7 @@ print(ggplot()
  + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, colour = "red", fill = "red", data = sims)
  + facet_wrap(~matrix, scales = "free", ncol = 1)
  + scale_y_continuous(name = "")
- + scale_x_continuous(limits = c(offset0, time_steps))
+ + scale_x_continuous(limits = c(0, time_steps))
  + theme_bw()
 )
 
@@ -89,7 +89,32 @@ print(calibrator
   + aes(time, value)
   + geom_line()
   + facet_wrap(~matrix, scales = "free")
-  + scale_x_continuous(limits = c(offset0, time_steps))
+  #+ scale_x_continuous(limits = c(offset0, time_steps))
+  + theme_bw()
+)
+
+remade_vax_data = list(
+  
+double_vac = data.frame(
+    time = timevar_spec$integers$double_vac_changepoints
+  , value = timevar_spec$default$double_vac_values
+),
+booster_shot = data.frame(
+    time = timevar_spec$integers$booster_vac_changepoints
+  , value = timevar_spec$default$booster_vac_values
+)
+) |> bind_rows(.id = "matrix")
+
+print(calibrator
+  |> mp_optimized_spec("modified")
+  |> mp_simulator(time_steps, outputs = mp_flow_vars(timevar_spec))
+  |> mp_trajectory()
+  |> ggplot()
+  + aes(time, value)
+  + geom_line()
+  + geom_point(data = remade_vax_data)
+  + facet_wrap(~matrix, scales = "free")
+  #+ scale_x_continuous(limits = c(offset0, time_steps))
   + theme_bw()
 )
 

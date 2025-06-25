@@ -10,12 +10,13 @@ library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
 library(shellpipes)
+rpcall("beta_plot.Rout beta_plot.R calibrate_inc.rds params.rda")
 library(tidyverse)
 library(macpan2)
 loadEnvironments()
 set.seed(2025)
 
-start_date <- "2021-12-15"
+start_date <- as.Date("2021-12-15") - offset0
 last_date <-"2022-05-26"
 
 calibrator <- rdsRead("calibrate_inc.rds")
@@ -40,9 +41,10 @@ beta_values <- fitted_data |>
   drop_na() |>
   select(c(date, beta))
 
-beta_values$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
+beta_values$alert_level <- rep(c('warmup', 'ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'), times = c(offset0 - 4, 10, 10, 35, 35, 73))
 
 alert_colors <- c(
+  "warmup"      = "black",
   "No-ALS"      = "#F7E2E2",  
   "ALS-2"       = "#D3D3D3", 
   "ALS-3"       = "#66D1B5",  
@@ -58,7 +60,7 @@ beta_summary <- do.call(data.frame, beta_summary)
 
 names(beta_summary) <- c("alert_level", "mean_value", "sd_value")
 
-desired_order <- c("No-ALS", "ALS-2", "ALS-3", "Mod-ALS-3", "ALS-4")
+desired_order <- c('warmup', "No-ALS", "ALS-2", "ALS-3", "Mod-ALS-3", "ALS-4")
 beta_summary$alert_level <- factor(beta_summary$alert_level, levels = desired_order)
 
 beta_errorplot <- ggplot(beta_summary, aes(x = alert_level, y = mean_value, color = alert_level)) +

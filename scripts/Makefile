@@ -56,8 +56,8 @@ plot_model_fit.Rout: plot_model_fit.R fitsero.rds params.rda calibrate_inc.rds
 prevalence_plot.Rout: prevalence_plot.R params.rda calibrate_inc.rds
 	$(pipeR)
 
-beta_plot.Rout: beta_plot.R calibrate_inc.rds
-	$(pipeR)
+beta_plot.Rout: beta_plot.R calibrate_inc.rds params.rda
+	$(pipeRcall)
 
 true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate_inc.rds ../data/serop_avgcase_data.csv #../outputs/true_infections_data.csv 
 	$(pipeR)
