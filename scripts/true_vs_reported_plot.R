@@ -25,35 +25,25 @@ reported_cases$date <- as.Date(reported_cases$date, format = "%Y-%m-%d")
 reported_cases <- reported_cases |>
   drop_na()
 
-calibrator <- rdsRead("calibrate_inc.rds")
-
-# model simulation with calibrated parameters
-fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
-
-fitted_data <- (fitted_data
-        |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
-        |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
-        |> dplyr::filter(matrix %in% c("date","sero_inc"))
-)
-
-# convert matrix values into columns
-true_infections <- fitted_data |>
-  select(-any_of(c("row", "col"))) |>
+seroprevdata <- rdsRead("fitsero.rds") |>
+  mutate(matrix = as.character(matrix)) |>
+  mutate(value = ifelse(is.na(value) & time == 0, 700, value)) |>
+  group_by(matrix) |>
+  mutate(date = seq(as.Date("2022-05-26"), by = "-1 day", length.out = n()) |> rev()) |> 
+  dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-26")) |>
   pivot_wider(names_from = matrix, values_from = value) |>
-  group_by(date) |>
-  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
-  ungroup() |>
-  distinct(date, .keep_all = TRUE) |>
+  group_by(date) |> 
   drop_na() |>
-  select(c(date, sero_inc)) |>
-  rename_at(vars("sero_inc"), ~"cases") |>
-  mutate(cases = as.integer(cases))
+  select(c(date, sero_inc))|>
+  rename_at(vars("sero_inc"), ~"cases")
+
+print(seroprevdata)
 
 d1 <- reported_cases[c("date","cases")]
 d1$type <- "reported"
 colnames(d1) <- c("date","cases","type")
 
-d2 <- true_infections[c("date","cases")]
+d2 <- seroprevdata[c("date","cases")]
 d2$type <- "true_infections"
 allcases <- rbind(d1,d2)
 
