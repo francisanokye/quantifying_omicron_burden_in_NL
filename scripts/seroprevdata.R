@@ -25,7 +25,7 @@ print(seroprevalence)
 serodat <- (seroprevalence
 	|> transmute(NULL
 		, date
-		, time = as.numeric(date - as.Date(start_date))+1
+		, time = as.numeric(date - as.Date(start_date))+1 + offset0
 		, matrix = "serop"
 		, value = pct_mean
 	)

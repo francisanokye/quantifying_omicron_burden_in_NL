@@ -34,7 +34,7 @@ timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
 timevar_spec_inc.Rout: timevar_spec_inc.R flows.rda vacdat.rds params.rda
 	$(pipeRcall)
 
-seroprevdata.Rout: seroprevdata.R ../data/raw_citf_data.csv    
+seroprevdata.Rout: seroprevdata.R params.rda ../data/raw_citf_data.csv    
 	$(pipeR)
 
 fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
