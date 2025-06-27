@@ -26,7 +26,7 @@ seroprevdata <- rdsRead("seroprevdata.rds")
 time_steps = max(seroprevdata$time)
 
 if (spline_beta) {
-  basis_cols = 6
+  basis_cols = 4
   basis_rows = time_steps
   X = splines::ns(1:basis_rows
     , basis_cols
@@ -47,17 +47,17 @@ calibrator = mp_tmb_calibrator(
   , time = mp_sim_bounds(1, time_steps, "steps")
   , traj = list(serop = mp_poisson())
   , par = list(
-        log_beta = mp_uniform()
+        log_beta = mp_normal(log(0.25), 0.01)
       , time_var_beta = mp_normal(0, 0.5)
-      , log_R_initial = mp_uniform()
+      #, log_R_initial = mp_uniform()
   )
-  , outputs = c("beta","logit_serop")
+  , outputs = c("log_beta_thing", "log_inc", "logit_serop")
 )
 mp_optimize(calibrator)
 sims = calibrator |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
 print(ggplot()
  + geom_point(aes(time, value), data = seroprevdata)
- #+ geom_line(aes(time, value), linewidth = 1, colour = "red", data = sims)
+ + geom_line(aes(time, value), linewidth = 1, colour = "red", data = sims)
  + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, colour = "red", fill = "red", data = sims)
  + facet_wrap(~matrix, scales = "free", ncol = 1)
  + scale_y_continuous(name = "")
