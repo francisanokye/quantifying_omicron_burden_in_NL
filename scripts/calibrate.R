@@ -130,5 +130,8 @@ print(calibrator
 # extract fitted coeficients and print out
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
 print(model_estimates, digits = 2)
+model_estimates = mp_tmb_coef(fake_cal, conf.int = TRUE)
+print(model_estimates, digits = 2)
+
 
 rdsSave(calibrator)
