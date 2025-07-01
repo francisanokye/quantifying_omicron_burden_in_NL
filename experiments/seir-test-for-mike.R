@@ -50,7 +50,10 @@ calibrator = mp_tmb_calibrator(seir_tv
     , log_alpha = mp_uniform()
   )
   , default = list(
-      beta_values = rep(0, basis_cols)
+        beta_values = rep(0, basis_cols)
+      , gamma = 0.2
+      , alpha = 0.4
+      , beta0 = 0.3
   )
   , outputs = c(
         "log_infection"
