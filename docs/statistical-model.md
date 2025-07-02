@@ -4,15 +4,18 @@ Statistical Model
 
 
 We assume that the transmission rate, $\beta$, is a smooth function of
-time that can be represented as. $$
+time that can be represented as.
+
+$$
 \beta(t) = \exp\left(b_0 + \sum_{i=1}^{N_B} b_iB_i(t-t_s)\right)
-$$ where $t$ is the time measured in days, $t_s$ is the start time,
-$b_0$ is the log of the baseline transmission rate, the $B_i(\cdot)$ are
-$N_B$ natural splines (TODO: Steve give a more precise definition), and
-the $b_i$, $i = 1, ..., N_B$, are parameters to be estimated that
-determine the shape of the time-variation function. The prior
-distribution of this function is determined by a prior the following
-priors.
+$$
+
+where $t$ is the time measured in days, $t_s$ is the start time, $b_0$
+is the log of the baseline transmission rate, the $B_i(\cdot)$ are $N_B$
+natural splines (TODO: Steve give a more precise definition), and the
+$b_i$, $i = 1, ..., N_B$, are parameters to be estimated that determine
+the shape of the time-variation function. The prior distribution of this
+function is determined by a prior the following priors.
 
 $$
 \log(b_0) \sim \mathcal{N}\left(\log\left(\frac{1}{4}\right), 1\right)
