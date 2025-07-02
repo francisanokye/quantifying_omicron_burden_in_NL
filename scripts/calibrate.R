@@ -40,55 +40,54 @@ if (spline_beta) {
     , link_function = mp_log
   )
 }
-
+get_logit_prior = \(prior_range) {
+  mp_normal(
+      mean(qlogis(prior_range))
+    , log(diff(qlogis(prior_range)) / (2 * 1.96))
+  )
+}
+get_log_prior = \(prior_range) {
+  mp_normal(
+      mean(log(prior_range))
+    , log(diff(log(prior_range)) / (2 * 1.96))
+  )
+}
+priors = list(
+      log_beta = mp_normal(log(0.25), log(1))
+    , time_var_beta = mp_normal(0, log(1))
+    , log_gamma_a = get_log_prior(prior_range$gamma_a)
+    , log_gamma_i = get_log_prior(prior_range$gamma_i)
+    , logit_kappa2 = get_logit_prior(prior_range$kappa2)
+    , logit_kappa3 = get_logit_prior(prior_range$kappa3)
+    , log_sigma = get_log_prior(prior_range$sigma)
+)
 calibrator = mp_tmb_calibrator(
     spec = timevar_spec |> mp_hazard()
-  , data = seroprevdata |> select(-date)
-  , time = mp_sim_bounds(1, time_steps, "steps")
-  , traj = list(serop = mp_poisson())
-  , par = list(
-        log_beta = mp_normal(log(0.25), 0.01)
-      , time_var_beta = mp_normal(0, 0.5)
-      #, log_R_initial = mp_uniform()
+  , data = (seroprevdata 
+      |> select(-date) 
+      |> dplyr::filter(matrix == "serop") 
+      |> mutate(matrix = "logit_serop", value = qlogis(value))
   )
+  , time = mp_sim_bounds(1, time_steps)
+  , traj = list(logit_serop = mp_normal(sd = mp_fit(1)))
+  , par = priors
   , outputs = c("log_beta_thing", "log_inc", "logit_serop")
 )
 mp_optimize(calibrator)
-priors = list(
-      log_beta = mp_normal(log(0.25), 0.01)
-    , time_var_beta = mp_normal(0, 0.5)
-    #, log_R_initial = mp_uniform()
-    , log_gamma_i = mp_uniform()
-    , log_gamma_a = mp_uniform()
-    #, logit_kappa2 = mp_uniform()
-    #, logit_kappa3 = mp_uniform()
-    #, log_sigma = mp_uniform()
-)
-model_traj = mp_optimized_spec(calibrator, "modified") |> mp_simulator(time_steps, outputs = c("serop", "inc")) |> mp_trajectory()
-fake_cal = mp_tmb_calibrator(
-    spec = timevar_spec |> mp_hazard()
-  , data = model_traj
-  , time = mp_sim_bounds(1, time_steps, "steps")
-  , traj = list(serop = mp_poisson())
-  , par = priors
-  #, outputs = c("log_beta_thing", "log_inc", "logit_serop")
-  , outputs = c("log_beta_thing", "log_serop", "log_inc")
-)
-mp_optimize(fake_cal)
 
-fake_sims = fake_cal |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
-real_sims = calibrator |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
-plot_data = bind_rows(list(fake = fake_sims, real = real_sims), .id = "type")
+sims = (calibrator
+  |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
+  |> dplyr::filter(time >= offset0)
+)
 print(ggplot()
- + geom_point(aes(time, value), data = plot_data)
- + geom_line(aes(time, value, colour = type), linewidth = 1, data = plot_data)
- + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high, fill = type), alpha = 0.4, data = plot_data)
+ + geom_point(aes(time, value), data = seroprevdata)
+ + geom_line(aes(time, value), linewidth = 1, data = sims)
+ + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, data = sims)
  + facet_wrap(~matrix, scales = "free", ncol = 1)
  + scale_y_continuous(name = "")
- + scale_x_continuous(limits = c(0, time_steps))
+ + scale_x_continuous(limits = c(offset0, time_steps))
  + theme_bw()
 )
-
 
 print(calibrator
   |> mp_optimized_spec("modified")
@@ -103,15 +102,14 @@ print(calibrator
 )
 
 remade_vax_data = list(
-  
-double_vac = data.frame(
-    time = timevar_spec$integers$double_vac_changepoints
-  , value = timevar_spec$default$double_vac_values
-),
-booster_shot = data.frame(
-    time = timevar_spec$integers$booster_vac_changepoints
-  , value = timevar_spec$default$booster_vac_values
-)
+  double_vac = data.frame(
+      time = timevar_spec$integers$double_vac_changepoints
+    , value = timevar_spec$default$double_vac_values
+  ),
+  booster_shot = data.frame(
+      time = timevar_spec$integers$booster_vac_changepoints
+    , value = timevar_spec$default$booster_vac_values
+  )
 ) |> bind_rows(.id = "matrix")
 
 print(calibrator
@@ -130,8 +128,5 @@ print(calibrator
 # extract fitted coeficients and print out
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE)
 print(model_estimates, digits = 2)
-model_estimates = mp_tmb_coef(fake_cal, conf.int = TRUE)
-print(model_estimates, digits = 2)
-
 
 rdsSave(calibrator)

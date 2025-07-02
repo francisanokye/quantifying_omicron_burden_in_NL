@@ -78,4 +78,3 @@ timevar_spec = mp_tmb_insert(timevar_spec
 timevar_spec$integers$double_vac_changepoints
 
 rdsSave(timevar_spec)
-
