@@ -1,6 +1,6 @@
 library(macpan2)
 library(shellpipes)
-rpcall("calibrate.Rout calibrate.R timevar_spec.rds seroprevdata.rds params.rda")
+rpcall("calibrate.Rout calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda")
 library(conflicted)
 library(tidyverse)
 library(dplyr)
@@ -23,10 +23,18 @@ spline_beta = TRUE
 timevar_spec <- rdsRead("timevar_spec.rds")
 
 seroprevdata <- rdsRead("seroprevdata.rds")
+fitserodata <- rdsRead("fitsero.rds")
 time_steps = max(seroprevdata$time)
+upper_plot_time = 300 #time_steps
+
+## SW: i'm winging this ...
+fitserodata = (seroprevdata 
+  |> mutate(value = timevar_spec$default$N * (value - dplyr::lag(value)) / 7)
+  |> mutate(matrix = "inc")
+)
 
 if (spline_beta) {
-  basis_cols = 4
+  basis_cols = 5
   basis_rows = time_steps
   X = splines::ns(1:basis_rows
     , basis_cols
@@ -74,15 +82,16 @@ sims = (calibrator
   |> dplyr::filter(time >= offset0)
 )
 
-print(sims)
-
+#print(sims)
+lim_dat = \(x) dplyr::filter(x, time <= upper_plot_time)
 print(ggplot()
- + geom_point(aes(time, value), data = seroprevdata)
- + geom_line(aes(time, value), linewidth = 1, data = sims)
- + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, data = sims)
+ + geom_point(aes(time, value), data = lim_dat(seroprevdata))
+ + geom_point(aes(time, value), data = lim_dat(fitserodata))
+ + geom_line(aes(time, value), linewidth = 1, data = lim_dat(sims))
+ + geom_ribbon(aes(x = time, ymin = conf.low, ymax = conf.high), alpha = 0.4, data = lim_dat(sims))
  + facet_wrap(~matrix, scales = "free", ncol = 1)
  + scale_y_continuous(name = "")
- + scale_x_continuous(limits = c(offset0, time_steps))
+ + scale_x_continuous(limits = c(offset0, upper_plot_time))
  + theme_bw()
 )
 
@@ -90,6 +99,7 @@ print(calibrator
   |> mp_optimized_spec("modified")
   |> mp_simulator(time_steps, outputs = mp_state_vars(timevar_spec))
   |> mp_trajectory()
+  |> lim_dat()
   |> ggplot()
   + aes(time, value)
   + geom_line()
@@ -113,6 +123,7 @@ print(calibrator
   |> mp_optimized_spec("modified")
   |> mp_simulator(time_steps, outputs = mp_flow_vars(timevar_spec))
   |> mp_trajectory()
+  |> lim_dat()
   |> ggplot()
   + aes(time, value)
   + geom_line()
@@ -123,7 +134,7 @@ print(calibrator
 )
 
 # extract fitted coeficients and print out
-model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE) |> dplyr::select(-term, -col, -type)
+model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE) |> dplyr::select(-term, -col, -type) |> mutate(mat = abbreviate(mat, minlength = 15))
 print(model_estimates, digits = 2)
 
 rdsSave(calibrator)

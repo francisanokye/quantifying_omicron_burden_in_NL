@@ -40,7 +40,7 @@ seroprevdata.Rout: seroprevdata.R params.rda ../data/raw_citf_data.csv
 fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
 	$(pipeR)
 
-calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda
+calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
 	$(pipeRcall)
 
 # calibrate_inc.Rout: calibrate_inc.R timevar_spec_inc.R

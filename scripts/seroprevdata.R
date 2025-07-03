@@ -4,7 +4,7 @@ library(tidyverse)
 loadEnvironments()
 
 start_date <- "2021-12-15"
-last_date <-"2022-05-26"
+last_date <- "2022-07-15"  # "2022-05-26"
 
 ## Need the script for seroprevdata
 

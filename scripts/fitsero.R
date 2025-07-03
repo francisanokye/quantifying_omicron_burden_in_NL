@@ -114,8 +114,7 @@ print(A)
 # the average recovery period (14 days) to better reflect the infection dynamics rather than the delayed
 # immune response
 
-daily_seroprev <- daily_seroprev |>
-  mutate(date = date - days(14))
+daily_seroprev <- daily_seroprev |> mutate(date = date - days(14))
 
 # select only data from Dec 15, 2021 to June 3, 2022
 daily_seroprev <- daily_seroprev[(daily_seroprev$date >= "2021-12-15") & (daily_seroprev$date <= "2022-06-03"),]
