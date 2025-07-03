@@ -12,7 +12,9 @@ among state variables that is consistent with the model. We used
 $\text{offset} = 150$ days (TODO: why? should we try other values?).
 
 We assume that the transmission rate, $\beta$, is a smooth function of
-time that can be represented as. $$
+time that can be represented as.
+
+$$
 \beta(t) = \exp\left(b_0 + \sum_{i=1}^{N_B} b_iB_i(t)\right)
 $$
 
