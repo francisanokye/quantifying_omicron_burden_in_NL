@@ -1,23 +1,102 @@
 ---
 title: "Statistical Model"
-header-includes:
-   - \usepackage{amsmath}
-output: rmarkdown::html_vignette
+output: "rmarkdown::github_document"
 ---
 
-We assume that the transmission rate, $\beta$, is a smooth function of time that can be represented as.
-$$
-\beta(t) = \exp\left(b_0 + \sum_{i=1}^{N_B} b_iB_i(t-t_s)\right)
-$$
-where $t$ is the time measured in days, $t_s$ is the start time, $b_0$ is the log of the baseline transmission rate, the $B_i(\cdot)$ are $N_B$ natural splines (TODO: Steve give a more precise definition), and the $b_i$, $i = 1, ..., N_B$, are parameters to be estimated that determine the shape of the time-variation function. The prior distribution of this function is determined by a prior the following priors.
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+We used weekly sero-prevalence data from $t_s$ to $t_f$, the first and last dates for which such data were available. To generate model trajectories, we solved the ODE system (TODO: insert equations and reference) using fourth-order Runge–Kutta integration with daily time steps from $t_s - \text{offset}$ to $t_f$. The warm-up period of length $\text{offset} = 150$ days (TODO: justify or explore alternatives) allows the model to evolve from an initial state with a small number of infectious individuals to a compartmental distribution consistent with model dynamics by time $t_s$.
+
+The likelihood function models the logit of observed sero-prevalence as Gaussian. Specifically, for each observation, we assume:
 
 $$
-\log(b_0) \sim \mathcal{N}\left(\log\left(\frac{1}{4}\right), 1\right)
-$$
-$$
-\log(b_i) \sim \mathcal{N}\left(0, 1\right)
+\text{logit}(\text{observed sero-prevalence}) \sim \mathcal{N}(\mu, \sigma^2)
 $$
 
-We also place priors on dynamical parameters ... TODO
+where the mean is given by
 
+$$
+\mu = \text{logit}(R/N),
+$$
 
+with $R$ denoting the number of recovered individuals and $N$ the total population size. The standard deviation $\sigma$ was treated as an unknown parameter and estimated on the log scale to ensure positivity. This likelihood also involved several other parameters, as described below.
+
+We modeled the time-varying transmission rate $\beta(t)$ as a smooth function represented using natural splines:
+
+$$
+\beta(t) = \exp\left(b_0 + \sum_{i=1}^{N_B} b_i B_i(t)\right),
+$$
+
+where $t$ is the number of days since $t_s - \text{offset}$, the $B_i(t)$ are $N_B$ natural spline basis functions with boundary knots at $t_s$ and $t_f$, and the $b_i$ are parameters to be estimated. The prior distributions on the log-scale spline coefficients are given by:
+
+$$
+\log(b_i) \sim
+\begin{cases}
+\mathcal{N}\left(\log\left(\frac{1}{4}\right), 1\right) & \text{if } i = 0 \\
+\mathcal{N}(0, 1) & \text{if } i = 1, \ldots, N_B
+\end{cases}
+$$
+
+We also placed priors on dynamical parameters other than the transmission rate.
+
+To specify priors for the rate parameters $\gamma_a$, $\gamma_i$, and $\sigma$, we assumed plausible ranges for their reciprocals, corresponding to the expected number of days individuals remain in the associated source compartments:
+
+```{r prior_range, echo = FALSE}
+load("../scripts/params.rda")
+fr = (prior_range[c("gamma_a", "gamma_i", "sigma")]
+  |> lapply(\(x) 1/x)
+  |> lapply(rev)
+  |> lapply(setNames, c("Lower (days)", "Upper (days)"))
+  |> as.data.frame() 
+  |> t()
+)
+rownames(fr) = sprintf("1/%s", rownames(fr))
+fr = fr |> as.data.frame() |> rownames_to_column("Parameter")
+print(fr)
+```
+
+We specified Gaussian priors on the logarithm of each rate parameter such that 95% of the prior mass lies between the reciprocals of the lower and upper bounds. That is, for a parameter $\theta$, we set:
+
+$$
+\log(\theta) \sim \mathcal{N}(\mu, \sigma^2),
+$$
+
+where
+
+$$
+\mu = -\frac{\log(\text{lower}) + \log(\text{upper})}{2}, \quad
+\sigma = \frac{\log(\text{upper}) - \log(\text{lower})}{2 \times 1.96}
+$$
+
+These priors reflect uncertainty about the time scale associated with each rate.
+
+For parameters naturally expressed as probabilities, we used the following bounds:
+
+```{r prior_range_probs, echo = FALSE}
+load("../scripts/params.rda")
+fr = (prior_range[c("kappa2", "kappa3")]
+  |> lapply(setNames, c("Lower", "Upper"))
+  |> as.data.frame() 
+  |> t()
+  |> as.data.frame()
+  |> rownames_to_column("Parameter")
+)
+print(fr)
+```
+
+We specified Gaussian priors on the logit scale, again ensuring that 95% of the prior mass lies between the stated bounds. That is, for a parameter $\theta$, we used:
+
+$$
+\text{logit}(\theta) \sim \mathcal{N}(\mu, \sigma^2),
+$$
+
+where
+
+$$
+\mu = \frac{\text{logit}(\text{lower}) + \text{logit}(\text{upper})}{2}, \quad
+\sigma = \frac{\text{logit}(\text{upper}) - \text{logit}(\text{lower})}{2 \times 1.96}
+$$
+
+We fitted the model by maximizing the posterior distribution using `macpan2`, a tool that facilitates fitting compartmental models with the Template Model Builder (TMB) package. `macpan2` uses the delta method to compute confidence intervals, which we applied to parameter estimates, state trajectories, and fitted sero-prevalence.
