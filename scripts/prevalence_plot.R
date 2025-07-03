@@ -21,7 +21,7 @@ loadEnvironments()
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
 
-calibrator <- rdsRead("calibrate_inc.rds") #readRDS("calibrate_inc.rds")
+calibrator <- rdsRead("calibrate.rds")
 
 # model simulation with calibrated parameters
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)

@@ -16,39 +16,32 @@ library(macpan2)
 loadEnvironments()
 set.seed(2025)
 
-start_date <- "2021-12-15"
-last_date <-"2022-05-26"
+start_date <- as.Date("2021-12-15") - offset0
+last_date <-"2022-05-22"
 
-calibrator <- rdsRead("calibrate_inc.rds")
+calibrator <- rdsRead("calibrate.rds")
 
-# model simulation with calibrated parameters
-fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
+sims <- (calibrator
+	 |>mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
+	 |> dplyr::filter(time >= offset0)
+	 |> mutate(date = as.Date(start_date) + as.numeric(time))
+	 |> select(-any_of(c("row", "col"))) 
+  	 |> pivot_wider(names_from = matrix, values_from = value) 
+  	 |> group_by(date) 
+  	 |> mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) 
+  	 |> ungroup() 
+  	 |> distinct(date, .keep_all = TRUE) 
+  	 |> drop_na() 
+  	 |> select(c(date, inc))
+	 |> filter(date >= as.Date("2021-12-15"))		
+        )
 
-fitted_data <- (fitted_data
-        |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
-        |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
-        |> dplyr::filter(matrix %in% c("date","sero_inc"))
-)
-
-# convert matrix values into columns
-true_infections <- fitted_data |>
-  select(-any_of(c("row", "col"))) |>
-  pivot_wider(names_from = matrix, values_from = value) |>
-  group_by(date) |>
-  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
-  ungroup() |>
-  distinct(date, .keep_all = TRUE) |>
-  drop_na() |>
-  select(c(date, sero_inc))
-
-true_infections$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 73))
-true_infections <- true_infections |>
-	drop_na()
+sims$alert_level <- rep(c('ALS-2', 'ALS-3', 'ALS-4', 'Mod-ALS-3', 'No-ALS'),times = c(10, 10, 35, 35, 69))
 
 # Estimate Effective Reproductive (Rt) and the average case-weighted Rt period ALS period
 # Omicron's  serial interval distribution is 3.5 and that the SD is 2.4 using an estimate 
 
-incidence_df <- data.frame(date = true_infections$date, I = true_infections$sero_inc)
+incidence_df <- data.frame(date = sims$date, I = sims$inc)
 
 # estimate Rt using EpiEstim
 n_days <- length(incidence_df$date)
@@ -107,21 +100,21 @@ summary_Rt <- Rt_df %>%
 
 print(summary_Rt)
 
-alert_colors <- c("No-ALS" = "darkgray", "ALS-2" = "brown", "ALS-3" = "#009E73", "Mod-ALS-3" = "orange", "ALS-4" = "steelblue")
+alert_colors <- c("No-ALS" = "#D3D3D3", "ALS-2" = "#66D1B5", "ALS-3" = "#87CEFA", "Mod-ALS-3" = "#F7E2E2", "ALS-4" = "#FFD580")
 
 Rt_df$period <- factor(Rt_df$period, levels = names(alert_colors))
 
 Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
-  geom_rect(aes(xmin=ymd('2022-03-14'), xmax = ymd('2022-05-26'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) +
+  geom_rect(aes(xmin=ymd('2022-03-14'), xmax = ymd('2022-05-22'), ymin = -Inf, ymax = Inf), 
+            fill = adjustcolor("#D3D3D3"), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2021-12-21'), xmax = ymd('2021-12-24'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#D3D3D3", alpha = 0.03), alpha = 0.05) +
+            fill = adjustcolor("#66D1B5"), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2021-12-24'), xmax = ymd('2022-01-08'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#66D1B5", alpha = 0.03), alpha = 0.05) +
+            fill = adjustcolor("#87CEFA"), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2022-02-07'), xmax = ymd('2022-03-14'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#FFD580", alpha = 0.03), alpha = 0.05) +
+            fill = adjustcolor("#F7E2E2"), alpha = 0.05) +
   geom_rect(aes(xmin=ymd('2022-01-08'), xmax = ymd('2022-02-07'), ymin = -Inf, ymax = Inf), 
-            fill = adjustcolor("#87CEFA", alpha = 0.03), alpha = 0.05) +
+            fill = adjustcolor("#FFD580"), alpha = 0.05) +
   geom_ribbon(data = Rt_df, aes(ymin = pmax(0, `Mean(R)` - 0.25 * sd(`Mean(R)`)),ymax = `Mean(R)` + 0.25 * sd(`Mean(R)`)), fill = "gray70", alpha = 0.75)+
   geom_line(lwd = 1.5, color = "blue") +
   scale_color_manual(values = alert_colors, guide = "none") +
@@ -141,16 +134,17 @@ Eff_Reprod <- (ggplot(Rt_df, aes(x = date, y = `Mean(R)`)) +
   geom_vline(xintercept = as.Date("2022-01-08"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-02-07"), colour = "gold4", linetype = 2, size = 1)  +
   geom_vline(xintercept = as.Date("2022-03-14"), colour = "black", linetype = 1, size = 1)  +
-  annotate("text", x = as.Date("2021-12-18"), y = 1.6, label = expression(R[t[2]] == 1.87),size = 4,angle = 90, hjust = 1, color = "black")+
-  annotate("text", x = as.Date("2022-01-02"), y = 1.6, label = expression(R[t[3]] == 1.22),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-02-02"), y = 1.4, label = expression(R[t[4]]== 1.09),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
-  annotate("text", x = as.Date("2022-03-06"), y = 1.4, label = expression(R[t[3][m]] == 1.07),size = 4,angle = 0, hjust = 1, color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-05-01"), y = 1.4, label = expression(R[t[0]] == 0.98),size = 4, hjust = 1, color = "black", alpha = 1)+
-  annotate("text", x = as.Date("2022-03-02"), y = 2.0, label = "Pre-Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1, color = "black")+
-  annotate("text", x = as.Date("2022-05-18"), y = 2.0, label = "Post Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1,color = "black")+
+  annotate("text", x = as.Date("2021-12-18"), y = 1.3, label = expression(R[t[2]] == 1.37),size = 4,angle = 90, hjust = 1, color = "black")+
+  annotate("text", x = as.Date("2022-01-02"), y = 1.3, label = expression(R[t[3]] == 1.06),size = 4,angle = 90, hjust = 1,color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2022-02-02"), y = 1.2, label = expression(R[t[4]]== 1.01),size = 4,angle = 0, hjust = 1, color = "black",alpha = 1)+
+  annotate("text", x = as.Date("2022-03-06"), y = 1.2, label = expression(R[t[3][m]] == 1.10),size = 4,angle = 0, hjust = 1, color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2022-05-01"), y = 1.2, label = expression(R[t[0]] == 0.99),size = 4, hjust = 1, color = "black", alpha = 1)+
+  annotate("text", x = as.Date("2022-03-02"), y = 1.60, label = "Pre-Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1, color = "black")+
+  annotate("text", x = as.Date("2022-05-18"), y = 1.60, label = "Post Cancellation of Public \nHealth Emergency Declaration",size = 4, hjust=1,color = "black")+
   ggtitle(label = expression("Estimated Time-varying " * R[t] * " Across Intervention Periods in NL", subtitle = "")) +
-  labs(x = "Dates (Dec 15, 2021 -- May 26, 2022)", y =  expression("" * R[t] * " "))
+  labs(x = "Dates (Dec 15, 2021 -- May 26, 2022)", y =  expression("Effective Reproduction Number ("* R[t]* ")"))
 )
+
 
 print(Eff_Reprod)
 

@@ -203,9 +203,9 @@ beta_errorplot_all <- beta_errorplot_all +
 
 print(beta_errorplot_all)
 
-#png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
-#beta_errorplot_all
-#dev.off()
+png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
+beta_errorplot_all
+dev.off()
 
 
 

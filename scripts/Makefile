@@ -47,22 +47,29 @@ calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds params.rda
 calibrate_inc.Rout: calibrate_inc.R timevar_spec_inc.rds fitsero.rds params.rda
 	$(pipeRcall)
 
+bettas.Rout: bettas.R fitsero.rds params.rda calibrate.rds
+	$(pipeR)
+
+reprod_numb.Rout: reprod_numb.R fitsero.rds params.rda calibrate.rds
+	$(pipeR)
+
+
 output.Rout: output.R calibrate_inc.rds
 	$(pipeR)
 
-plot_model_fit.Rout: plot_model_fit.R fitsero.rds params.rda calibrate_inc.rds
+plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds params.rda calibrate.rds
 	$(pipeR)
 
-prevalence_plot.Rout: prevalence_plot.R params.rda calibrate_inc.rds
+prevalence_plot.Rout: prevalence_plot.R params.rda calibrate.rds
 	$(pipeR)
 
-beta_plot.Rout: beta_plot.R calibrate_inc.rds params.rda
+beta_plot.Rout: beta_plot.R calibrate.rds params.rda
 	$(pipeRcall)
 
-true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate_inc.rds fitsero.rds ../data/serop_avgcase_data.csv #../outputs/true_infections_data.csv 
+true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate.rds fitsero.rds ../data/serop_avgcase_data.csv params.rda 
 	$(pipeR)
 
-eff_Rt.Rout: eff_Rt.R calibrate_inc.rds #output.rds
+eff_Rt.Rout: eff_Rt.R calibrate.rds params.rda
 	$(pipeR)
 
 Ignore += makestuff

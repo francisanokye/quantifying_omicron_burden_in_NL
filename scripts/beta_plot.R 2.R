@@ -30,7 +30,7 @@ fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 fitted_data <- (fitted_data
         |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
         |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
-        |> dplyr::filter(matrix %in% c("date","beta_thing"))
+        n|> dplyr::filter(matrix %in% c("date","beta_thing"))
 )
 
 # convert matrix values into columns
@@ -50,18 +50,18 @@ beta_values <- beta_values |>
 beta_values <- beta_values %>%
   mutate(
     alert_level = case_when(
-      date >= as.Date("2021-12-15") & date <= as.Date("2021-12-19") ~ "ALS-2\nK-12 Open",
-      date >= as.Date("2021-12-20") & date <= as.Date("2021-12-24") ~ "ALS-2\nK-12 Closed",
-      date >= as.Date("2021-12-25") & date <= as.Date("2022-01-03") ~ "ALS-3\nK-12 Closed",
-      date >= as.Date("2022-01-04") & date <= as.Date("2022-01-25") ~ "ALS-4\nK-12 Closed",
-      date >= as.Date("2022-01-26") & date <= as.Date("2022-02-07") ~ "ALS-4\nK-12 Open",
-      date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "Mod-ALS-3\nK-12 Open",
-      date >= as.Date("2022-03-15") & date <= as.Date("2022-05-22") ~ "No-ALS\nK-12 Open",
+      date >= as.Date("2021-12-15") & date <= as.Date("2021-12-19") ~ "ALS-2\nNo",
+      date >= as.Date("2021-12-20") & date <= as.Date("2021-12-24") ~ "ALS-2\nYes",
+      date >= as.Date("2021-12-25") & date <= as.Date("2022-01-03") ~ "ALS-3\nYes",
+      date >= as.Date("2022-01-04") & date <= as.Date("2022-01-25") ~ "ALS-4\nYes",
+      date >= as.Date("2022-01-26") & date <= as.Date("2022-02-07") ~ "ALS-4\nNo",
+      date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "Mod-ALS-3\nNo",
+      date >= as.Date("2022-03-15") & date <= as.Date("2022-05-22") ~ "No-ALS\nNo",
       TRUE ~ NA_character_
     ),
     combined_alert = case_when(
-      date >= as.Date("2021-12-20") & date <= as.Date("2022-01-25") ~ "ALS-2-3-4\nK-12 Closed",
-      date >= as.Date("2022-01-26") & date <= as.Date("2022-05-22") ~ "ALS-4-Mod3-None\nK-12 Open",
+      date >= as.Date("2021-12-20") & date <= as.Date("2022-01-25") ~ "ALS-2-3-4\nYes",
+      date >= as.Date("2022-01-26") & date <= as.Date("2022-05-22") ~ "ALS-4-Mod3-None\nNo",
       TRUE ~ NA_character_
     )
   )
@@ -117,30 +117,29 @@ beta_summary_all$alert_level <- factor(
 actual_levels <- levels(beta_summary_all$alert_level)
 
 alert_colors <- c(
-  "ALS-2\nK-12 Open" = "#1b9e77",
-  "ALS-2\nK-12 Closed" = "#d95f02",
-  "ALS-3\nK-12 Closed" = "#7570b3",
-  "ALS-4\nK-12 Closed" = "#e7298a",
-  "ALS-4\nK-12 Open" = "#66a61e",
-  "Mod-ALS-3\nK-12 Open" = "#e6ab02",
-  "No-ALS\nK-12 Open" = "#a6761d",
-  "ALS-2-3-4\nK-12 Closed" = "#666666",
-  "ALS-4-Mod3-None\nK-12 Open" = "#1f78b4"
+  "ALS-2\nNo" = "#1b9e77",
+  "ALS-2\nYes" = "#d95f02",
+  "ALS-3\nYes" = "#7570b3",
+  "ALS-4\nYes" = "#e7298a",
+  "ALS-4\nNo" = "#66a61e",
+  "Mod-ALS-3\nNo" = "#e6ab02",
+  "No-ALS\nNo" = "#a6761d",
+  "ALS-2-3-4\nYes" = "#666666",
+  "ALS-4-Mod3-None\nNo" = "#1f78b4"
 )
 
 # color interventions based on the school closure
 
-alert_k12 <- c("Mod-ALS-3\nK-12 Open" = "blue",
-               "ALS-4-Mod3-None\nK-12 Open" = "blue",
-               "ALS-4\nK-12 Open"= "blue",
-               "No-ALS\nK-12 Open"= "blue",
-               "ALS-4\nK-12 Closed" = "red",
-               "ALS-2-3-4\nK-12 Closed" = "red",
-               "ALS-3\nK-12 Closed" = "red",
-               "ALS-2\nK-12 Closed" = "red",
-               "ALS-2\nK-12 Open" = "blue"
+alert_k12 <- c("Mod-ALS-3\nNo" = "blue", 
+	       "ALS-4-Mod3-None\nNo" = "blue",
+	       "ALS-4\nNo"= "blue",
+	       "No-ALS\nNo"= "blue",          
+	       "ALS-4\nYes" = "red",
+	       "ALS-2-3-4\nYes" = "red",
+	       "ALS-3\nYes" = "red",
+	       "ALS-2\nYes" = "red",
+	       "ALS-2\nNo" = "blue"
 )
-
 # Plot
 beta_errorplot_all <- (
   ggplot(beta_summary_all,
@@ -189,23 +188,12 @@ beta_errorplot_all <- (
     )
 )
 
-# create colored labels
-label_html <- purrr::map_chr(names(alert_k12), function(lvl) {
-  col <- alert_k12[[lvl]]
-  sprintf("<span style='color:%s;'>%s</span>", col, gsub("\\n","<br>",lvl))
-})
-names(label_html) <- names(alert_k12)
-
-# add to plot
-beta_errorplot_all <- beta_errorplot_all +
-  scale_x_discrete(labels = label_html) +
-  theme(axis.text.x = ggtext::element_markdown(size = 8, angle = 0, hjust = 0.5))
-
 print(beta_errorplot_all)
 
-#png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
-#beta_errorplot_all
-#dev.off()
+
+png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
+beta_errorplot_all
+dev.off()
 
 
 
