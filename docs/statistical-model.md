@@ -14,7 +14,9 @@ $\text{offset} = 150$ days (TODO: why? should we try other values?).
 We assume that the transmission rate, $\beta$, is a smooth function of
 time that can be represented as. $$
 \beta(t) = \exp\left(b_0 + \sum_{i=1}^{N_B} b_iB_i(t)\right)
-$$ where $t$ is the number of days since $t_s - \text{offset}$, the
+$$
+
+where $t$ is the number of days since $t_s - \text{offset}$, the
 $B_i(\cdot)$ are $N_B$ natural splines with one boundary knots at $t_s$
 and $t_f$, and the $b_i$, $i = 0, ..., N_B$, are parameters to be
 estimated that determine the shape of the time-variation function. The
