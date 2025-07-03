@@ -62,7 +62,7 @@ priors = list(
     , log_sigma = get_log_prior(prior_range$sigma)
 )
 calibrator = mp_tmb_calibrator(
-    spec = timevar_spec |> mp_hazard()
+    spec = timevar_spec |> mp_rk4() # mp_hazard()
   , data = (seroprevdata 
       |> select(-date) 
       |> dplyr::filter(matrix == "serop") 
