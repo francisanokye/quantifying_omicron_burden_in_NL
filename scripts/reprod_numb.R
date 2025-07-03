@@ -1,5 +1,3 @@
-
-
 library(dplyr)
 library(lubridate)
 library(ggplot2)
@@ -7,13 +5,13 @@ library(RColorBrewer)
 library(dplyr)
 library(tidyr)
 library(zoo)
-library(grid)
 library(ggthemes)
+library(ggtext)
 library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
 library(shellpipes)
-rpcall("beta_plot.Rout beta_plot.R calibrate.rds params.rda")
+rpcall("beta_plot.Rout beta_plot.R calibrate_inc.rds params.rda")
 library(tidyverse)
 library(macpan2)
 loadEnvironments()
@@ -45,7 +43,7 @@ beta_values <- fitted_data |>
   select(c(date, beta_thing))
 
 beta_values <- beta_values |>
-	dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+        dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 beta_values <- beta_values %>%
   mutate(
@@ -65,9 +63,9 @@ beta_values <- beta_values %>%
       TRUE ~ NA_character_
     )
   )
-
-# summary: initial default alert levels
-# -------------------------------------
+# ------------------------------------------------------------
+# Summarize specific alert levels
+# ------------------------------------------------------------
 
 beta_summary <- beta_values %>%
   group_by(alert_level) %>%
@@ -79,9 +77,9 @@ beta_summary <- beta_values %>%
   filter(!is.na(alert_level)) %>%
   mutate(type = "Specific")
 
-
-# summary: the combined alert levels
-# ----------------------------------
+# ------------------------------------------------------------
+# Summarize combined alert levels
+# ------------------------------------------------------------
 
 beta_summary_combined <- beta_values %>%
   group_by(combined_alert) %>%
@@ -94,23 +92,78 @@ beta_summary_combined <- beta_values %>%
   rename(alert_level = combined_alert) %>%
   mutate(type = "Combined")
 
-# merge both summaries
-# --------------------
+# ------------------------------------------------------------
+# Merge both summaries
+# ------------------------------------------------------------
 
 beta_summary_all <- bind_rows(beta_summary, beta_summary_combined)
 
-# arrange in descending order
-# ---------------------------
+# Fixed parameter values
+kappa1 <- 1
+kappa2 <- 0.91
+kappa3 <- 0.3
+gamma_i <- 1/7
+gamma_a <- 1/10
+mu <- 0.324
+zeta <- 0.75
+p1 <- 0.15
+p2 <- 0.85
+p3 <- 0
+
+# Pre-calculate the bracket term
+bracket_term <- (mu / gamma_i) + ((1 - mu) * zeta / gamma_a)
+
+# Susceptibility-weighted proportion
+susceptibility_sum <- (p1 * kappa1) + (p2 * kappa2) + (p3 * kappa3)
+
+# Multiplicative constant
+constant_mult <- susceptibility_sum * bracket_term
+
+# ------------------------------------------------------------
+# Calculate R0 for mean and SD
+# ------------------------------------------------------------
+
+# Function to compute R0 from β
+calc_R0 <- function(beta) {
+  beta * constant_mult
+}
+
+calc_R0_sd <- function(beta, beta_sd) {
+  # approximate SD via linear propagation
+  constant_mult * beta_sd
+}
+
+# Compute R0 and propagate SD
+beta_summary_all <- beta_summary_all %>%
+  mutate(
+    R0_mean = calc_R0(mean_value),
+    R0_sd = calc_R0_sd(mean_value, sd_value)
+  )
+
 ordering <- beta_summary_all %>%
-  group_by(alert_level) %>%
-  summarise(avg = mean(mean_value)) %>%
-  arrange(desc(avg)) %>%
+  arrange(desc(R0_mean)) %>%
   pull(alert_level)
 
 beta_summary_all$alert_level <- factor(
   beta_summary_all$alert_level,
   levels = ordering
 )
+
+actual_levels <- levels(beta_summary_all$alert_level)
+palette_size <- length(actual_levels)
+
+if (palette_size > 0) {
+  palette_colors <- RColorBrewer::brewer.pal(
+    min(palette_size, 8),
+    "Set2"
+  )
+  alert_colors <- setNames(
+    palette_colors[seq_len(palette_size)],
+    actual_levels
+  )
+} else {
+  alert_colors <- NULL
+}
 
 # extract unique levels
 # --------------------
@@ -130,65 +183,60 @@ alert_colors <- c(
 
 # color interventions based on the school closure
 
-alert_k12 <- c("Mod-ALS-3\nK-12 Open" = "blue",
-               "ALS-4-Mod3-None\nK-12 Open" = "blue",
-               "ALS-4\nK-12 Open"= "blue",
-               "No-ALS\nK-12 Open"= "blue",
-               "ALS-4\nK-12 Closed" = "red",
-               "ALS-2-3-4\nK-12 Closed" = "red",
-               "ALS-3\nK-12 Closed" = "red",
-               "ALS-2\nK-12 Closed" = "red",
-               "ALS-2\nK-12 Open" = "blue"
+alert_k12 <- c("Mod-ALS-3\nK-12 Open" = "blue", 
+	       "ALS-4-Mod3-None\nK-12 Open" = "blue",
+	       "ALS-4\nK-12 Open"= "blue",
+	       "No-ALS\nK-12 Open"= "blue",          
+	       "ALS-4\nK-12 Closed" = "red",
+	       "ALS-2-3-4\nK-12 Closed" = "red",
+	       "ALS-3\nK-12 Closed" = "red",
+	       "ALS-2\nK-12 Closed" = "red",
+	       "ALS-2\nK-12 Open" = "blue"
 )
 
-# Plot
-beta_errorplot_all <- (
-  ggplot(beta_summary_all,
-         aes(x = alert_level,
-             y = mean_value,
-             fill = alert_level,
-             color = alert_level)) +
-    geom_errorbar(
-      aes(ymin = mean_value - sd_value,
-          ymax = mean_value + sd_value),
-      width = 0.15,
-      size = 0.8
-    ) +
-    geom_point(
-      size = 3,
-      position = position_dodge(width = 0.5)
-    ) +
-    geom_text(
-      aes(label = round(mean_value, 3)),
-      vjust = 0.0,
-      hjust = -0.38,
-      size = 2.8,
-      color = "black"
-    ) +
-    labs(
-      title = "Effect Comparison: Alert Levels and K-12 Schools Closure",
-      x = "Intervention",
-      y = expression("Transmission rate ("*beta*")")
-    ) +
-    scale_fill_manual(
+
+# ------------------------------------------------------------
+# Plot R0 instead of beta
+# ------------------------------------------------------------
+
+r0_errorplot_all <- ggplot(beta_summary_all,
+                           aes(x = alert_level,
+                               y = R0_mean,
+                               fill = alert_level,
+			       color = alert_level)) +
+  geom_errorbar(aes(ymin = R0_mean - R0_sd,
+                    ymax = R0_mean + R0_sd),
+                width = 0.15,
+                linewidth = 0.8) +
+  geom_point(size = 3,
+             position = position_dodge(width = 0.5),
+             show.legend = FALSE) +
+  geom_text(aes(label = round(R0_mean, 3)),
+            vjust = 0.0,
+            hjust = -0.38,
+            size = 2.8,
+            color = "black") +
+  labs(title = expression("Estimated " * R[0] * " by Alert Levels and K-12 School Closures"),
+       x = "Intervention",
+       y = expression("Reproduction Number ("*R[0]*")")) +
+  scale_fill_manual(
       values = alert_colors
     ) +
     scale_color_manual(
       values = alert_colors
     ) +
-    theme_clean() +
-    theme(
-      axis.text.x = element_text(size = 8, angle = 0, hjust = 0.5, color = alert_k12),
-      axis.title.x = element_text(size = 12),
-      axis.text.y = element_text(size = 8),
-      axis.title.y = element_text(size = 12),
-      plot.title = element_text(size = 12, hjust = 0.5, face = "plain"),
-      legend.position = "none",
-      panel.border = element_blank(),
-      plot.background = element_blank()
-    )
-)
-
+  theme_clean() +
+  theme(
+    axis.text.x = element_text(size = 8, angle = 0, hjust = 0.5, color = alert_k12),
+    axis.title.x = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 12),
+    plot.title = element_text(size = 12, hjust = 0.5),
+    legend.position = "none",
+    panel.border = element_blank(),
+    plot.background = element_blank()
+  )
+  
 # create colored labels
 label_html <- purrr::map_chr(names(alert_k12), function(lvl) {
   col <- alert_k12[[lvl]]
@@ -197,17 +245,16 @@ label_html <- purrr::map_chr(names(alert_k12), function(lvl) {
 names(label_html) <- names(alert_k12)
 
 # add to plot
-beta_errorplot_all <- beta_errorplot_all +
+r0_errorplot_all <- r0_errorplot_all +
   scale_x_discrete(labels = label_html) +
   theme(axis.text.x = ggtext::element_markdown(size = 8, angle = 0, hjust = 0.5))
 
-print(beta_errorplot_all)
+print(r0_errorplot_all)
 
-#png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
-#beta_errorplot_all
+
+#png("../figures/R0_errorplot.png", width = 2500, height = 1500, res = 300, bg = "white")
+#r0_errorplot_all
 #dev.off()
-
-
 
 
 
