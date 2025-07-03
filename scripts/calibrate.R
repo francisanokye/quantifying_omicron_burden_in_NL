@@ -40,26 +40,20 @@ if (spline_beta) {
     , link_function = mp_log
   )
 }
-get_logit_prior = \(prior_range) {
+get_prior = function(trans) function(rng) {
   mp_normal(
-      mean(qlogis(prior_range))
-    , log(diff(qlogis(prior_range)) / (2 * 1.96))
-  )
-}
-get_log_prior = \(prior_range) {
-  mp_normal(
-      mean(log(prior_range))
-    , log(diff(log(prior_range)) / (2 * 1.96))
+      (trans(rng[1]) + trans(rng[2])) / 2
+    , log((trans(rng[2]) - trans(rng[1])) / (2 * 1.96))
   )
 }
 priors = list(
       log_beta = mp_normal(log(0.25), log(1))
     , time_var_beta = mp_normal(0, log(1))
-    , log_gamma_a = get_log_prior(prior_range$gamma_a)
-    , log_gamma_i = get_log_prior(prior_range$gamma_i)
-    , logit_kappa2 = get_logit_prior(prior_range$kappa2)
-    , logit_kappa3 = get_logit_prior(prior_range$kappa3)
-    , log_sigma = get_log_prior(prior_range$sigma)
+    , log_gamma_a = get_prior(log)(prior_range$gamma_a)
+    , log_gamma_i = get_prior(log)(prior_range$gamma_i)
+    , logit_kappa2 = get_prior(qlogis)(prior_range$kappa2)
+    , logit_kappa3 = get_prior(qlogis)(prior_range$kappa3)
+    , log_sigma = get_prior(log)(prior_range$sigma)
 )
 calibrator = mp_tmb_calibrator(
     spec = timevar_spec |> mp_rk4() # mp_hazard()

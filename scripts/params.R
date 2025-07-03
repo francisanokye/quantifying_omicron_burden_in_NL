@@ -6,7 +6,7 @@ params <- c(beta = 0.1, kappa1 = 1, kappa2 = 0.91, kappa3 = 0.3,
             zeta  =  0.75, 
             vac2 = 0.09, vac3 = 0.0189,
             vac2_const = 0.09, vac3_const = 0.0189,
-            N2 = 434968, N = 510550, 
+            N = 510550, 
             
             ## initial state
             A1 = 1, E1 = 1, I1 = 1, R1 = 1,
