@@ -11,8 +11,8 @@ allows the model to evolve from an initial state with a small number of
 infectious individuals to a compartmental distribution consistent with
 model dynamics by time $t_s$.
 
-The likelihood function models the **logit of observed sero-prevalence**
-as Gaussian. Specifically, for each observation, we assume:
+The likelihood function models the logit of observed sero-prevalence as
+Gaussian. Specifically, for each observation, we assume:
 
 $$
 \text{logit}(\text{observed sero-prevalence}) \sim \mathcal{N}(\mu, \sigma^2)
