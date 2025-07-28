@@ -14,7 +14,7 @@ pop = 510550
 start_date <- "2021-12-15"
 last_date <-"2022-05-26"
 
-calibrator <- rdsRead("calibrate_inc.rds")
+calibrator <- rdsRead("calibrate.rds")
 
 # load reported cases
 # serop_case_true <- rdsRead("fitsero.rds")

@@ -17,31 +17,30 @@ library(macpan2)
 set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
-
-# load macpan2 outputs
 calibrator <- rdsRead("calibrate.rds")
+seroprevdata <- rdsRead("seroprevdata.rds")
+time_steps = max(seroprevdata$time)
+upper_plot_time = 300
 
-# load seroprevalence data
-seroprevdata <- rdsRead("fitsero.rds") |>
-  mutate(matrix = as.character(matrix)) |>
-  mutate(value = ifelse(is.na(value) & time == 0, 700, value)) |>
-  group_by(matrix) |>
-  mutate(date = seq(as.Date("2022-05-22"), by = "-1 day", length.out = n()) |> rev()) |>
-  ungroup()
+seroprevdata <- seroprevdata %>%
+  complete(date = seq.Date(
+    from = as.Date("2021-12-15"),
+    to   = max(date),
+    by   = "1 day"
+))
 
-# load simulation results
-sims <- calibrator |>
-  mp_trajectory_sd(conf.int = TRUE) |>
-  select(-any_of(c("row", "col"))) |>
-  group_by(matrix) |>
-  mutate(matrix = as.character(matrix)) |>
-  mutate(date = seq(as.Date("2022-05-22"), by = "-1 day", length.out = n()) |> rev()) |>
-  ungroup()
+seroprevdata <- (seroprevdata
+        |> select(c("date","value"))
+        |> filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+)
 
-# extract only beta
-sims <- sims |>
-  filter(matrix == "beta_thing") |>
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+sims = (calibrator
+  |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
+  |> dplyr::filter(time >= offset0)
+  |> dplyr::filter(matrix == c("beta_thing"))
+  |> mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n()))
+  |> filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+)
 
 # ------------------------------------------------------------
 # Prepare for Plotting
@@ -51,14 +50,14 @@ sims <- sims |>
 als_shading <- tibble(
   xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
   xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3", "No-ALS"),
-  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3", "No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS"),
+  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS")
 )
 
 # vertical ALS phase lines
 als_data <- tibble(
   date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3", "No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS")
 )
 
 # ALS colors
@@ -67,23 +66,23 @@ fill_colors <- c(
   "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
   "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.4),
   "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
-  "Mod-ALS-3" = adjustcolor("#F7E2E2", alpha.f = 0.6),
+  "ALS-3^relax" = adjustcolor("#F7E2E2", alpha.f = 0.6),
   "No-ALS" = adjustcolor("#D3D3D3", alpha.f = 0.6)
 )
 
 # beta annotations for the plot
 beta_annot <- tibble(
-  x = as.Date(c("2021-12-18", "2022-01-02", "2022-02-02", "2022-03-11", "2022-05-01")),
-  y = c(0.15, 0.15, 0.10, 0.10, 0.10),
-  label = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3", "No-ALS"),
+  x = as.Date(c("2021-12-24", "2022-01-04", "2022-02-02", "2022-03-07", "2022-04-28")),
+  y = c(0.15, 0.15, 0.12, 0.12, 0.12),
+  label = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS"),
   matrix = "beta"
 )
 
 # bracket segments data
 bracket_df <- tibble(
-  xmin = as.Date(c("2021-12-20", "2022-01-25")),
-  xmax = as.Date(c("2022-01-25", "2022-05-22")),
-  sch_label = c("K-12 School\nClosed", "K-12 Schools Reopen")
+  xmin = as.Date(c("2021-12-15","2021-12-20", "2022-01-25")),
+  xmax = as.Date(c("2021-12-20","2022-01-25", "2022-05-22")),
+  sch_label = c("","K-12 School\nClosed", "K-12 Schools Reopen")
 )
 
 # compute bracket midpoints for labels
@@ -118,19 +117,19 @@ p1 <- ggplot() +
   ) +
   geom_text(
     data = filter(beta_annot, x < as.Date("2022-01-10")),
-    aes(x = x, y = y, label = label),
+    aes(x = x, y = y+0.15, label = label),
     parse = TRUE,
-    size = 5,
-    angle = 90,
+    size = 8,
+    angle = 45,
     hjust = 1,
     color = "black",
     face = "bold"
   ) +
   geom_text(
     data = filter(beta_annot, x >= as.Date("2022-01-10")),
-    aes(x = x, y = y, label = label),
+    aes(x = x, y = y+0.05, label = label),
     parse = TRUE,
-    size = 5,
+    size = 8,
     angle = 0,
     hjust = 1,
     color = "black",
@@ -160,7 +159,7 @@ p1 <- ggplot() +
   ) +
   scale_linetype_manual(
     name = "ALS Phases",
-    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "Mod-ALS-3" = "dashed", "No-ALS" = "solid")
+    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "ALS-3^relax" = "dashed", "No-ALS" = "solid")
   ) +
   scale_x_date(
   limits = c(as.Date("2021-12-15"), as.Date("2022-05-22")),
@@ -177,14 +176,14 @@ p1 <- ggplot() +
   theme(
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank(),
-    axis.text.y = element_text(size = 12),
-    axis.title.y = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 20, color = "black"),
     legend.position = "bottom",
     legend.direction = "horizontal",
     legend.box = "horizontal",
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    plot.title = element_text(size = 12, color = "black", hjust = 0.5),
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 20),
+    plot.title = element_text(size = 20, color = "black", hjust = 0.5),
     plot.background = element_blank()
   )
 
@@ -196,15 +195,15 @@ p2 <- ggplot() +
   geom_segment(
     data = bracket_df,
     aes(x = xmin, xend = xmax, y = 1, yend = 1),
-    colour = c("red","navy"),
-    size = 1.2,
+    colour = c("navy","red","navy"),
+    size = 1.5,
     arrow = arrow(angle = 90, ends = "both", length = unit(0.5, "cm"))
   ) +
   geom_text(
     data = bracket_df,
     aes(x = x_label, y = 0.0, label = sch_label),
-    colour = c("red","navy"),
-    size = 5
+    colour = c("navy","red","navy"),
+    size = 10
   ) +
   scale_x_date(
     limits = c(as.Date("2021-12-15"), as.Date("2022-05-22")),
@@ -215,7 +214,7 @@ p2 <- ggplot() +
   ylim(-1, 1) +
   theme_void() +
   theme(
-    axis.text.x = element_text(size = 12),
+    axis.text.x = element_text(size = 20),
     plot.margin = margin(0, 0, 0, 0)
   )
 
@@ -239,6 +238,6 @@ bettas <- p1_noleg / p2 / wrap_elements(legend_grob) +
 
 print(bettas)
 
-#png("../figures/transmission_rate.png", width = 3000, height = 2000, res = 300, bg = "white", type = "cairo")
-#bettas
-#dev.off()
+png("../figures/transmission_rate.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+bettas
+dev.off()

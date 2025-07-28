@@ -11,15 +11,6 @@ booster_daily_vac = dat |> dplyr::filter(type == "numtotal_additional")
 
 reporting_delay <- TRUE
 
-## why do I need this?!?
-
-#initialize_state = list(
-#    S1 ~ (N - A1 - E1 - I1 - R1 - V2 - A2 - E2 - I2 - R2 - V3 - A3 - E3 - I3 - R3)
-#  , V3 ~ 0
-#  , S1 ~ (N - A1 - E1 - I1 - R1 - V2 - A2 - E2 - I2 - R2 - V3 - A3 - E3 - I3 - R3)
-#  , V2 ~ ( - A2 - E2 - I2 - R2)
-#)
-
 initialize_state = list(
 	A1 ~ 1, E1 ~ 1, I1 ~ 1, R1 ~ 1
 	, A2 ~ 1, E2 ~ 1, I2 ~ 1, R2 ~ 1
@@ -36,16 +27,6 @@ spec <- mp_tmb_model_spec(
 	, during = flows
 	, default = params
 )
-
-
-## time_steps = 159
-## scale = 31.8
-## 5
-
-# rbf(159, 5)
-# sparse_rbf_notation(struc$time_steps_obj$dat_len(), 
-#     tv$dimension, zero_based = TRUE, tol = tv$sparse_tol)
-
 
 # we create a piecewise time-varying vaccination rate based on true data
 double_vac_changepoints = double_daily_vac$days - (offset0 %% 7) - 1

@@ -1,0 +1,84 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+```
+
+```{r fig.width=20, fig.height=25}
+######################################
+###### Testing Eligibility###########
+
+# Timeline axis data
+testing_timeline <- data.frame(date = as.Date(c("2021-12-15", "2022-01-01", "2022-02-01", 
+                                        "2022-03-01", "2022-04-01", "2022-05-01", "2022-05-22")),
+                       label = c("Dec 15", "Jan 1", "Feb 1", "Mar 1", "Apr 1", "May 1", "May 22")
+)
+
+# Testing segments
+testing_segments <- data.frame(
+  start = as.Date(c("2021-12-15","2022-01-03","2022-01-24", "2022-02-25", "2022-03-17")),
+  end   = as.Date(c("2022-01-03","2022-01-24","2022-02-25", "2022-03-17", "2022-05-22")),
+  level = c("T1 : People with\none symptom +\npeople notified\nof exposure",
+            "T2 : Asymptomatic\nclose contacts +\nsymptomatic\npeople who\nwere not\nclose contacts", 
+            "T3 : Asymptomatic\nvaccinated\nnon-household\ncontacts +\nsymptomatic\npeople",
+            "T4 : Symptomatic\ncontacts +\nasymptomatic\nhousehold\ncontacts", 
+            "T5: high risk (60+ yrs) + healthcare workers"),
+  y     = -0.2
+)
+
+# midpoints using Date math
+testing_segments <- testing_segments %>%
+  mutate(midpoint = start + (end - start) / 2)
+
+testing_colors <- c(
+  "T1 : People with\none symptom +\npeople notified\nof exposure" = "#A8DADC66",
+  "T2 : Asymptomatic\nclose contacts +\nsymptomatic\npeople who\nwere not\nclose contacts" = "#B5E48C66",
+  "T3 : Asymptomatic\nvaccinated\nnon-household\ncontacts +\nsymptomatic\npeople" = "#FFE29A66",
+  "T4 : Symptomatic\ncontacts +\nasymptomatic\nhousehold\ncontacts" = "#CDB4DB66",
+  "T5: high risk (60+ yrs) + healthcare workers" = "#FBC4AB66"
+)
+
+# event arrows
+events <- data.frame(
+  date = as.Date(c("2021-12-15","2022-01-03","2022-01-24", "2022-02-25", "2022-03-17")),
+  label = c("Dec 15\n2021","Jan 1\n2022","Jan 24\n2022", "Feb 25\n2022", "March 17\n2022"),
+  y_tip = 0.15,
+  y_text = 0.18
+)
+
+testing_timeline_plot <- (ggplot() +
+                    # timeline axis
+                    geom_segment(aes(x=min(testing_timeline$date), xend=max(testing_timeline$date),y=0, yend=0), size=1) +
+                    geom_segment(data=testing_timeline,aes(x=date, xend=date, y=0.05, yend=-0.05)) +
+                    geom_text(data=testing_timeline,aes(x=date, y=-0.1, label=label), size=7) +
+                    # event arrows
+                    geom_segment(data=events,aes(x=date, xend=date, y=0, yend=y_tip),arrow=arrow(length=unit(0.05,"cm")), size=1) +
+                    geom_text(data=events,aes(x=date, y=y_text, label=label),size=8, hjust=0.5) +
+                    # dotted lines for testing eligibility start and end
+                    geom_segment(data=testing_segments,aes(x=start, xend=start, y=0, yend=y),linetype="dashed", color="black") +
+                    geom_segment(data=testing_segments,aes(x=end, xend=end, y=0, yend=y),linetype="dashed", color="black") +
+                    # ALS bars
+                    geom_rect(data = testing_segments,aes(xmin=start, xmax=end,ymin=y-0.07, ymax=y+0.07,fill=level),color="black") +
+                    scale_fill_manual(values = testing_colors) +
+                    geom_text(data=testing_segments,aes(x=midpoint, y=y, label=level),size=7, color="black") +
+                    theme_void() +
+                    theme(plot.title = element_text(hjust = 0.5, size=14, face="bold"),plot.margin = margin(t = 5, r = 5, b = 5, l = 5))+
+                    coord_cartesian(ylim = c(-0.5, 0.6)) +
+                    theme(legend.position="none"))
+
+print(testing_timeline_plot)
+
+```
+
+
+
+
+
+
+

@@ -60,8 +60,8 @@ beta_values <- beta_values %>%
       TRUE ~ NA_character_
     ),
     combined_alert = case_when(
-      date >= as.Date("2021-12-20") & date <= as.Date("2022-01-25") ~ "ALS-2-3-4\nK-12 Closed",
-      date >= as.Date("2022-01-26") & date <= as.Date("2022-05-22") ~ "ALS-4-Mod3-None\nK-12 Open",
+      date >= as.Date("2021-12-20") & date <= as.Date("2022-01-25") ~ "K-12 Closed",
+      date >= as.Date("2022-01-26") & date <= as.Date("2022-05-22") ~ "K-12 Open",
       TRUE ~ NA_character_
     )
   )
@@ -124,18 +124,18 @@ alert_colors <- c(
   "ALS-4\nK-12 Open" = "#66a61e",
   "Mod-ALS-3\nK-12 Open" = "#e6ab02",
   "No-ALS\nK-12 Open" = "#a6761d",
-  "ALS-2-3-4\nK-12 Closed" = "#666666",
-  "ALS-4-Mod3-None\nK-12 Open" = "#1f78b4"
+  "K-12 Closed" = "#666666",
+  "K-12 Open" = "#1f78b4"
 )
 
 # color interventions based on the school closure
 
 alert_k12 <- c("Mod-ALS-3\nK-12 Open" = "blue",
-               "ALS-4-Mod3-None\nK-12 Open" = "blue",
+               "K-12 Open" = "blue",
                "ALS-4\nK-12 Open"= "blue",
                "No-ALS\nK-12 Open"= "blue",
                "ALS-4\nK-12 Closed" = "red",
-               "ALS-2-3-4\nK-12 Closed" = "red",
+               "K-12 Closed" = "red",
                "ALS-3\nK-12 Closed" = "red",
                "ALS-2\nK-12 Closed" = "red",
                "ALS-2\nK-12 Open" = "blue"
@@ -178,9 +178,9 @@ beta_errorplot_all <- (
     ) +
     theme_clean() +
     theme(
-      axis.text.x = element_text(size = 8, angle = 0, hjust = 0.5, color = alert_k12),
+      axis.text.x = element_text(size = 12, angle = 0, hjust = 0.5, color = alert_k12),
       axis.title.x = element_text(size = 12),
-      axis.text.y = element_text(size = 8),
+      axis.text.y = element_text(size = 12),
       axis.title.y = element_text(size = 12),
       plot.title = element_text(size = 12, hjust = 0.5, face = "plain"),
       legend.position = "none",
@@ -203,9 +203,9 @@ beta_errorplot_all <- beta_errorplot_all +
 
 print(beta_errorplot_all)
 
-#png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
-#beta_errorplot_all
-#dev.off()
+png("../figures/beta_plot.png", width = 2500, height = 1500, res = 300, bg = "white")
+beta_errorplot_all
+dev.off()
 
 
 

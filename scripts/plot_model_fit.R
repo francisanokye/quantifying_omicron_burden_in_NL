@@ -19,22 +19,29 @@ loadEnvironments()
 start_date <- as.Date("2021-12-15") - offset0
 last_date <-"2022-05-22"
 
+calibrator <- rdsRead("calibrate.rds")
 seroprevdata <- rdsRead("seroprevdata.rds")
 time_steps = max(seroprevdata$time)
+upper_plot_time = 300
 
+seroprevdata <- seroprevdata %>%
+  complete(date = seq.Date(
+    from = as.Date("2021-12-15"),
+    to   = max(date),
+    by   = "1 day"
+))
 
-calibrator <- rdsRead("calibrate.rds")
+seroprevdata <- (seroprevdata
+	|> select(c("date","value"))
+	|> filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+)
 
 sims = (calibrator
   |> mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE)
   |> dplyr::filter(time >= offset0)
-  |> select(-any_of(c("row", "col"))) 
-  |> group_by(matrix) 
-  |> mutate(matrix = as.character(matrix)) 
-  |> mutate(date = seq(as.Date("2022-05-22"), by = "-1 day", length.out = n()) |> rev())
-  |> dplyr::filter(matrix == c("date","serop")) 
+  |> dplyr::filter(matrix == c("serop"))
+  |> mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) 
   |> filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
-  |> ungroup()
 )
 
 # ALS phase shading 
@@ -101,7 +108,7 @@ model_fit <- ggplot() +
     scales = "free_y",
     ncol = 1,
     labeller = labeller(matrix = c(
-      serop = "Seroprevalence (%)"
+      serop = "Infection-induced Seroprevalence Fit"
     ))
   ) +
   scale_color_manual(
@@ -135,9 +142,11 @@ model_fit <- ggplot() +
     y = "Seroprevalence Estimate (%)"
   ) +
   scale_x_date(
-    date_breaks = "month",
+    expand = c(0, 0),
+    date_breaks = "2 week",
     date_labels = "%b %d"
   ) +
+  #scale_x_continuous(limits = c(offset0, upper_plot_time)) +
   theme_clean() +
   theme(
     axis.text.x = element_text(size = 10, angle = 0, hjust = 0.85),
@@ -161,9 +170,9 @@ model_fit <- ggplot() +
 print(model_fit)
 
 
-#png("../figures/model_fit.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
-#model_fit
-#dev.off()
+png("../figures/model_fit.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+model_fit
+dev.off()
 
 
 

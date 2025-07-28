@@ -82,7 +82,6 @@ sims = (calibrator
   |> dplyr::filter(time >= offset0)
 )
 
-#print(sims)
 lim_dat = \(x) dplyr::filter(x, time <= upper_plot_time)
 print(ggplot()
  + geom_point(aes(time, value), data = lim_dat(seroprevdata))
@@ -121,7 +120,7 @@ remade_vax_data = list(
 
 print(calibrator
   |> mp_optimized_spec("modified")
-  |> mp_simulator(time_steps, outputs = mp_flow_vars(timevar_spec))
+  |> mp_simulator(time_steps, outputs = c("double_vac","booster_shot"))#mp_flow_vars(timevar_spec))
   |> mp_trajectory()
   |> lim_dat()
   |> ggplot()

@@ -29,11 +29,6 @@ vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv params.rda
 timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
 	$(pipeR)
 
-## This is using sero_inc
-# timevar_spec_inc.Rout: timevar_spec_inc.R flows.R
-timevar_spec_inc.Rout: timevar_spec_inc.R flows.rda vacdat.rds params.rda
-	$(pipeRcall)
-
 seroprevdata.Rout: seroprevdata.R params.rda ../data/raw_citf_data.csv    
 	$(pipeR)
 
@@ -43,21 +38,16 @@ fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
 calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
 	$(pipeRcall)
 
-# calibrate_inc.Rout: calibrate_inc.R timevar_spec_inc.R
-calibrate_inc.Rout: calibrate_inc.R timevar_spec_inc.rds fitsero.rds params.rda
-	$(pipeRcall)
-
-bettas.Rout: bettas.R fitsero.rds params.rda calibrate.rds
+bettas.Rout: bettas.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 	$(pipeR)
 
 reprod_numb.Rout: reprod_numb.R fitsero.rds params.rda calibrate.rds
 	$(pipeR)
 
-
-output.Rout: output.R calibrate_inc.rds
+vaccination.Rout: vaccination.R calibrate.rds params.rda
 	$(pipeR)
 
-plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds params.rda calibrate.rds
+plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 	$(pipeR)
 
 prevalence_plot.Rout: prevalence_plot.R params.rda calibrate.rds
@@ -71,6 +61,9 @@ true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate.rds fitsero.rds ..
 
 eff_Rt.Rout: eff_Rt.R calibrate.rds params.rda
 	$(pipeR)
+
+timeline.Rout: timeline.R 
+        $(pipeR)
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff
