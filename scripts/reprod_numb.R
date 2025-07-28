@@ -183,7 +183,56 @@ plot_overall <- ggplot(overall_data, aes(x = alert_level, y = R0_mean, fill = al
 final_plot <- cowplot::plot_grid(plot_specific, plot_overall, ncol = 1, rel_heights = c(3, 1))
 print(final_plot)
 
-png("../figures/R0_errorplot.png", width = 5000, height = 2500, res = 300, bg = "white")
-final_plot
-dev.off()
+#png("../figures/R0_errorplot.png", width = 5000, height = 2500, res = 300, bg = "white")
+#final_plot
+
+print(overall_data)
+print(specific_data)
+
+chrono_order <- c("ALS-2\nK-12 Closed", "ALS-3\nK-12 Closed", "ALS-4\nK-12 Closed"
+	, "ALS-2\nK-12 Open", "ALS-4\nK-12 Open", "ALS-3^relax\nK-12 Open", "No-ALS\nK-12 Open"
+)
+
+spec_data <- (specific_data
+	|> mutate(chrono = factor(alert_level,levels=chrono_order))
+)
+
+
+gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
+	+ geom_point()
+	+  geom_rect(data = NULL, aes(
+    xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
+    xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
+    ymin = 1.37 - 1.96*0.0222,
+    ymax = 1.37 + 1.96*0.0222
+  ), fill = "red",alpha=0.05)
+     +  geom_rect(data = NULL, aes(
+    xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
+    xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
+    ymin = 1.37,
+    ymax = 1.37
+  ), color = "red")
+   +  geom_rect(data = NULL, aes(
+    xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
+    xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
+    ymin = 1.92 - 1.96*0.268,
+    ymax = 1.92 + 1.96*0.268
+  ), fill = "blue",alpha=0.05)
+     +  geom_rect(data = NULL, aes(
+    xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
+    xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
+    ymin = 1.92,
+    ymax = 1.92
+  ), color = "blue")
+
+	+ geom_errorbar(aes(ymin=R0_mean - 1.96*R0_sd,ymax=R0_mean + 1.96*R0_sd))
+  + labs(y = expression(""*R[0]*"(t)"))
+  + theme_bw()
+
+)
+
+print(gg)
+
+
+#dev.off()
 

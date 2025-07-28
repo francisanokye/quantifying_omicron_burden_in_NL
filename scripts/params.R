@@ -21,6 +21,7 @@ prior_range = list(
   , gamma_a = c(1/11, 1/8)
   , gamma_i = c(1/8, 1/6)
   , sigma = c(1/4, 1/2)
+  , R1 = c(1,10)
 )
 
 ## number of days before the first data point to start simulations
