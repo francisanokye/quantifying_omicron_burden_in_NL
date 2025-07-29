@@ -127,9 +127,10 @@ spec_data <- (specific_data
               |> mutate(chrono = factor(alert_level,levels=chrono_order))
 )
 
+print(spec_data)
 
 gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
-       + geom_point(size = 3.5)
+       + geom_point(size = 5)
        +  geom_rect(data = NULL, aes(
          xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
          xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
@@ -156,11 +157,12 @@ gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
        ), color = "blue")
        
        + geom_errorbar(aes(ymin=R0_mean - 1.96*R0_sd,ymax=R0_mean + 1.96*R0_sd),size = 1)
+       + geom_text(aes(label = sprintf("%.2f", R0_mean), y = R0_mean + 0.12),size = 6,fontface = "bold")
        + labs(y = expression(""*R[0]*"(t)"))
        + labs(title = "Overall Periods (K-12 Closed vs Open)",x = NULL, y = NULL) 
        + theme_minimal() +
          theme(
-           axis.text.x = element_text(size = 20, angle = 0, hjust = 0.5),
+           axis.text.x = element_text(size = 20, face = "bold", angle = 0, hjust = 0.5),
            axis.title.x = element_text(size = 20),
            axis.text.y = element_text(size = 20),
            axis.title.y = element_text(size = 20),
@@ -169,8 +171,7 @@ gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
            panel.border = element_blank(),
            plot.background = element_blank()
          )
-       
-)
+       )
 
 # display
 png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")

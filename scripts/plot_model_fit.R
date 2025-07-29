@@ -48,13 +48,13 @@ sims = (calibrator
 als_shading <- tibble::tibble(
   xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
   xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3","No-ALS"),
-  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3","No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3","No-ALS"),
+  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3","No-ALS")
 )
 
 als_data <- tibble::tibble(
   date = as.Date(c("2021-12-15","2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3","No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3","No-ALS")
 )
 
 fill_colors <- c(
@@ -62,7 +62,7 @@ fill_colors <- c(
   "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
   "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.4),
   "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
-  "Mod-ALS-3" = adjustcolor("#F7E2E2", alpha.f = 0.6),
+  "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.6),
   "No-ALS" = adjustcolor("#D3D3D3", alpha.f = 0.6))
 
 model_fit <- ggplot() +

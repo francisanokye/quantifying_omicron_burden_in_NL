@@ -101,9 +101,9 @@ combined_case_plot <- (ggplot(allcases, aes(x = date)) +
   geom_segment(aes(x = as.Date("2022-02-07"), y = 0, yend = Inf),linetype = "dashed",color = "gold4",linewidth = 1) +
   geom_segment(aes(x = as.Date("2022-03-14"), y = 0, yend = Inf),linetype = "solid",color = "black",linewidth = 1) +
   annotate("text", x = as.Date("2021-12-18"), y = 50000, label = "ALS-2", size = 6, angle = 90, hjust = 1) +
-  annotate("text", x = as.Date("2021-12-28"), y = 50000, label = "ALS-3", size = 6, angle = 90, hjust = 1) +
+  annotate("text", x = as.Date("2021-12-29"), y = 50000, label = "ALS-3", size = 6, angle = 90, hjust = 1) +
   annotate("text", x = as.Date("2022-01-30"), y = 70000, label = "ALS-4", size = 6, hjust = 1) +
-  annotate("text", x = as.Date("2022-03-09"), y = 70000, label = expression(ALS-3^relax), size = 6, hjust = 1) +
+  annotate("text", x = as.Date("2022-03-05"), y = 70000, label = "ALS-3", size = 6, hjust = 1) +
   annotate("text", x = as.Date("2022-04-20"), y = 70000, label = "No-ALS", size = 6, hjust = 1) +
   theme_clean() +
   theme(

@@ -62,11 +62,11 @@ als_data <- tibble(
 
 # ALS colors
 fill_colors <- c(
-  "95% CI" = "red",
+  "95% CI" = "violet",
   "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
   "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.4),
   "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
-  "ALS-3^relax" = adjustcolor("#F7E2E2", alpha.f = 0.6),
+  "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.6),
   "No-ALS" = adjustcolor("#D3D3D3", alpha.f = 0.6)
 )
 
@@ -90,9 +90,7 @@ bracket_df <- bracket_df |>
   mutate(x_label = as.Date((as.numeric(xmin) + as.numeric(xmax)) / 2, origin = "1970-01-01"))
 
 # vertical dotted lines for K-12 start/end
-k12_lines <- tibble(
-  date = as.Date(c("2021-12-20", "2022-01-25"))
-)
+k12_lines <- tibble(date = as.Date(c("2021-12-20", "2022-01-25")))
 
 # ------------------------------------------------------------
 # Plot 1: Main Model Fit Plot
