@@ -25,7 +25,6 @@ flows.Rout: flows.R params.rda
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv params.rda 
 	$(pipeRcall)
 
-## This is using serop only
 timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
 	$(pipeR)
 
@@ -44,22 +43,10 @@ bettas.Rout: bettas.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 reprod_numb.Rout: reprod_numb.R fitsero.rds params.rda calibrate.rds
 	$(pipeR)
 
-vaccination.Rout: vaccination.R calibrate.rds params.rda
-	$(pipeR)
-
 plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 	$(pipeR)
 
-prevalence_plot.Rout: prevalence_plot.R params.rda calibrate.rds
-	$(pipeR)
-
-beta_plot.Rout: beta_plot.R calibrate.rds params.rda
-	$(pipeRcall)
-
 true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate.rds fitsero.rds ../data/serop_avgcase_data.csv params.rda 
-	$(pipeR)
-
-eff_Rt.Rout: eff_Rt.R calibrate.rds params.rda
 	$(pipeR)
 
 timeline.Rout: timeline.R 

@@ -167,9 +167,6 @@ model_fit <- ggplot() +
     linetype = "none"
   )
 
-print(model_fit)
-
-
 png("../figures/model_fit.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
 model_fit
 dev.off()

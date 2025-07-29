@@ -50,7 +50,7 @@ beta_values <- beta_values %>%
       date >= as.Date("2021-12-25") & date <= as.Date("2022-01-03") ~ "ALS-3\nK-12 Closed",
       date >= as.Date("2022-01-04") & date <= as.Date("2022-01-25") ~ "ALS-4\nK-12 Closed",
       date >= as.Date("2022-01-26") & date <= as.Date("2022-02-07") ~ "ALS-4\nK-12 Open",
-      date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "ALS-3^relax\nK-12 Open",
+      date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "ALS-3\nK-12 Open",
       date >= as.Date("2022-03-15") & date <= as.Date("2022-05-22") ~ "No-ALS\nK-12 Open",
       TRUE ~ NA_character_
     ),
@@ -129,7 +129,7 @@ alert_colors <- c(
   "ALS-3\nK-12 Closed" = "#87CEFA66",
   "ALS-4\nK-12 Closed" = "#FFD58066",
   "ALS-4\nK-12 Open" = "#FFD58066",
-  "ALS-3^relax\nK-12 Open" = "#F7E2E299",
+  "ALS-3\nK-12 Open" = "#87CEFA66",
   "No-ALS\nK-12 Open" = "#D3D3D399",
   "K-12 Closed" = "red",
   "K-12 Open" = "navy"
@@ -181,16 +181,11 @@ plot_overall <- ggplot(overall_data, aes(x = alert_level, y = R0_mean, fill = al
   )
 
 final_plot <- cowplot::plot_grid(plot_specific, plot_overall, ncol = 1, rel_heights = c(3, 1))
-print(final_plot)
 
-#png("../figures/R0_errorplot.png", width = 5000, height = 2500, res = 300, bg = "white")
-#final_plot
 
-print(overall_data)
-print(specific_data)
 
 chrono_order <- c("ALS-2\nK-12 Closed", "ALS-3\nK-12 Closed", "ALS-4\nK-12 Closed"
-	, "ALS-2\nK-12 Open", "ALS-4\nK-12 Open", "ALS-3^relax\nK-12 Open", "No-ALS\nK-12 Open"
+	, "ALS-2\nK-12 Open", "ALS-4\nK-12 Open", "ALS-3\nK-12 Open", "No-ALS\nK-12 Open"
 )
 
 spec_data <- (specific_data
@@ -227,12 +222,25 @@ gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
 
 	+ geom_errorbar(aes(ymin=R0_mean - 1.96*R0_sd,ymax=R0_mean + 1.96*R0_sd))
   + labs(y = expression(""*R[0]*"(t)"))
-  + theme_bw()
+  + labs(title = "Overall Periods (K-12 Closed vs Open)",x = NULL, y = NULL) 
+	+ theme_minimal() +
+	  theme(
+	    axis.text.x = element_text(size = 20, angle = 0, hjust = 0.5),
+	    axis.title.x = element_text(size = 20),
+	    axis.text.y = element_text(size = 20),
+	    axis.title.y = element_text(size = 20),
+	    plot.title = element_text(size = 20, hjust = 0.5),
+	    legend.position = "none",
+	    panel.border = element_blank(),
+	    plot.background = element_blank()
+	  )
 
 )
 
 print(gg)
 
-
-#dev.off()
+# display
+png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+gg
+dev.off()
 
