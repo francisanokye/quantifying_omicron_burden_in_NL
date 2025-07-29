@@ -24,9 +24,9 @@ calibrator <- rdsRead("calibrate.rds")
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 
 fitted_data <- (fitted_data
-        |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
-        |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
-        |> dplyr::filter(matrix %in% c("date","beta_thing"))
+                |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
+                |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
+                |> dplyr::filter(matrix %in% c("date","beta_thing"))
 )
 
 beta_values <- fitted_data |>
@@ -40,7 +40,7 @@ beta_values <- fitted_data |>
   select(c(date, beta_thing))
 
 beta_values <- beta_values |>
-        dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 beta_values <- beta_values %>%
   mutate(
@@ -119,128 +119,60 @@ specific_data <- beta_summary_all %>%
   arrange(k12_status, desc(R0_mean)) %>%
   mutate(alert_level = factor(alert_level, levels = alert_level))
 
-overall_data <- beta_summary_all %>%
-  filter(k12_group == "Overall") %>%
-  mutate(alert_level = factor(alert_level, levels = alert_level))
-
-alert_colors <- c(
-  "ALS-2\nK-12 Open" = "#66D1B566",
-  "ALS-2\nK-12 Closed" = "#66D1B566",
-  "ALS-3\nK-12 Closed" = "#87CEFA66",
-  "ALS-4\nK-12 Closed" = "#FFD58066",
-  "ALS-4\nK-12 Open" = "#FFD58066",
-  "ALS-3\nK-12 Open" = "#87CEFA66",
-  "No-ALS\nK-12 Open" = "#D3D3D399",
-  "K-12 Closed" = "red",
-  "K-12 Open" = "navy"
-)
-
-# Use k12_status to determine label color
-label_html <- purrr::map_chr(specific_data$alert_level, function(lvl) {
-  status <- specific_data$k12_status[which(specific_data$alert_level == lvl)][1]
-  col <- ifelse(status == "K-12 Closed", "red", "blue")
-  pretty_label <- gsub("ALS-3\\^relax", "ALS-3<sup>relax</sup>", lvl)
-  pretty_label <- gsub("\\n", "<br>", pretty_label)
-  sprintf("<span style='color:%s;'>%s</span>", col, pretty_label)
-})
-names(label_html) <- specific_data$alert_level
-
-plot_specific <- ggplot(specific_data, aes(x = alert_level, y = R0_mean, fill = alert_level)) +
-  geom_col(color = "black", width = 0.6) +
-  geom_errorbar(aes(ymin = R0_mean - R0_sd, ymax = R0_mean + R0_sd), width = 0.15) +
-  geom_text(aes(label = format(R0_mean, nsmall = 1, digits = 2)),hjust = -0.5, vjust = -0.5, size = 8)+
-  scale_fill_manual(values = alert_colors) +
-  scale_x_discrete(labels = label_html) +
-  labs(title = expression("Estimated " * R[0] * " by Specific Alert Levels"),
-       x = NULL, y = expression("Reproduction Number ("*R[0]*")")) +
-  theme_minimal() +
-  theme(
-    axis.text.x = ggtext::element_markdown(size = 20),
-    axis.title = element_text(size = 20),
-    plot.title = element_text(size = 20, hjust = 0.5),
-    legend.position = "none"
-  )
-
-plot_overall <- ggplot(overall_data, aes(x = alert_level, y = R0_mean, fill = alert_level)) +
-  geom_col(color = "black", width = 0.5) +
-  geom_errorbar(aes(ymin = R0_mean - R0_sd, ymax = R0_mean + R0_sd), width = 0.15) +
-  geom_text(aes(label = format(R0_mean, nsmall = 1, digits = 2)),hjust = 0.5, vjust = -0.95, size = 8)+
-  coord_cartesian(ylim = c(0, max(beta_summary_all$R0_mean + beta_summary_all$R0_sd) + 0.6))+
-  scale_fill_manual(values = alert_colors) +
-  labs(title = "Overall Periods (K-12 Closed vs Open)",x = NULL, y = NULL) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(size = 20, angle = 0, hjust = 0.5),
-    axis.title.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    plot.title = element_text(size = 20, hjust = 0.5),
-    legend.position = "none",
-    panel.border = element_blank(),
-    plot.background = element_blank()
-  )
-
-final_plot <- cowplot::plot_grid(plot_specific, plot_overall, ncol = 1, rel_heights = c(3, 1))
-
-
-
 chrono_order <- c("ALS-2\nK-12 Closed", "ALS-3\nK-12 Closed", "ALS-4\nK-12 Closed"
-	, "ALS-2\nK-12 Open", "ALS-4\nK-12 Open", "ALS-3\nK-12 Open", "No-ALS\nK-12 Open"
+                  , "ALS-2\nK-12 Open", "ALS-4\nK-12 Open", "ALS-3\nK-12 Open", "No-ALS\nK-12 Open"
 )
 
 spec_data <- (specific_data
-	|> mutate(chrono = factor(alert_level,levels=chrono_order))
+              |> mutate(chrono = factor(alert_level,levels=chrono_order))
 )
 
 
 gg <- (ggplot(spec_data,aes(x=chrono,y=R0_mean))
-	+ geom_point()
-	+  geom_rect(data = NULL, aes(
-    xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
-    xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
-    ymin = 1.37 - 1.96*0.0222,
-    ymax = 1.37 + 1.96*0.0222
-  ), fill = "red",alpha=0.05)
-     +  geom_rect(data = NULL, aes(
-    xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
-    xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
-    ymin = 1.37,
-    ymax = 1.37
-  ), color = "red")
-   +  geom_rect(data = NULL, aes(
-    xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
-    xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
-    ymin = 1.92 - 1.96*0.268,
-    ymax = 1.92 + 1.96*0.268
-  ), fill = "blue",alpha=0.05)
-     +  geom_rect(data = NULL, aes(
-    xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
-    xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
-    ymin = 1.92,
-    ymax = 1.92
-  ), color = "blue")
-
-	+ geom_errorbar(aes(ymin=R0_mean - 1.96*R0_sd,ymax=R0_mean + 1.96*R0_sd))
-  + labs(y = expression(""*R[0]*"(t)"))
-  + labs(title = "Overall Periods (K-12 Closed vs Open)",x = NULL, y = NULL) 
-	+ theme_minimal() +
-	  theme(
-	    axis.text.x = element_text(size = 20, angle = 0, hjust = 0.5),
-	    axis.title.x = element_text(size = 20),
-	    axis.text.y = element_text(size = 20),
-	    axis.title.y = element_text(size = 20),
-	    plot.title = element_text(size = 20, hjust = 0.5),
-	    legend.position = "none",
-	    panel.border = element_blank(),
-	    plot.background = element_blank()
-	  )
-
+       + geom_point(size = 3.5)
+       +  geom_rect(data = NULL, aes(
+         xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
+         xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
+         ymin = 1.37 - 1.96*0.0222,
+         ymax = 1.37 + 1.96*0.0222
+       ), fill = "red",alpha=0.05)
+       +  geom_rect(data = NULL, aes(
+         xmin = stage("ALS-2\nK-12 Closed", after_scale = xmin-0.5),
+         xmax = stage("ALS-4\nK-12 Closed", after_scale = xmax+0.5),
+         ymin = 1.37,
+         ymax = 1.37
+       ), color = "red")
+       +  geom_rect(data = NULL, aes(
+         xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
+         xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
+         ymin = 1.92 - 1.96*0.268,
+         ymax = 1.92 + 1.96*0.268
+       ), fill = "blue",alpha=0.05)
+       +  geom_rect(data = NULL, aes(
+         xmin = stage("ALS-2\nK-12 Open", after_scale = xmin-0.5),
+         xmax = stage("No-ALS\nK-12 Open", after_scale = xmax+0.5),
+         ymin = 1.92,
+         ymax = 1.92
+       ), color = "blue")
+       
+       + geom_errorbar(aes(ymin=R0_mean - 1.96*R0_sd,ymax=R0_mean + 1.96*R0_sd),size = 1)
+       + labs(y = expression(""*R[0]*"(t)"))
+       + labs(title = "Overall Periods (K-12 Closed vs Open)",x = NULL, y = NULL) 
+       + theme_minimal() +
+         theme(
+           axis.text.x = element_text(size = 20, angle = 0, hjust = 0.5),
+           axis.title.x = element_text(size = 20),
+           axis.text.y = element_text(size = 20),
+           axis.title.y = element_text(size = 20),
+           plot.title = element_text(size = 20, hjust = 0.5),
+           legend.position = "none",
+           panel.border = element_blank(),
+           plot.background = element_blank()
+         )
+       
 )
-
-print(gg)
 
 # display
 png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 gg
 dev.off()
-

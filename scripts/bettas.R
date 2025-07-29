@@ -50,14 +50,14 @@ sims = (calibrator
 als_shading <- tibble(
   xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
   xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS"),
-  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 # vertical ALS phase lines
 als_data <- tibble(
   date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS")
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 # ALS colors
@@ -74,7 +74,7 @@ fill_colors <- c(
 beta_annot <- tibble(
   x = as.Date(c("2021-12-24", "2022-01-04", "2022-02-02", "2022-03-07", "2022-04-28")),
   y = c(0.15, 0.15, 0.12, 0.12, 0.12),
-  label = c("ALS-2", "ALS-3", "ALS-4", "ALS-3^relax", "No-ALS"),
+  label = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
   matrix = "beta"
 )
 
@@ -159,7 +159,7 @@ p1 <- ggplot() +
   ) +
   scale_linetype_manual(
     name = "ALS Phases",
-    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "ALS-3^relax" = "dashed", "No-ALS" = "solid")
+    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "ALS-3" = "dashed", "No-ALS" = "solid")
   ) +
   scale_x_date(
   limits = c(as.Date("2021-12-15"), as.Date("2022-05-22")),
