@@ -49,6 +49,9 @@ plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds fitsero.rds params.rda ca
 true_vs_reported_plot.Rout: true_vs_reported_plot.R calibrate.rds fitsero.rds ../data/serop_avgcase_data.csv params.rda 
 	$(pipeR)
 
+stack_transmission_R0_plot.Rout: stack_transmission_R0_plot.R ../figures/transmission_rate.png ../figures/reprod_numb.png
+	$(pipeR)
+
 timeline.Rout: timeline.R 
         $(pipeR)
 
