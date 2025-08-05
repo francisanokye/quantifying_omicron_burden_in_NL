@@ -19,17 +19,11 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 |Data File                       |                       Description                                             |    
 |--------------------------------|------------------------------------------------------------------------------------|
 |serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
-|rp_eligfrac2.csv                | contains calculated RT-PCR testing eligibility (reporting) fractions and the dates | 
-|rp_eligfrac3.csv                | contains reporting probabilities of 1 used to estimate model parameters            | 
-|eligibility_adjusted_cases.csv	| data frame saved after using rp_eligfrac2.csv to estimate cases                    | 					
-|true_infections_data.csv	      | data frame saved after using rp_eligfrac3.csv to estimate true infections          |
 |vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
                               
-
-
 ### Reproducing the Results from the Paper
 
-This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all results, including calibration, simulations, and plots, follow the steps below.
+This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all plots in the results of the manuscript, follow the steps below.
 
 ---
 
@@ -55,20 +49,20 @@ cd quantifying_omicron_burden_in_NL/scripts
 
 The script folder should contain the following files in the table
 
-| Script File                        | Purpose                                                    | 
-| ---------------------------------- | ---------------------------------------------------------- | 
-| `params.R`                         | Defines model parameter values                             | 
-| `keydates.R`                       | Defines key policy/intervention dates                      |
-| `flows.R`                          | Computes compartmental flows                               | 
-| `spec.R`                           | Builds model specifications                                | 
-| `timevar_spec.R`                   | Defines time-varying parameters (e.g., beta, report\_prob) | 
-| `seroprevdata.R`                   | Loads or processes seroprevalence data                     | 
-| `calibrate.R`                      | Calibrates the model to data                               | 
-| `calibrate_plot.R`                 | Plots model fit to data                                    | 
-| `extract_beta.R`                   | Extracts fitted β(t) or other parameters                   | 
-| `counterfact_sim.R`                | Updates reporting prob & simulates cases                   |
-| `allscenarios.R`                   | Combines all the case scenarios                            |
-| `Makefile`                         | Streamlines entire analysis pipeline from data to results  |
+| Script File                        | Purpose                                                                           | 
+| ---------------------------------- | ----------------------------------------------------------                        | 
+| `params.R`                         | Defines model parameter values                                                    | 
+| `flows.R`                          | Computes compartmental flows                                                      | 
+| `spec.R`                           | Builds model specifications                                                       | 
+| `timevar_spec.R`                   | Builds model specifications  & defines time-varying parameters (e.g., beta)       | 
+| `seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
+| `calibrate.R`                      | Calibrates the model to data                                                      | 
+| `plot_model_plot.R`                | Plots model fit                                                                   | 
+| `true_vs_reported_plot.R`          | Plots the cumulative reported cases vs estimated infections and the underreporting|
+| `bettas.R`                         | Plots the underlying time-varying transmission rates                              |
+| `reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
+| `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
+| `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
 
 #### Step-by-Step Pipeline (Makefile Targets)
 
@@ -76,41 +70,43 @@ The script folder should contain the following files in the table
    These load and process the baseline parameters:
    Load baseline model specification and parameters and applies the custom reporting fractions in rp_eligfrac3.csv to generates a time-varying spec.
 
-```bash
-make timevar_spec.Rout
-```
-
 - **Run the model calibration**  
    This fits the SEAIR model in the timevar_spec to the data and saves the output
 
-```bash
-make calibrate.Rout   
-```
 
-- **Plot model fit with calibrated parameters**  
+- **Plot model fit with calibrated parameters (Figure 1)**  
    Plots the model to the seroprevalence and saves in the figures folder. 
 
 ```bash
 make plot_model_fit.Rout 
 ```
 
-- **Use estimated model parameters to estimate the true infections**  
-   It restores the fitted model from calibrate.rds, including the estimated parameters, generates a plot and saves in figures folder.
-
-```bash
-make plot_true_infections.Rout 
-```
-
-- **Loads saved model fit output and summarizes the transmission parameter estimates**  
-   Extracts the estimated time-varying transmission rate from the calibrated model saved in *.calibrate.rds and generates a plot which gets saved in the figures folder
-
-```bash
-make beta_plot.Rout   
-```
-
-- **True infections vrs reported cases plot**  
-Plots estimated true infections and the reported cases on the same figure.
+- **True infections vrs reported cases plot (Figure 2)**  
+Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
 make true_vs_reported_plot.Rout   
+``
+
 ```
+- **Time-varying transmission rate**  
+Generates the transmission rate plot.
+
+```bash
+make bettas.Rout   
+``
+
+```
+- **Error bar plot comparing ALS reproduction numbers**  
+Generates the stack of the above two plots.
+
+```bash
+make reprod_numb.Rout   
+``
+
+```
+- **Stacks transmission rate and error bar to generate (Figure 3)**  
+
+```bash
+make stack_transmission_R0_plot.Rout   
+``
