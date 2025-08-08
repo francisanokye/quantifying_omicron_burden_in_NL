@@ -42,6 +42,9 @@ bettas.Rout: bettas.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 
 reprod_numb.Rout: reprod_numb.R fitsero.rds params.rda calibrate.rds
 	$(pipeR)
+	
+als_R0.Rout: als_R0.R fitsero.rds params.rda calibrate.rds
+	$(pipeR)
 
 plot_model_fit.Rout: plot_model_fit.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 	$(pipeR)
