@@ -9,6 +9,7 @@
 *.Rout
 *.rds
 *.args
+*.swp
 scripts/makestuff/
 *.DS_Store
 *.pdf.icloud
