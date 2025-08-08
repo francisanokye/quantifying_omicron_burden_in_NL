@@ -35,11 +35,5 @@ serodat <- seroprevalence |>
   ) |>
   filter(between(date, as.Date(start_date), as.Date(last_date)))
 
-print(serodat)
-
-# quick plot for visual inspection
-gg <- ggplot(seroprevalence, aes(date, pct_mean)) +
-  geom_point()
-
 # save formatted matrix
 rdsSave(serodat)
