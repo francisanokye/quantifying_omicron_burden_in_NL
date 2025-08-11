@@ -17,11 +17,12 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 
 [3] [GovNL_2021_1215](https://www.gov.nl.ca/releases/2021/health/1215n04/), [4] [GovNL_2022_0103](https://www.gov.nl.ca/releases/2022/health/0103n02/), [5] [GovNL_2022_0124](https://www.gov.nl.ca/releases/2022/health/0124n05/), [6] [GovNL_2022_0225](https://www.gov.nl.ca/releases/2022/health/0309n02/), [7] [GovNL_2022_0317](https://www.gov.nl.ca/releases/2022/health/0317n11/)
 
-|Data File                       |                       Description                                             |    
+|Data File                       |                       Description                                                  |    
 |--------------------------------|------------------------------------------------------------------------------------|
 |serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
 |vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
-                              
+|raw_citf_data.csv               | raw CITF seroprevalence estimates                                                  |
+|--------------------------------|------------------------------------------------------------------------------------|
 ### Reproducing the Results from the Paper
 
 This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all plots in the results of the manuscript, follow the steps below.
