@@ -74,7 +74,7 @@ This pipeline helps to generate the figures for the results used in the paper. I
 make plot_model_fit.Rout 
 ```
 
-- **True infections vrs reported cases plot (Figure 2)**  
+- **True infections vrs reported cases plot (cumulative)**  
 Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
