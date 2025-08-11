@@ -98,7 +98,7 @@ make reprod_numb.Rout
 ``
 
 ```
-- **Stacks transmission rate and error bar to generate (Figure 3)**  
+- **Stacks transmission rate and error bar to generate**  
 
 ```bash
 make stack_transmission_R0_plot.Rout   
