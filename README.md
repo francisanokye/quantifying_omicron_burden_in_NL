@@ -65,19 +65,21 @@ The script folder should contain the following files in the table
 | `reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
 | `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
-
+--------------------------------------------------------------------------------------------------------------------------
 #### Step-by-Step Pipeline (Makefile Targets)
+
+This pipeline helps to generate the figures for the results used in the paper. It begins by loading and processing the baseline SEAIR model specification and parameters, then generates a time-varying specification for calibration. The model is then fitted to observed data using this time-varying specification, with the calibrated parameters and outputs saved for further analysis. Finally, the code generates Figure 1 by plotting the calibrated model output against seroprevalence data, saving the resulting figures in the figures folder for inclusion in the manuscript.
 
 - **Load model and parameters and key dates**  
    These load and process the baseline parameters:
-   Load baseline model specification and parameters and applies the custom reporting fractions in rp_eligfrac3.csv to generates a time-varying spec.
+   Load baseline model specification and parameters and apply the custom reporting fractions in rp_eligfrac3.csv to generate a time-varying spec.
 
 - **Run the model calibration**  
    This fits the SEAIR model in the timevar_spec to the data and saves the output
 
 
 - **Plot model fit with calibrated parameters (Figure 1)**  
-   Plots the model to the seroprevalence and saves in the figures folder. 
+   Plots the model fit to the seroprevalence estimates and saves it in the figures folder. 
 
 ```bash
 make plot_model_fit.Rout 
