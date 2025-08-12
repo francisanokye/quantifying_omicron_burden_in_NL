@@ -24,7 +24,7 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 | data/serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
 | data/vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
 | data/raw_citf_data.csv               | raw CITF seroprevalence estimates                                                  |
-|--------------------------------|------------------------------------------------------------------------------------|
+
 ### Reproducing the Results from the Paper
 
 This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all plots in the results of the manuscript, follow the steps below.
