@@ -1,6 +1,8 @@
 ### Code and data for quantifying Omicron hidden burden in NL
 This repository contains the code to reproduce the main results of the manuscript [Quantifying Omicron’s spread and the impact of non-pharmaceutical interventions in Newfoundland and Labrador](https://). 
 
+## MLi: Don't need abstract
+
 ### Abstract
 The highly transmissible Omicron variant of SARS-CoV-2 caused many infections in Newfoundland and Labrador (NL), a Canadian province that had previously recorded few COVID-19 cases most of which were imported infections with only few community outbreaks reported. NL retained its Alert Level System (ALS) of non-pharmaceutical interventions to mitigate transmission, while keeping all levels of schooling from kindergarten through Grade 12 (K–12 schools) open as much as possible. Reported case counts became unreliable as diagnostic polymerase chain reaction (PCR) testing capacity was exceeded and testing eligibility criteria changed several times. Using infection-induced seroprevalence estimates from January 1, 2022, to May 22, 2022 to estimate infection, we developed and fit a mechanistic compartmental model stratified by vaccination status to estimate the true number of Omicron infections. We estimated the time-varying transmission rate and the mean reproduction number (![R0](https://latex.codecogs.com/svg.latex?\mathcal{R}_{0})) across overlapping periods of ALS levels and school closure and opening. We found that underreporting varied over time, with **79.5%** of overall infections not captured by official surveillance case counts. Omicron transmission was lower when schools were closed (mean ![R0](https://latex.codecogs.com/svg.latex?\mathcal{R}_{0}) = 1.36, 95% CI: 1.34–1.39) and higher when open (mean ![R0](https://latex.codecogs.com/svg.latex?\mathcal{R}_{0}) = 1.81, 95% CI: 1.49–2.12), with alert level 4 (ALS-4) having the highest effect during K–12 school open periods. Our analysis shows integrating seroprevalence estimates with mechanistic models can reveal infection burden and intervention effects, offering valuable insights for public health decision-making when routine surveillance underestimates true transmission.
 
@@ -19,9 +21,9 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 
 |Data File                       |                       Description                                                  |    
 |--------------------------------|------------------------------------------------------------------------------------|
-|serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
-|vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
-|raw_citf_data.csv               | raw CITF seroprevalence estimates                                                  |
+| data/serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
+| data/vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
+| data/raw_citf_data.csv               | raw CITF seroprevalence estimates                                                  |
 |--------------------------------|------------------------------------------------------------------------------------|
 ### Reproducing the Results from the Paper
 
@@ -53,16 +55,16 @@ The script folder should contain the following files in the table
 
 | Script File                        | Purpose                                                                           | 
 | ---------------------------------- | ----------------------------------------------------------                        | 
-| `params.R`                         | Defines model parameter values                                                    | 
-| `flows.R`                          | Computes compartmental flows                                                      | 
-| `spec.R`                           | Builds model specifications                                                       | 
-| `timevar_spec.R`                   | Builds model specifications  & defines time-varying parameters (e.g., beta)       | 
-| `seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
-| `calibrate.R`                      | Calibrates the model to data                                                      | 
-| `plot_model_plot.R`                | Plots model fit                                                                   | 
-| `true_vs_reported_plot.R`          | Plots the cumulative reported cases vs estimated infections and the underreporting|
-| `bettas.R`                         | Plots the underlying time-varying transmission rates                              |
-| `reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
+| `scripts/params.R`                         | Defines model parameter values                                                    | 
+| `scripts/flows.R`                          | Computes compartmental flows                                                      | 
+| `scripts/spec.R`                           | Builds model specifications                                                       | 
+| `scripts/timevar_spec.R`                   | Builds model specifications  & defines time-varying parameters (e.g., beta)       | 
+| `scripts/seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
+| `scripts/calibrate.R`                      | Calibrates the model to data                                                      | 
+| `scripts/plot_model_plot.R`                | Plots model fit                                                                   | 
+| `scripts/true_vs_reported_plot.R`          | Plots the cumulative reported cases vs estimated infections and the underreporting|
+| `scripts/bettas.R`                         | Plots the underlying time-varying transmission rates                              |
+| `scripts/reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
 | `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
 --------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +74,7 @@ This pipeline helps to generate the figures for the results used in the paper. I
 
 - **Fit model to data and plot (Figure_1)**  
 ```bash
-make plot_model_fit.Rout 
+make scripts\plot_model_fit.Rout 
 ```
 
 - **True infections vrs reported cases plot (cumulative) (Figure_2)**  
