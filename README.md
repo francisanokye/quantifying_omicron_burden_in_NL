@@ -17,11 +17,12 @@ Omicron-reported case data for NL were obtained through a data-sharing agreement
 
 [3] [GovNL_2021_1215](https://www.gov.nl.ca/releases/2021/health/1215n04/), [4] [GovNL_2022_0103](https://www.gov.nl.ca/releases/2022/health/0103n02/), [5] [GovNL_2022_0124](https://www.gov.nl.ca/releases/2022/health/0124n05/), [6] [GovNL_2022_0225](https://www.gov.nl.ca/releases/2022/health/0309n02/), [7] [GovNL_2022_0317](https://www.gov.nl.ca/releases/2022/health/0317n11/)
 
-|Data File                       |                       Description                                             |    
+|Data File                       |                       Description                                                  |    
 |--------------------------------|------------------------------------------------------------------------------------|
 |serop_avgcase_data.csv          | contains reported cases and seroprevalence estimates                               |
 |vaccination-coverage-map.csv    | used to generate the Omicron dominance plot                                        | 
-                              
+|raw_citf_data.csv               | raw CITF seroprevalence estimates                                                  |
+|--------------------------------|------------------------------------------------------------------------------------|
 ### Reproducing the Results from the Paper
 
 This project uses a `Makefile`-based pipeline to ensure fully reproducible analysis. To generate all plots in the results of the manuscript, follow the steps below.
@@ -64,25 +65,16 @@ The script folder should contain the following files in the table
 | `reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
 | `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
-
+--------------------------------------------------------------------------------------------------------------------------
 #### Step-by-Step Pipeline (Makefile Targets)
 
-- **Load model and parameters and key dates**  
-   These load and process the baseline parameters:
-   Load baseline model specification and parameters and applies the custom reporting fractions in rp_eligfrac3.csv to generates a time-varying spec.
-
-- **Run the model calibration**  
-   This fits the SEAIR model in the timevar_spec to the data and saves the output
-
-
-- **Plot model fit with calibrated parameters (Figure 1)**  
-   Plots the model to the seroprevalence and saves in the figures folder. 
+This pipeline helps to generate the figures for the results used in the paper. It begins by loading and processing the baseline SEAIR model specification and parameters, then generates a time-varying specification for calibration. The model is then fitted to observed data using this time-varying specification, with the calibrated parameters and outputs saved for further analysis. Finally, the code generates Figure 1 by plotting the calibrated model output against seroprevalence data, saving the resulting figures in the figures folder for inclusion in the manuscript.
 
 ```bash
 make plot_model_fit.Rout 
 ```
 
-- **True infections vrs reported cases plot (Figure 2)**  
+- **True infections vrs reported cases plot (cumulative)**  
 Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
@@ -106,7 +98,7 @@ make reprod_numb.Rout
 ``
 
 ```
-- **Stacks transmission rate and error bar to generate (Figure 3)**  
+- **Stacks transmission rate and error bar to generate**  
 
 ```bash
 make stack_transmission_R0_plot.Rout   
