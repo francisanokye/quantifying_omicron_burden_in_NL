@@ -216,6 +216,6 @@ final_plot <- plot_grid(
 )
 
 # export figure
-png("../figures/reported_vs_true.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 final_plot
 dev.off()

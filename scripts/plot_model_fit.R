@@ -144,6 +144,6 @@ model_fit <- ggplot() +
   guides(fill = "none", linetype = "none")
 
 # save figure
-png("../figures/model_fit.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_1.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
 model_fit
 dev.off()

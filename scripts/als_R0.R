@@ -93,6 +93,6 @@ gg <- ggplot(r0_data, aes(x = chrono, y = R0_mean, color = "black")) +
   )
 
 # ==== Save Figure ====
-png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_4.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 print(gg)
 dev.off()

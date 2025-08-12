@@ -19,6 +19,6 @@ combined_plot <- plot_grid(
   rel_heights = c(1, 1) 
 )
 
-png("../figures/transmission_R0.png", width = 5000, height = 5000, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_3.png", width = 5000, height = 5000, res = 300, bg = "white", type = "cairo")
 combined_plot
 dev.off()
