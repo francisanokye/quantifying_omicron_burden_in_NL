@@ -31,7 +31,7 @@ This project uses a `Makefile`-based pipeline to ensure fully reproducible analy
 
 #### Setup Instructions
 
-Before reproducing the results, follow these steps to set up your environment:
+Follow these steps to set up your environment:
 
 - install [macpan2](https://canmod.github.io/macpan2/index.html)
 
@@ -68,13 +68,14 @@ The script folder should contain the following files in the table
 --------------------------------------------------------------------------------------------------------------------------
 #### Step-by-Step Pipeline (Makefile Targets)
 
-This pipeline helps to generate the figures for the results used in the paper. It begins by loading and processing the baseline SEAIR model specification and parameters, then generates a time-varying specification for calibration. The model is then fitted to observed data using this time-varying specification, with the calibrated parameters and outputs saved for further analysis. Finally, the code generates Figure 1 by plotting the calibrated model output against seroprevalence data, saving the resulting figures in the figures folder for inclusion in the manuscript.
+This pipeline helps to generate the figures for the results used in the paper. It begins by loading and processing the baseline SEAIR model specification and parameters, then generates a time-varying specification for calibration. The model is then fitted to observed data using this time-varying specification, with the calibrated parameters and outputs saved for further analysis. ALways check the figures folder for the plots after run.
 
+- **Fit model to data and plot (Figure_1)**  
 ```bash
 make plot_model_fit.Rout 
 ```
 
-- **True infections vrs reported cases plot (cumulative)**  
+- **True infections vrs reported cases plot (cumulative) (Figure_2)**  
 Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
@@ -98,8 +99,13 @@ make reprod_numb.Rout
 ``
 
 ```
-- **Stacks transmission rate and error bar to generate**  
+- **Stacks transmission rate and error bar to generate (Figure_3)**  
 
 ```bash
 make stack_transmission_R0_plot.Rout   
+``
+```
+- **Generate ALS plots (Figure_4)**  
+```bash
+make als_R0.Rout   
 ``
