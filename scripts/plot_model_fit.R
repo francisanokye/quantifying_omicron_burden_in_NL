@@ -72,20 +72,20 @@ model_fit <- ggplot() +
   ) +
   geom_point(
     data = seroprevdata,
-    aes(x = date, y = value, color = "Data"),
+    aes(x = date, y = value*100, color = "Data"),
     size = 3,
     show.legend = TRUE
   ) +
   geom_ribbon(
     data = sims,
-    aes(x = date, ymin = conf.low, ymax = conf.high),
+    aes(x = date, ymin = conf.low*100, ymax = conf.high*100),
     fill = "red",
     alpha = 0.3,
     show.legend = FALSE
   ) +
   geom_line(
     data = sims,
-    aes(x = date, y = value, color = "Model"),
+    aes(x = date, y = value*100, color = "Model"),
     linewidth = 1,
     show.legend = TRUE
   ) +
@@ -100,7 +100,7 @@ model_fit <- ggplot() +
     ~matrix,
     scales = "free_y",
     ncol = 1,
-    labeller = labeller(matrix = c(serop = "Infection-induced Seroprevalence Fit"))
+    labeller = labeller(matrix = c(serop = "Mechanistic compartmental model fit to CITF seroprevalence data for NL"))
   ) +
   scale_color_manual(
     name = NULL,
@@ -119,7 +119,7 @@ model_fit <- ggplot() +
   ) +
   labs(
     x = "Date (Dec 15, 2021 - May 26, 2022)",
-    y = "Seroprevalence Estimate (%)"
+    y = "Cumulative % infected with SARS-CoV-2"
   ) +
   scale_x_date(
     expand = c(0, 0),
@@ -144,6 +144,6 @@ model_fit <- ggplot() +
   guides(fill = "none", linetype = "none")
 
 # save figure
-png("../figures/Figure_1.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_2.png", width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
 model_fit
 dev.off()

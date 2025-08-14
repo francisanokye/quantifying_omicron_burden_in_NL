@@ -146,7 +146,7 @@ remade_vax_data = list(
 
 simdat <- calibrator |>
   mp_optimized_spec("modified") |>
-  mp_simulator(time_steps, outputs = c("double_vac", "booster_shot")) |>
+  mp_simulator(time_steps, outputs = c("double_vac", "booster_shot", "E1","E2","E3","A1","A2","A3","I1","I2","I3","R1","R2","R3")) |> 
   mp_trajectory() |>
   lim_dat() |>
   dplyr::filter(time >= 150)
@@ -216,6 +216,7 @@ print(gg)
 ```
 
 ```{r}
+simdat
 start_date <- as.Date("2021-12-15") - offset0
 last_date <-"2022-05-22"
 

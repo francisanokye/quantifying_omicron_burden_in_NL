@@ -1,212 +1,193 @@
-library(dplyr)
-library(lubridate)
-library(ggplot2)
-library(RColorBrewer)
-library(dplyr)
-library(tidyr)
-library(zoo)
-library(forcats)
-library(ggthemes)
-library(cowplot)
-library(patchwork)
-library(shellpipes)
-library(macpan2)
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(lubridate)
+  library(ggplot2)
+  library(tidyr)
+  library(ggthemes)
+  library(cowplot)
+  library(shellpipes)
+  library(macpan2)
+})
 
-# load environment and set seed
+# --- setup --------------------------------------------------------------------
+
+# load analysis environment and set seed
 loadEnvironments()
 set.seed(2025)
 
-# define date range
+# study window (model start uses offset0; plotting window uses jan 1–may 22, 2022)
 start_date <- as.Date("2021-12-15") - offset0
-last_date <-"2022-05-22"
+last_date  <- "2022-05-22"
 
-# model simulation with calibrated parameters
-calibrator <- rdsRead("calibrate.rds")
-fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE)
+# --- model output (estimated infections) --------------------------------------
 
-# filter and reshape simulation output
-fitted_data <- (fitted_data
-                |> mutate(date = as.Date(start_date) + as.numeric(time) -1 )
-                |> dplyr::filter(between(date, as.Date(start_date), as.Date(last_date)))
-                |> dplyr::filter(matrix %in% c("date","inc","conf.low","conf.high"))
-)
+# simulate trajectory with confidence intervals from calibrated model
+calibrator   <- rdsRead("calibrate.rds")
+fitted_data  <- mp_trajectory_sd(calibrator, conf.int = TRUE)
 
-# convert matrix values into columns
-true_infections <- fitted_data |>
-  select(-any_of(c("row", "col"))) |>
-  pivot_wider(names_from = matrix, values_from = value) |>
-  group_by(date) |>
-  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) |>
-  ungroup() |>
-  distinct(date, .keep_all = TRUE) |>
-  drop_na()
+# convert long trajectory to daily frame for the variables of interest
+fitted_data <- fitted_data %>%
+  mutate(date = as.Date(start_date) + as.numeric(time) - 1) %>%
+  dplyr::filter(between(date, as.Date(start_date), as.Date(last_date))) %>%
+  dplyr::filter(matrix %in% c("date", "inc", "conf.low", "conf.high"))
 
-# trim date range
-true_infections <- true_infections |>
+# widen matrices to columns and keep one record per date
+true_infections <- fitted_data %>%
+  select(-any_of(c("row", "col"))) %>%
+  pivot_wider(names_from = matrix, values_from = value) %>%
+  group_by(date) %>%
+  mutate(across(everything(), ~ first(na.omit(.)), .names = "{.col}")) %>%
+  ungroup() %>%
+  distinct(date, .keep_all = TRUE) %>%
+  drop_na() %>%
   dplyr::filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
 
-# load reported data
+# --- reported data ------------------------------------------------------------
+
+# load line list of reported daily cases (expects columns: date, cases)
 reported_cases <- csvRead()
 reported_cases$date <- as.Date(reported_cases$date, format = "%Y-%m-%d")
 
-# trim and clean reported data
-reported_cases <- reported_cases |>
-  dplyr::filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22")) |>
+# trim to study window and remove missing
+reported_cases <- reported_cases %>%
+  dplyr::filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22")) %>%
   drop_na()
 
-# align data formats
-d1 <- reported_cases[c("date","cases")]
-d1$type <- "reported"
-colnames(d1) <- c("date","inc","type")
+# --- assemble panel a data (daily series) -------------------------------------
 
-d2 <- true_infections[c("date","inc")]
+# standardize columns for binding
+d1 <- reported_cases[c("date", "cases")]
+d1$type <- "reported"
+colnames(d1) <- c("date", "inc", "type")
+
+d2 <- true_infections[c("date", "inc")]
 d2$type <- "true_infections"
 
-allcases <- rbind(d1,d2)
+allcases <- rbind(d1, d2) %>%
+  mutate(type = factor(type, levels = c("reported", "true_infections")))
 
-# factor levels
-allcases <- (allcases |>
-               mutate(type = factor(type, levels = c("reported", "true_infections"))))
+# --- panel a: daily incidence (reported vs estimated) with testing cuts -------
 
-# compute cumulative totals
-last_date <- max(allcases$date)
-final_vals <- allcases %>%
-  group_by(type) %>%
+combined_case_plot <- ggplot(allcases, aes(x = date)) +
+  geom_point(data = dplyr::filter(allcases, type == "true_infections"),
+             aes(y = inc, color = "Seroincidence"), size = 2) +
+  geom_line(data = dplyr::filter(allcases, type == "true_infections"),
+            aes(y = inc, color = "Seroincidence"), linewidth = 1.2) +
+  geom_point(data = dplyr::filter(allcases, type == "reported"),
+             aes(y = inc, color = "Reported Cases"), size = 2) +
+  geom_line(data = dplyr::filter(allcases, type == "reported"),
+            aes(y = inc, color = "Reported Cases"), linewidth = 1.2) +
+  scale_color_manual(NULL, values = c("Reported Cases" = "darkgreen",
+                                      "Seroincidence"  = "red")) +
+  labs(x = "Date (dec 15, 2021 – may 22, 2022)",
+       y = "Number of cases",
+       title = "Daily incidence: reported vs estimated seroincidence") +
+  scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
+  geom_vline(aes(xintercept = as.Date("2022-01-03")), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(aes(xintercept = as.Date("2022-01-24")), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(aes(xintercept = as.Date("2022-02-25")), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(aes(xintercept = as.Date("2022-03-17")), colour = "purple", linetype = 4, linewidth = 1) +
+  annotate("text", x = as.Date("2022-01-18"), y = 1000, label = "T1", size = 6, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-02-15"), y = 1000, label = "T2", size = 6, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-03-15"), y = 1000, label = "T3", size = 6, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-04-25"), y = 1000, label = "T4", size = 6, hjust = 1, fontface = "bold") +
+  theme_clean() +
+  theme(axis.text.x   = element_text(size = 15),
+        axis.title.x  = element_text(size = 20),
+        axis.text.y   = element_text(size = 20),
+        axis.title.y  = element_text(size = 20),
+        plot.title    = element_text(size = 20, hjust = 0.5, face = "plain"),
+        legend.position = "bottom",
+        legend.text   = element_text(size = 20),
+        legend.background = element_rect(color = NA),
+        plot.background   = element_blank())
+
+# --- panel b data (underreporting ratio + period means) -----------------------
+
+# keep only needed columns and ensure ordering
+reported_cases <- reported_cases %>%
   arrange(date) %>%
+  select(date, cases)
+
+true_infections <- true_infections %>%
+  arrange(date) %>%
+  select(date, inc)
+
+# daily ratio (safe division)
+underreporting_df <- left_join(true_infections, reported_cases, by = "date") %>%
+  mutate(ratio = ifelse(cases > 0, inc / cases, NA_real_))
+
+# testing-eligibility periods
+t_breaks <- as.Date(c("2022-01-03","2022-01-24","2022-02-25","2022-03-17","2022-05-22"))
+t_labels <- c("T1","T2","T3","T4")
+
+underreporting_df <- underreporting_df %>%
+  mutate(T = cut(date, breaks = t_breaks, labels = t_labels, right = FALSE))
+
+# per-period summaries (mean ratio + date bounds and midpoints)
+period_summary <- underreporting_df %>%
+  filter(!is.na(T)) %>%
+  group_by(T) %>%
   summarise(
-    cum_total = sum(inc, na.rm = TRUE),
-    .groups = "drop"
+    mean_ratio = mean(ratio, na.rm = TRUE),
+    x_start    = min(date, na.rm = TRUE),
+    x_end      = max(date, na.rm = TRUE),
+    x_mid      = x_start + (x_end - x_start) / 2,
+    .groups    = "drop"
   )
 
-# prepare text labels
-text_labels <- tibble(
-  date = last_date - 17,
-  cum_total = final_vals$cum_total * 1.01,
-  label = ifelse(
-    final_vals$type == "reported",
-    paste0(scales::comma(final_vals$cum_total)),
-    paste0(scales::comma(final_vals$cum_total))
-  ),
-  type = ifelse(final_vals$type == "reported", "Reported Cases", "Seroincidence")
+# manual y-positions for period mean lines (edit values to adjust heights)
+ypos_map <- tibble::tibble(
+  T     = factor(c("T1","T2","T3","T4"), levels = levels(period_summary$T)),
+  y_pos = c(1.1, 2.9, 2.6, 21.4)
 )
 
-# build main plot
-combined_case_plot <- (ggplot(allcases, aes(x = date)) +
-                         geom_rect(aes(xmin=ymd('2022-03-17'), xmax = ymd('2022-05-22'), ymin = 0, ymax = Inf), fill = adjustcolor("#F7E2E2", alpha = 0.03), alpha = 0.05) +
-                         geom_line(data = true_infections, aes(y = cumsum(inc), color = "Seroincidence"),linewidth = 1.5) +
-                         geom_point(data = filter(allcases, type == "reported"), aes(y = cumsum(inc), color = "Reported Cases"),size = 1.5) +
-                         geom_line(data = filter(allcases, type == "reported"), aes(y = cumsum(inc), color = "Reported Cases"),linewidth = 0.5) +
-                         scale_color_manual(name = NULL,values = c("Reported Cases" = "darkgreen", "Seroincidence" = "red")) +
-                         labs(x = "Date (Dec 15, 2021 - May 22, 2022)",y = "Cumulative Number of Cases",title = "Cumulative Infections: Reported vrs Estimated Seroincidence") +
-                         scale_x_date(date_breaks = "2 week",date_labels = "%b %d") +
-                         geom_segment(aes(x = as.Date("2022-01-04"), y = 0, yend = Inf),linetype = "dashed",color = "gold4",linewidth = 1) +
-                         geom_segment(aes(x = as.Date("2022-02-07"), y = 0, yend = Inf),linetype = "dashed",color = "gold4",linewidth = 1) +
-                         geom_segment(aes(x = as.Date("2022-03-14"), y = 0, yend = Inf),linetype = "solid",color = "black",linewidth = 1) +
-                         annotate("text", x = as.Date("2022-01-01"), y = 70000, label = "ALS-3", size = 6, angle = 90, hjust = 1) +
-                         annotate("text", x = as.Date("2022-01-30"), y = 70000, label = "ALS-4", size = 6, hjust = 1) +
-                         annotate("text", x = as.Date("2022-03-05"), y = 70000, label = "ALS-3", size = 6, hjust = 1) +
-                         annotate("text", x = as.Date("2022-04-20"), y = 70000, label = "No-ALS", size = 6, hjust = 1) +
-                         theme_clean() +
-                         theme(
-                           axis.text.x = element_text(size = 12),
-                           axis.title.x = element_text(size = 16),
-                           axis.text.y = element_text(size = 16),
-                           axis.title.y = element_text(size = 16),
-                           plot.title = element_text(size = 16, hjust = 0.5),
-                           legend.position = "bottom",
-                           legend.text = element_text(size = 16),
-                           legend.background = element_rect(color = NA),
-                           plot.background = element_blank()
-                         ))
+period_summary <- dplyr::left_join(period_summary, ypos_map, by = "T")
 
-# add cumulative labels
-combined_case_plot <- combined_case_plot +
-  geom_text(
-    data = text_labels,
-    aes(
-      x = date,
-      y = cum_total,
-      label = label,
-      color = type
-    ),
-    hjust = 0.1,
-    vjust = 0,
-    size = 6,
-    fontface = "plain",
-    show.legend = FALSE
-  )
+# set y-limits to ensure lines/labels are visible
+ylim_top <- max(
+  1.1 * max(underreporting_df$ratio, na.rm = TRUE),
+  1.1 * max(period_summary$y_pos, na.rm = TRUE)
+)
 
-# compute cumulative curves
-reported_cases_cum <- reported_cases %>%
-  arrange(date) %>%
-  mutate(cum_cases = cumsum(cases)) %>%
-  select(date, cum_cases)
+# --- panel b: underreporting ratio over time with period mean overlays --------
 
-true_infections_cum <- true_infections %>%
-  arrange(date) %>%
-  mutate(cum_inc = cumsum(inc)) %>%
-  select(date, cum_inc)
-
-# join and compute underreporting ratio
-underreporting_df <- left_join(true_infections_cum, reported_cases_cum, by = "date") %>%
-  mutate(ratio = cum_inc / cum_cases) %>%
-  mutate(ratio = ifelse(is.finite(ratio), ratio, NA)) %>%
-  mutate(ratio_clipped = pmin(ratio, 10))
-
-# compute overall underreporting
-tot_obs <- sum(reported_cases$cases, na.rm = TRUE)
-tot_const <- sum(true_infections$inc, na.rm = TRUE)
-overall_ratio <- tot_const / tot_obs
-underreporting_rate <- 1 - (1 / overall_ratio)
-
-# build inset plot
-const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio_clipped, color = "underreporting ratio")) +
-  geom_line(linewidth = 1.2) +
-  geom_point(size = 2) +
-  annotate(
-    "text",
-    x = min(underreporting_df$date) + 100,
-    y = 5.5,
-    label = paste0("Factor: ", round(overall_ratio, 1),
-                   "\nRate: ", scales::percent(underreporting_rate, accuracy = 0.1)),
-    size = 5,
-    hjust = 0,
-    color = "black",
-    fontface = "bold"
-  ) +
-  scale_y_continuous(
-    limits = c(0, 7),
-    breaks = seq(0, 7, by = 2),
-    labels = scales::number_format(accuracy = 0.1)
-  ) +
-  geom_vline(data = underreporting_df, aes(xintercept = as.Date("2022-01-03")), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(data = underreporting_df, aes(xintercept = as.Date("2022-01-24")), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(data = underreporting_df, aes(xintercept = as.Date("2022-02-25")), colour = "purple", linetype = 4, linewidth = 1)+
-  geom_vline(data = underreporting_df, aes(xintercept = as.Date("2022-03-17")), colour = "purple", linetype = 4, linewidth = 1)+
-  annotate("text", x = as.Date("2022-01-18"), y = 5, label = "T2", size = 6, hjust = 1) +
-  annotate("text", x = as.Date("2022-02-15"), y = 5, label = "T3", size = 6, hjust = 1) +
-  annotate("text", x = as.Date("2022-03-15"), y = 5, label = "T4", size = 6, hjust = 1) +
-  annotate("text", x = as.Date("2022-04-25"), y = 2, label = "T5", size = 6, hjust = 1) +
-  labs(x = "Date (Dec 15, 2021 - May 22, 2022)",y = "Underreporting Ratio",title = "Underreporting Ratio Over Time") +
-  scale_x_date(expand = c(0, 0),date_breaks = "2 week",date_labels = "%b %d") +
-  scale_color_manual(name = NULL,values = c("underreporting ratio" = "steelblue")) +
+const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio, color = "underreporting ratio")) +
+  # per-period mean lines at custom heights
+  geom_segment(data = period_summary,
+               aes(x = x_start, xend = x_end, y = y_pos, yend = y_pos),
+               inherit.aes = FALSE, linewidth = 1.4, color = "maroon",alpha = 0.5, arrow = arrow(type = "closed", length = unit(0.25, "cm"), ends = "both")) +
+  # per-period labels with the computed mean
+  geom_text(data = period_summary,
+            aes(x = x_mid, y = y_pos, label = paste0(T, ": ", round(mean_ratio, 1))),
+            inherit.aes = FALSE, vjust = -1.5,hjust = 0.68,size = 6, fontface = "bold", color = "black") +
+  geom_line(linewidth = 1.2, na.rm = TRUE) +
+  geom_point(size = 2, na.rm = TRUE) +
+  geom_vline(xintercept = as.Date("2022-01-03"), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(xintercept = as.Date("2022-01-24"), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(xintercept = as.Date("2022-02-25"), colour = "purple", linetype = 4, linewidth = 1) +
+  geom_vline(xintercept = as.Date("2022-03-17"), colour = "purple", linetype = 4, linewidth = 1) +
+  labs(x = "Date (dec 15, 2021 – may 22, 2022)",
+       y = "Underreporting ratio (estimated / reported)",
+       title = "Underreporting ratio over time with testing period means") +
+  scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
+  scale_y_continuous(limits = c(0, ylim_top)) +
+  scale_color_manual(NULL, values = c("underreporting ratio" = "blue")) +
   theme_clean() +
-  theme(
-    axis.text.x = element_text(size = 12),
-    axis.title.x = element_text(size = 16),
-    axis.text.y = element_text(size = 16),
-    axis.title.y = element_text(size = 16),
-    plot.title = element_text(size = 16, hjust = 0.5),
-    plot.subtitle = element_text(size = 16, hjust = 0.5),
-    legend.text = element_text(size = 16),
-    legend.background = element_rect(color = NA),
-    legend.position = "bottom",
-    plot.background = element_blank()
-  )
+  theme(axis.text.x   = element_text(size = 15),
+        axis.title.x  = element_text(size = 20),
+        axis.text.y   = element_text(size = 20),
+        axis.title.y  = element_text(size = 20),
+        plot.title    = element_text(size = 20, hjust = 0.5,face = "plain"),
+        legend.text   = element_text(size = 20),
+        legend.background = element_rect(color = NA),
+        legend.position   = "bottom",
+        plot.background   = element_blank())
 
-# combine plots side-by-side
-final_plot <- plot_grid(
-  combined_case_plot, 
+# --- combine panels and export ------------------------------------------------
+
+final_plot <- cowplot::plot_grid(
+  combined_case_plot,
   const_cum,
   labels = "AUTO",
   nrow = 1,
@@ -215,7 +196,6 @@ final_plot <- plot_grid(
   rel_widths = c(1, 1)
 )
 
-# export figure
-png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 final_plot
 dev.off()

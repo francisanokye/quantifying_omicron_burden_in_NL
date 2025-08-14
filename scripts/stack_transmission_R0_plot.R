@@ -2,23 +2,24 @@ library(cowplot)
 library(png)
 library(grid)
 
-# load saved PNG images
-img1 <- readPNG("../figures/transmission_rate.png")
-img2 <- readPNG("../figures/reprod_numb.png")
+# build panels that fill their space (no odd margins)
+p1 <- ggdraw() + draw_image("../figures/transmission_rate.png")
+p2 <- ggdraw() + draw_image("../figures/reprod_numb.png")
+p3 <- ggdraw() + draw_image("../figures/als_R0.png")
 
-# convert plots to grobs
-g1 <- rasterGrob(img1, interpolate = TRUE)
-g2 <- rasterGrob(img2, interpolate = TRUE)
-
-# stack vertically
 combined_plot <- plot_grid(
-  g1, g2,
-  ncol = 1, 
-  labels = c("F","G"),label_size = 20,
-  align = "v",     
-  rel_heights = c(1, 1) 
+  p1, p2, p3,
+  ncol = 1,
+  rel_heights = c(1, 1, 1),        # one height per panel
+  labels = c("A", "B", "C"),
+  label_size = 10,
+  label_fontface = "plain",
+  label_x = 0.01,                   # pull labels closer to left edge
+  label_y = 0.99,                   # near top edge
+  hjust = 0.5, vjust = 1,
+  align = "v"
 )
 
-png("../figures/Figure_3.png", width = 5000, height = 5000, res = 300, bg = "white", type = "cairo")
+png("../figures/Figure_4.png", width = 3000, height = 4800, res = 300, bg = "white", type = "cairo")
 combined_plot
 dev.off()
