@@ -75,7 +75,7 @@ make scripts\plot_model_fit.Rout
 Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
-make true_vs_reported_plot.Rout   
+make scripts/true_vs_reported_plot.Rout   
 ``
 
 ```
@@ -83,7 +83,7 @@ make true_vs_reported_plot.Rout
 Generates the transmission rate plot.
 
 ```bash
-make bettas.Rout   
+make scripts/bettas.Rout   
 ``
 
 ```
@@ -91,17 +91,18 @@ make bettas.Rout
 Generates the stack of the above two plots.
 
 ```bash
-make reprod_numb.Rout   
+make scripts/reprod_numb.Rout   
 ``
 
+```
+- **Generate ALS plots (Figure_4)**  
+```bash
+make scripts/als_R0.Rout   
+``
 ```
 - **Stacks transmission rate and error bar to generate (Figure_3)**  
 
 ```bash
-make stack_transmission_R0_plot.Rout   
+make scripts/stack_transmission_R0_plot.Rout   
 ``
-```
-- **Generate ALS plots (Figure_4)**  
-```bash
-make als_R0.Rout   
-``
+
