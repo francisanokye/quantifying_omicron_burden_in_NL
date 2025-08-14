@@ -155,7 +155,4 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
     plot.background = element_blank()
   )
 
-# ==== Save Figure ====
-png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 print(gg)
-dev.off()

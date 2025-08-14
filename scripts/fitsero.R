@@ -27,10 +27,6 @@ seroprevalence <- seroprevalence |>
 
 # # Create a copy of data
 est_SERP <- seroprevalence
-# 
-# # Create the daily seroprevalence 
-# est_SERP <- est_SERP %>%
-#   mutate(daily_pct = c(0,diff(pct_mean)))
 
 # subset only the study period
 est_SERP <- est_SERP[(est_SERP$date >= "2021-11-01") & (est_SERP$date < "2022-06-09"),]

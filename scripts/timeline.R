@@ -140,12 +140,3 @@ testing_timeline_plot <- ggplot() +
   coord_cartesian(ylim = c(-0.5, 0.6))
 
 print(testing_timeline_plot)
-
-# save als and testing plots
-png("../figures/als_timeline_plot.png", width = 3000, height = 1800, res = 300, bg = "white", type = "cairo")
-als_timeline_plot
-dev.off()
-
-png("../figures/testing_timeline_plot.png", width = 3000, height = 1800, res = 300, bg = "white", type = "cairo")
-testing_timeline_plot
-dev.off()

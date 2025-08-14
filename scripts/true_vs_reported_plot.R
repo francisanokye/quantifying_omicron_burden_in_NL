@@ -92,7 +92,7 @@ combined_case_plot <- ggplot(allcases, aes(x = date)) +
   annotate("text", x = as.Date("2022-03-15"), y = 1000, label = "T3", size = 6, hjust = 1, fontface = "bold") +
   annotate("text", x = as.Date("2022-04-25"), y = 1000, label = "T4", size = 6, hjust = 1, fontface = "bold") +
   theme_clean() +
-  theme(axis.text.x   = element_text(size = 15),
+  theme(axis.text.x   = element_text(size = 14),
         axis.title.x  = element_text(size = 20),
         axis.text.y   = element_text(size = 20),
         axis.title.y  = element_text(size = 20),
@@ -152,41 +152,52 @@ ylim_top <- max(
 
 # --- panel b: underreporting ratio over time with period mean overlays --------
 
-const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio, color = "underreporting ratio")) +
-  # per-period mean lines at custom heights
+# -- data for translucent bars (0 up to period mean) --
+bars_df <- period_summary %>%
+  transmute(xmin = x_start, xmax = x_end, ymin = 0, ymax = y_pos, T)
+
+# -- Panel B with transparent bars + mean line on top --
+const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio)) +
+  # 1) translucent bars per period (draw first)
+  geom_rect(data = bars_df,
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = T),
+            inherit.aes = FALSE, alpha = 0.18, color = NA) +
+  # 2) period mean line over the bar
   geom_segment(data = period_summary,
                aes(x = x_start, xend = x_end, y = y_pos, yend = y_pos),
-               inherit.aes = FALSE, linewidth = 1.4, color = "maroon",alpha = 0.5, arrow = arrow(type = "closed", length = unit(0.25, "cm"), ends = "both")) +
-  # per-period labels with the computed mean
+               inherit.aes = FALSE, linewidth = 1.4, color = "maroon") +
+  # 3) label the period mean on the bar
   geom_text(data = period_summary,
             aes(x = x_mid, y = y_pos, label = paste0(T, ": ", round(mean_ratio, 1))),
-            inherit.aes = FALSE, vjust = -1.5,hjust = 0.68,size = 6, fontface = "bold", color = "black") +
-  geom_line(linewidth = 1.2, na.rm = TRUE) +
-  geom_point(size = 2, na.rm = TRUE) +
-  geom_vline(xintercept = as.Date("2022-01-03"), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(xintercept = as.Date("2022-01-24"), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(xintercept = as.Date("2022-02-25"), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(xintercept = as.Date("2022-03-17"), colour = "purple", linetype = 4, linewidth = 1) +
+            inherit.aes = FALSE, vjust = -1.5,hjust = 0.68,size = 6, fontface = "bold") +
+  # 4) daily ratio curve on top
+  geom_line(color = "blue", linewidth = 1.2, na.rm = TRUE) +
+  geom_point(color = "blue", size = 2, na.rm = TRUE) +
+  # vertical cut lines
+  geom_vline(xintercept = as.Date(c("2022-01-03","2022-01-24","2022-02-25","2022-03-17")),
+             colour = "purple", linetype = 4, linewidth = 1) +
   labs(x = "Date (dec 15, 2021 – may 22, 2022)",
        y = "Underreporting ratio (estimated / reported)",
        title = "Underreporting ratio over time with testing period means") +
   scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
   scale_y_continuous(limits = c(0, ylim_top)) +
-  scale_color_manual(NULL, values = c("underreporting ratio" = "blue")) +
-  theme_clean() +
-  theme(axis.text.x   = element_text(size = 15),
-        axis.title.x  = element_text(size = 20),
-        axis.text.y   = element_text(size = 20),
-        axis.title.y  = element_text(size = 20),
-        plot.title    = element_text(size = 20, hjust = 0.5,face = "plain"),
-        legend.text   = element_text(size = 20),
-        legend.background = element_rect(color = NA),
-        legend.position   = "bottom",
-        plot.background   = element_blank())
+  scale_fill_manual(values = c("T1" = "pink4", "T2" = "pink4",
+                               "T3" = "pink4", "T4" = "pink4"),
+                    guide = "none") +
+  theme_clean() + 
+  theme(axis.text.x = element_text(size = 15), 
+        axis.title.x = element_text(size = 20), 
+        axis.text.y = element_text(size = 20), 
+        axis.title.y = element_text(size = 20), 
+        plot.title = element_text(size = 20, hjust = 0.5,face = "plain"), 
+        legend.text = element_text(size = 20), 
+        legend.background = element_rect(color = NA), 
+        legend.position = "bottom", 
+        plot.background = element_blank())
 
 # --- combine panels and export ------------------------------------------------
 
-final_plot <- cowplot::plot_grid(
+gg <- cowplot::plot_grid(
   combined_case_plot,
   const_cum,
   labels = "AUTO",
@@ -196,6 +207,5 @@ final_plot <- cowplot::plot_grid(
   rel_widths = c(1, 1)
 )
 
-png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-final_plot
-dev.off()
+print(gg)
+

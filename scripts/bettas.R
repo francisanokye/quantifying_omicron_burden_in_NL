@@ -197,10 +197,7 @@ p1_leg   <- p1 + theme(legend.position = "bottom")
 legend_grob <- cowplot::get_legend(p1_leg)
 p1_noleg   <- p1 + theme(legend.position = "none")
 
-bettas <- p1_noleg / p2 / wrap_elements(legend_grob) +
+gg <- p1_noleg / p2 / wrap_elements(legend_grob) +
   plot_layout(heights = c(3, 0.7, 0.25))
 
-# ==== export figure ====
-png("../figures/transmission_rate.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-bettas
-dev.off()
+print(gg)
