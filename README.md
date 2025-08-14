@@ -56,9 +56,10 @@ The script folder should contain the following files in the table
 | `scripts/seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
 | `scripts/calibrate.R`                      | Calibrates the model to data                                                      | 
 | `scripts/plot_model_plot.R`                | Plots model fit                                                                   | 
-| `scripts/true_vs_reported_plot.R`          | Plots the cumulative reported cases vs estimated infections and the underreporting|
+| `scripts/true_vs_reported_plot.R`          | Plots the incidence reported cases vs estimated infections and the underreporting|
 | `scripts/bettas.R`                         | Plots the underlying time-varying transmission rates                              |
-| `scripts/reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS       | 
+| `scripts/reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS with K--12 status       | 
+| `scripts/als_R0.R`                         | Plots the errorbar comparing the different reproduction numbers for the ALS only       | 
 | `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
 --------------------------------------------------------------------------------------------------------------------------
