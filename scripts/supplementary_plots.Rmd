@@ -146,16 +146,16 @@ remade_vax_data = list(
 
 simdat <- calibrator |>
   mp_optimized_spec("modified") |>
-  mp_simulator(time_steps, outputs = c("double_vac", "booster_shot", "E1","E2","E3","A1","A2","A3","I1","I2","I3","R1","R2","R3")) |> 
+  mp_simulator(time_steps, outputs = c("double_vac", "booster_shot", "S1","V2","V3","E1","E2","E3","A1","A2","A3","I1","I2","I3","R1","R2","R3")) |> 
   mp_trajectory() |>
   lim_dat() |>
-  dplyr::filter(time >= 150)
+  dplyr::filter(time >= 150) 
 
 ggplot(simdat, aes(time, value)) +
   geom_line() +
+  geom_point() +
   facet_wrap(~matrix, scales = "free") +
   theme_bw()
-
 ```
 
 ```{r fig.height=10, fig.width=20}

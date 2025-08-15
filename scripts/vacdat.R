@@ -23,7 +23,7 @@ gg <- (ggplot(nl,aes(week_end,value))
 	+ facet_wrap(~type,scale="free")
 )
 
-print(gg)
+#print(gg)
 
 V2_init <- (nl
 	|> filter(type == "numtotal_fully")
@@ -31,6 +31,7 @@ V2_init <- (nl
 	|> pull(value)
 )
 
+print(V2_init)
 
 nl_additional <- (nl
 	|> filter(type %in% c("numtotal_additional","numtotal_fully"))
@@ -50,7 +51,7 @@ nl_additional <- (nl
 
 )
 
-print(nl_additional,n=Inf)
+#print(nl_additional,n=Inf)
 
 saveVars(nl_additional,V2_init, offset0)
 

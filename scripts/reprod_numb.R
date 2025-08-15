@@ -109,9 +109,9 @@ mean_labels <- summary_stats %>%
   arrange(desc(mean)) %>%
   mutate(
     label = sprintf("Mean (%s): %.2f [%.2f–%.2f]", k12_status, mean, lower, upper),
-    x = 0.8,                       # Left edge
-    y = 2.5 - 0.07 * row_number(),  # Stacked close together
-    hjust = 0,
+    x = 0.8,                       
+    y = 2.9 - 0.07 * row_number(),  
+    hjust = 0.1,
     vjust = 1
   )
 
@@ -126,7 +126,7 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
   geom_errorbar(aes(ymin = R0_mean - 1.96*R0_sd, ymax = R0_mean + 1.96*R0_sd),
                 width = 0.2, linewidth = 1) +
   geom_text(aes(label = sprintf("%.2f", R0_mean), y = R0_mean + 0.11),
-            size = 8, hjust = 1.2) +
+            size = 8, hjust = 1.1, vjust = 1.0) +
   geom_segment(
     data = summary_stats,
     aes(x = 0.5, xend = length(levels(spec_data$chrono)) + 0.5,
@@ -137,7 +137,7 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
     data = mean_labels,
     aes(x = x, y = y, label = label, color = color, hjust = hjust, vjust = vjust),
     inherit.aes = FALSE,
-    size = 6
+    size = 7
   ) +
   scale_color_identity() +
   scale_fill_identity() +
@@ -156,3 +156,7 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
   )
 
 print(gg)
+
+# png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# gg
+# dev.off()

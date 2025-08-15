@@ -92,7 +92,7 @@ gg_arrow <- ggplot() +
            x = 1, xend = n_levels, y = 0, yend = 0,
            arrow = arrow(length = unit(0.25, "inches"),
                          ends = "last", type = "closed"),
-           linewidth = 0.8, color = "black") +
+           linewidth = 1.5, color = "black") +
   annotate("text",
            x = (1 + n_levels)/2, y = -0.5,
            label = "decreasing strictness", size = 11, color = "black") +
@@ -104,3 +104,7 @@ gg_arrow <- ggplot() +
 final_plot <- gg_main / gg_arrow + plot_layout(heights = c(12, 2)) # more bottom space
 
 print(final_plot)
+
+# png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# final_plot
+# dev.off()
