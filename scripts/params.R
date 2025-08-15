@@ -1,6 +1,8 @@
 library(shellpipes)
 set.seed(2024)
 
+loadEnvironments()
+
 # parameter values
 params <- c(beta = 0.1
 	, kappa1 = 1
@@ -16,11 +18,8 @@ params <- c(beta = 0.1
 	, vac2_const = 0.09
 	, vac3_const = 0.0189
 	, N = 510550
+	, V2_init = V2_init
   
-  # initial state
-	, A1 = 1, E1 = 1, I1 = 1, R1 = 1
-	, A2 = 1, E2 = 1, I2 = 1, R2 = 1
-	, A3 = 1, E3 = 1, I3 = 1, R3 = 1
 )
 
 # ~95% prior interval
@@ -31,8 +30,5 @@ prior_range <- list(kappa2 = c(0.85, 0.95)
 	, sigma = c(1/4, 1/2)
 	, R1 = c(1, 10)
 )
-
-# number of days before the first data point to start simulations
-offset0 <- 150
 
 saveEnvironment()

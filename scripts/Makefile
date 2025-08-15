@@ -16,7 +16,10 @@ vim_session:
 Sources += Makefile
 Sources += $(wildcard *.R)
 
-params.Rout: params.R
+vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv 
+	$(pipeR)
+
+params.Rout: params.R vacdat.rda
 	$(pipeR)
 
 flows.Rout: flows.R params.rda
@@ -24,10 +27,7 @@ flows.Rout: flows.R params.rda
 
 ## Con't refactoring here next time
 
-vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv params.rda 
-	$(pipeRcall)
-
-timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rds params.rda
+timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rda params.rda
 	$(pipeR)
 
 seroprevdata.Rout: seroprevdata.R params.rda ../data/raw_citf_data.csv    

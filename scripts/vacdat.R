@@ -1,8 +1,10 @@
 library(tidyverse)
 library(shellpipes)
-rpcall("vacdat.Rout vacdat.R ../data/vaccination-coverage-map.csv params.rda")
 
 loadEnvironments()
+
+# number of days before the first data point to start simulations
+offset0 <- 150
 
 dat <- csvRead()
 day0 <- as.Date("2021-12-17") - lubridate::days(offset0)
@@ -23,6 +25,13 @@ gg <- (ggplot(nl,aes(week_end,value))
 
 print(gg)
 
+V2_init <- (nl
+	|> filter(type == "numtotal_fully")
+	|> filter(week_end == as.Date("2021-07-24"))
+	|> pull(value)
+)
+
+
 nl_additional <- (nl
 	|> filter(type %in% c("numtotal_additional","numtotal_fully"))
 	|> mutate(value = ifelse((week_end == as.Date("2021-12-18")) & (type == "numtotal_additional") ,10,value))
@@ -33,8 +42,9 @@ nl_additional <- (nl
 		, boosterdiff = diff(c(value,0))
 		, daily_rate = boosterdiff/as.numeric(daydiff)
 		, days = as.numeric(week_end - day0)
+		, week_end = week_end
 	)
-	|> select(days,daily_rate)
+	|> select(days,daily_rate,week_end)
 	|> filter(between(days,0,159 + offset0))
 #	|> filter(between(days,-20,159))
 
@@ -42,5 +52,5 @@ nl_additional <- (nl
 
 print(nl_additional,n=Inf)
 
-rdsSave(nl_additional)
+saveVars(nl_additional,V2_init, offset0)
 
