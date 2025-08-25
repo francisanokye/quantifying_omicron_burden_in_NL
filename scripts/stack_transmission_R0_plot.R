@@ -20,6 +20,6 @@ gg <- plot_grid(
 
 print(gg)
 
-# png("../figures/Figure_5.png", width = 5000, height = 3500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+png("../figures/Figure_5.png", width = 5000, height = 3500, res = 300, bg = "white", type = "cairo")
+gg
+dev.off()

@@ -14,21 +14,21 @@ rpcall("beta_plot.Rout beta_plot.R calibrate_inc.rds params.rda")
 loadEnvironments()
 set.seed(2025)
 
-start_date <- as.Date("2021-12-15") - offset0
+start_date <- as.Date("2022-01-01") - offset0
 calibrator <- rdsRead("calibrate.rds")
 
 # ==== Extract beta(t) over study window ====
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE) %>%
   mutate(date = as.Date(start_date) + time - 1) %>%
   filter(matrix == "beta_thing",
-         date >= as.Date("2021-12-25"),
+         date >= as.Date("2022-01-01"),
          date <= as.Date("2022-05-22")) %>%
   transmute(date, beta_thing = value)
 
 # ==== Map dates to ALS phases ====
 fitted_data <- fitted_data %>%
   mutate(alert_level = case_when(
-    date >= as.Date("2021-12-25") & date <= as.Date("2022-01-03") ~ "ALS-3",
+    date >= as.Date("2022-01-01") & date <= as.Date("2022-01-03") ~ "ALS-3",
     date >= as.Date("2022-01-04") & date <= as.Date("2022-02-07") ~ "ALS-4",
     date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "ALS-3",
     date >= as.Date("2022-03-15") & date <= as.Date("2022-05-22") ~ "No-ALS",
@@ -105,6 +105,6 @@ final_plot <- gg_main / gg_arrow + plot_layout(heights = c(12, 2)) # more bottom
 
 print(final_plot)
 
-# png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# final_plot
-# dev.off()
+#png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+#final_plot
+#dev.off()

@@ -25,15 +25,15 @@ upper_plot_time <- 300
 
 # ==== prepare seroprevalence data ====
 seroprevdata <- seroprevdata %>%
-  complete(date = seq.Date(from = as.Date("2021-12-15"), to = max(date), by = "1 day")) %>%
+  complete(date = seq.Date(from = as.Date("2022-01-01"), to = max(date), by = "1 day")) %>%
   select(date, value) %>%
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
 
 # ==== extract beta(t) with uncertainty ====
 sims <- calibrator %>%
   mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE) %>%
   filter(time >= offset0, matrix == "beta_thing") %>%
-  mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) %>%
+  mutate(date = seq.Date(from = as.Date("2022-01-01"), by = "1 day", length.out = n())) %>%
   filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
 
 # ==== define ALS shading periods ====
@@ -202,6 +202,6 @@ gg <- p1_noleg / p2 / wrap_elements(legend_grob) +
 
 print(gg)
 
-# png("../figures/Figure_4.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+#png("../figures/Figure_4.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+#gg
+#dev.off()

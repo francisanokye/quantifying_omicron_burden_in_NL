@@ -15,7 +15,7 @@ timeline <- data.frame(
 # event arrows
 events <- data.frame(
   date = as.Date(c("2021-12-15", "2022-03-14")),
-  label = c("1st Omicron\ncase", "End\nMeasures"),
+  label = c("1st Omicron\ncase", "End\nPHE"),
   y_tip = 0.15,
   y_text = 0.25
 )
@@ -24,7 +24,7 @@ events <- data.frame(
 als_segments <- data.frame(
   start = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
   end   = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  level = c("ALS-2", "ALS-3", "ALS-4", "Mod-ALS-3", "No-ALS"),
+  level = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
   y     = -0.2
 )
 
@@ -45,7 +45,7 @@ als_colors <- c(
   "ALS-2" = "#66D1B566",
   "ALS-3" = "#87CEFA66",
   "ALS-4" = "#FFD58066",
-  "Mod-ALS-3" = "#F7E2E299",
+  "ALS-3" = "#87CEFA66",
   "No-ALS" = "#D3D3D399"
 )
 

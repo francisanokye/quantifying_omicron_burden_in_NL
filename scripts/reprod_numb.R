@@ -13,7 +13,7 @@ rpcall("beta_plot.Rout beta_plot.R calibrate_inc.rds params.rda")
 loadEnvironments()
 set.seed(2025)
 
-start_date <- as.Date("2021-12-15") - offset0
+start_date <- as.Date("2022-01-01") - offset0
 last_date  <- "2022-05-22"
 calibrator <- rdsRead("calibrate.rds")
 
@@ -74,7 +74,7 @@ spec_data <- beta_summary_all %>%
   filter(k12_group == "Specific") %>%
   arrange(k12_status, desc(R0_mean)) %>%
   mutate(chrono = factor(alert_level, levels = c(
-    "ALS-3\nK-12 Closed", "ALS-4\nK-12 Closed", "ALS-4\nK-12 Open",
+    "ALS-4\nK-12 Closed", "ALS-3\nK-12 Closed", "ALS-4\nK-12 Open",
     "ALS-3\nK-12 Open", "No-ALS\nK-12 Open"
   )))
 
@@ -137,7 +137,7 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
     data = mean_labels,
     aes(x = x, y = y, label = label, color = color, hjust = hjust, vjust = vjust),
     inherit.aes = FALSE,
-    size = 7
+    size = 9
   ) +
   scale_color_identity() +
   scale_fill_identity() +
@@ -157,6 +157,6 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
 
 print(gg)
 
-# png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+#png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+#gg
+#dev.off()

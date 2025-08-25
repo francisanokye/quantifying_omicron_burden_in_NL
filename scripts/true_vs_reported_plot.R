@@ -16,7 +16,7 @@ loadEnvironments()
 set.seed(2025)
 
 # study window (model start uses offset0; plotting window uses jan 1–may 22, 2022)
-start_date <- as.Date("2021-12-15") - offset0
+start_date <- as.Date("2022-01-01") - offset0
 last_date  <- "2022-05-22"
 
 # --- model output (estimated infections) --------------------------------------
@@ -79,7 +79,7 @@ combined_case_plot <- ggplot(allcases, aes(x = date)) +
             aes(y = inc, color = "Reported Cases"), linewidth = 1.2) +
   scale_color_manual(NULL, values = c("Reported Cases" = "darkgreen",
                                       "Seroincidence"  = "red")) +
-  labs(x = "Date (dec 15, 2021 – may 22, 2022)",
+  labs(x = "Date",
        y = "Number of cases",
        title = "Daily incidence: reported vs estimated seroincidence") +
   scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
@@ -184,7 +184,7 @@ const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio)) +
     colour = "purple", linetype = 4, linewidth = 1
   ) +
   labs(
-    x = "Date (dec 15, 2021 – may 22, 2022)",
+    x = "Date",
     y = "Underreporting ratio (estimated / reported)",
     title = "Underreporting ratio over time with testing period means",
     fill = NULL, color = NULL
@@ -228,6 +228,6 @@ gg <- cowplot::plot_grid(
 
 print(gg)
 
-# png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+gg
+dev.off()

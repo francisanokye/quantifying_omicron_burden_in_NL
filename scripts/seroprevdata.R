@@ -7,7 +7,7 @@ library(tidyverse)
 loadEnvironments()
 
 # define study period
-start_date <- "2021-12-15"
+start_date <- "2022-01-01"#"2021-12-15"
 last_date  <- "2022-07-15"  # "2022-05-26"
 
 # read and format seroprevalence data

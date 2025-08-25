@@ -17,7 +17,7 @@ options(macpan2_log_dir = ".")
 loadEnvironments()
 
 # set simulation period
-start_date <- as.Date("2021-12-15") - offset0
+start_date <- as.Date("2022-01-01") - offset0 #as.Date("2021-12-15") - offset0
 last_date <- "2022-05-22"
 
 # read inputs
@@ -28,28 +28,28 @@ upper_plot_time <- 300
 
 # fill missing dates
 seroprevdata <- seroprevdata %>%
-  complete(date = seq.Date(from = as.Date("2021-12-15"), to = max(date), by = "1 day")) %>%
+  complete(date = seq.Date(from = as.Date("2022-01-01"), to = max(date), by = "1 day")) %>%
   select(date, value) %>%
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
 
 # get trajectory for seroprevalence
 sims <- calibrator %>%
   mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE) %>%
   filter(time >= offset0, matrix == c("serop")) %>%
-  mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) %>%
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  mutate(date = seq.Date(from = as.Date("2022-01-01"), by = "1 day", length.out = n())) %>%
+  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
 
 # define als phase shading
 als_shading <- tibble(
-  xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
-  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
+  xmin = as.Date(c("2022-01-01", "2022-01-08", "2022-02-07", "2022-03-14")),
+  xmax = as.Date(c("2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
+  phase = c("ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  fill_lab = c("ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 als_data <- tibble(
-  date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
+  date = as.Date(c("2021-01-01", "2022-01-08", "2022-02-07", "2022-03-14")),
+  phase = c( "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 # define fill colors
@@ -145,6 +145,6 @@ model_fit <- ggplot() +
 
 print(model_fit)
 
-# png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+#png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+#model_fit
+#dev.off()
