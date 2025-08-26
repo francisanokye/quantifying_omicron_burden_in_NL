@@ -12,7 +12,7 @@ gg <- plot_grid(
   labels = c("A", "B"),
   label_size = 15,
   label_fontface = "plain",
-  label_x = 0.15,                   # pull labels closer to left edge
+  label_x = 0.22,                   # pull labels closer to left edge
   label_y = 0.99,                   # near top edge
   hjust = 0.001, vjust = 1,
   align = "v"

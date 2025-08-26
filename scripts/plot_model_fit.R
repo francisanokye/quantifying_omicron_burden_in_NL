@@ -100,7 +100,7 @@ model_fit <- ggplot() +
     ~matrix,
     scales = "free_y",
     ncol = 1,
-    labeller = labeller(matrix = c(serop = "Mechanistic compartmental model fit to CITF seroprevalence data for NL"))
+    labeller = labeller(matrix = c(serop = "SEAIR model fit to seroprevalence estimates in NL"))
   ) +
   scale_color_manual(
     name = NULL,
@@ -118,7 +118,7 @@ model_fit <- ggplot() +
     guide = "none"
   ) +
   labs(
-    x = "Date (Dec 15, 2021 - May 26, 2022)",
+    x = "Date",
     y = "Cumulative % infected with SARS-CoV-2"
   ) +
   scale_x_date(
@@ -128,14 +128,14 @@ model_fit <- ggplot() +
   ) +
   theme_clean() +
   theme(
-    axis.text.x = element_text(size = 10, angle = 0, hjust = 0.85),
-    axis.title.x = element_text(size = 12, color = "black"),
-    axis.text.y = element_text(size = 10),
-    axis.title.y = element_text(size = 12, color = "black"),
-    plot.title = element_text(size = 12, color = "black", hjust = 0.5),
-    strip.text = element_text(size = 12, color = "black"),
+    axis.text.x = element_text(size = 20, angle = 0, hjust = 0.85),
+    axis.title.x = element_text(size = 22, color = "black"),
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 22, color = "black"),
+    plot.title = element_text(size = 22, color = "black", hjust = 0.5),
+    strip.text = element_text(size = 20, color = "black"),
     legend.title = element_blank(),
-    legend.text = element_text(size = 10),
+    legend.text = element_text(size = 20),
     legend.background = element_rect(color = NA),
     legend.margin = margin(0, 0, 0, 0),
     plot.background = element_blank(),
@@ -145,6 +145,6 @@ model_fit <- ggplot() +
 
 print(model_fit)
 
-#png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-#model_fit
-#dev.off()
+png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+model_fit
+dev.off()
