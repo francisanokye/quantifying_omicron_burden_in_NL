@@ -16,7 +16,7 @@ loadEnvironments()
 set.seed(2025)
 
 # study window (model start uses offset0; plotting window uses jan 1–may 22, 2022)
-start_date <- as.Date("2022-01-01") - offset0
+start_date <- as.Date("2021-12-15") - offset0
 last_date  <- "2022-05-22"
 
 # --- model output (estimated infections) --------------------------------------
@@ -40,7 +40,7 @@ true_infections <- fitted_data %>%
   ungroup() %>%
   distinct(date, .keep_all = TRUE) %>%
   drop_na() %>%
-  dplyr::filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
+  dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 # --- reported data ------------------------------------------------------------
 
@@ -50,7 +50,7 @@ reported_cases$date <- as.Date(reported_cases$date, format = "%Y-%m-%d")
 
 # trim to study window and remove missing
 reported_cases <- reported_cases %>%
-  dplyr::filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22")) %>%
+  dplyr::filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22")) %>%
   drop_na()
 
 # --- assemble panel a data (daily series) -------------------------------------
@@ -69,35 +69,42 @@ allcases <- rbind(d1, d2) %>%
 # --- panel a: daily incidence (reported vs estimated) with testing cuts -------
 
 combined_case_plot <- ggplot(allcases, aes(x = date)) +
+  geom_rect(
+  data = data.frame(xmin = as.Date("2021-12-15"), xmax = as.Date("2022-01-02"), ymin = -Inf,ymax =  Inf),
+  aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+  inherit.aes = FALSE,
+  fill = "grey20",
+  alpha = 0.35,
+  show.legend = FALSE
+)+
   geom_point(data = dplyr::filter(allcases, type == "true_infections"),
-             aes(y = inc, color = "Seroincidence"), size = 2) +
+             aes(y = inc, color = "seroincidence (estimated)"), size = 2) +
   geom_line(data = dplyr::filter(allcases, type == "true_infections"),
-            aes(y = inc, color = "Seroincidence"), linewidth = 1.2) +
+            aes(y = inc, color = "seroincidence (estimated)"), linewidth = 1.2) +
   geom_point(data = dplyr::filter(allcases, type == "reported"),
-             aes(y = inc, color = "Reported Cases"), size = 2) +
+             aes(y = inc, color = "reported"), size = 2) +
   geom_line(data = dplyr::filter(allcases, type == "reported"),
-            aes(y = inc, color = "Reported Cases"), linewidth = 1.2) +
-  scale_color_manual(NULL, values = c("Reported Cases" = "darkgreen",
-                                      "Seroincidence"  = "red")) +
-  labs(x = "Date",
-       y = "Number of cases",
-       title = "Daily incidence: reported vs estimated seroincidence") +
+            aes(y = inc, color = "reported"), linewidth = 1.2) +
+  scale_color_manual(NULL, values = c("reported" = "#4D4D4D","seroincidence (estimated)"  = "red")) +
+  labs(y = "Number of infections",title = "Daily infections: reported vs estimated") +
   scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
-  geom_vline(aes(xintercept = as.Date("2022-01-03")), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(aes(xintercept = as.Date("2022-01-24")), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(aes(xintercept = as.Date("2022-02-25")), colour = "purple", linetype = 4, linewidth = 1) +
-  geom_vline(aes(xintercept = as.Date("2022-03-17")), colour = "purple", linetype = 4, linewidth = 1) +
-  annotate("text", x = as.Date("2022-01-18"), y = 1000, label = "T1", size = 6, hjust = 1, fontface = "bold") +
-  annotate("text", x = as.Date("2022-02-15"), y = 1000, label = "T2", size = 6, hjust = 1, fontface = "bold") +
-  annotate("text", x = as.Date("2022-03-15"), y = 1000, label = "T3", size = 6, hjust = 1, fontface = "bold") +
-  annotate("text", x = as.Date("2022-04-25"), y = 1000, label = "T4", size = 6, hjust = 1, fontface = "bold") +
+  geom_vline(aes(xintercept = as.Date("2021-12-15")), colour = "gold4", linetype = 4, linewidth = 1.5) +
+  geom_vline(aes(xintercept = as.Date("2022-01-03")), colour = "gold4", linetype = 4, linewidth = 1.5) +
+  geom_vline(aes(xintercept = as.Date("2022-01-24")), colour = "gold4", linetype = 4, linewidth = 1.5) +
+  geom_vline(aes(xintercept = as.Date("2022-02-25")), colour = "gold4", linetype = 4, linewidth = 1.5) +
+  geom_vline(aes(xintercept = as.Date("2022-03-17")), colour = "gold4", linetype = 4, linewidth = 1.5) +
+  annotate("text", x = as.Date("2021-12-25"), y = 1000, label = "T1",colour = "purple", size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-01-18"), y = 1000, label = "T2", colour = "purple", size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-02-15"), y = 1000, label = "T3", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-03-15"), y = 1000, label = "T4", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-04-25"), y = 1000, label = "T5", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
   theme_clean() +
-  theme(axis.text.x   = element_text(size = 14),
-        axis.title.x  = element_text(size = 20),
+  theme(axis.text.x   = element_text(size = 12),
+        axis.title.x  = element_blank(),
         axis.text.y   = element_text(size = 20),
         axis.title.y  = element_text(size = 20),
-        plot.title    = element_text(size = 20, hjust = 0.5, face = "plain"),
-        legend.position = "bottom",
+        plot.title    = element_text(size = 24, hjust = 0.5, face = "plain"),
+        legend.position = c(0.35,0.9),
         legend.text   = element_text(size = 20),
         legend.background = element_rect(color = NA),
         plot.background   = element_blank())
@@ -113,18 +120,18 @@ true_infections <- true_infections %>%
   arrange(date) %>%
   select(date, inc)
 
-# daily ratio (safe division)
-underreporting_df <- left_join(true_infections, reported_cases, by = "date") %>%
-  mutate(ratio = ifelse(cases > 0, inc / cases, NA_real_))
+# daily ratio (safe division) 
+underreporting_df <- left_join(true_infections, reported_cases, by = "date") %>% 
+	mutate(ratio = ifelse(cases > 0, inc / cases, NA_real_))
 
-# testing-eligibility periods
-t_breaks <- as.Date(c("2022-01-03","2022-01-24","2022-02-25","2022-03-17","2022-05-22"))
-t_labels <- c("T1","T2","T3","T4")
+# --- testing-eligibility periods (make end inclusive by +1 day) ---
+t_breaks <- as.Date(c("2021-12-15","2022-01-03","2022-01-24","2022-02-25","2022-03-17","2022-05-23"))
+t_labels <- c("T1","T2","T3","T4","T5")
 
 underreporting_df <- underreporting_df %>%
   mutate(T = cut(date, breaks = t_breaks, labels = t_labels, right = FALSE))
 
-# per-period summaries (mean ratio + date bounds and midpoints)
+# --- per-period summaries: mean & geometry helpers ---
 period_summary <- underreporting_df %>%
   filter(!is.na(T)) %>%
   group_by(T) %>%
@@ -134,85 +141,68 @@ period_summary <- underreporting_df %>%
     x_end      = max(date, na.rm = TRUE),
     x_mid      = x_start + (x_end - x_start) / 2,
     .groups    = "drop"
+  ) %>%
+  mutate(
+    mean_ratio = if_else(is.nan(mean_ratio), NA_real_, mean_ratio),  
+    label_txt  = scales::number(mean_ratio, accuracy = 0.1)         
   )
 
-# manual y-positions for period mean lines (edit values to adjust heights)
-ypos_map <- tibble::tibble(
-  T     = factor(c("T1","T2","T3","T4"), levels = levels(period_summary$T)),
-  y_pos = c(1.1, 2.9, 2.6, 21.4)
-)
+# --- y-limits to show lines/labels ---
+ylim_top <- 1.1 * max(c(underreporting_df$ratio, period_summary$mean_ratio), na.rm = TRUE)
 
-period_summary <- dplyr::left_join(period_summary, ypos_map, by = "T")
-
-# set y-limits to ensure lines/labels are visible
-ylim_top <- max(
-  1.1 * max(underreporting_df$ratio, na.rm = TRUE),
-  1.1 * max(period_summary$y_pos, na.rm = TRUE)
-)
-
-# --- panel b: underreporting ratio over time with period mean overlays --------
-
-# -- data for translucent bars (0 up to period mean) --
-bars_df <- period_summary %>%
-  transmute(xmin = x_start, xmax = x_end, ymin = 0, ymax = y_pos, T)
-
-# -- Panel B with transparent bars + mean line on top --
-
+# --- plot ---
 const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio)) +
   geom_rect(
-    data = bars_df,
-    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = "Testing period mean"),
-    inherit.aes = FALSE, alpha = 0.18, color = NA
-  ) +
+  data = data.frame(xmin = as.Date("2021-12-15"), xmax = as.Date("2022-01-02"), ymin = -Inf,ymax =  Inf),
+  aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+  inherit.aes = FALSE,
+  fill = "grey20",
+  alpha = 0.35,
+  show.legend = FALSE
+)+  
+# period mean line drawn AT the mean
   geom_segment(
     data = period_summary,
-    aes(x = x_start, xend = x_end, y = y_pos, yend = y_pos),
-    inherit.aes = FALSE, linewidth = 1.4, color = "maroon"
+    aes(x = x_start, xend = x_end, y = mean_ratio, yend = mean_ratio),
+    inherit.aes = FALSE, linewidth = 1.4, color = "maroon", na.rm = TRUE
   ) +
-  # label the period mean on the bar
   geom_text(
-    data = period_summary,
-    aes(x = x_mid, y = y_pos, label = paste0(T, ": ", round(mean_ratio, 1))),
-    inherit.aes = FALSE, vjust = -1.5, hjust = 0.68, size = 6, fontface = "bold"
-  ) +
-  # daily ratio curve (legend key)
-  geom_line(aes(color = "Daily ratio"), linewidth = 1.2, na.rm = TRUE) +
-  geom_point(aes(color = "Daily ratio"), size = 2, na.rm = TRUE) +
-  # vertical cut lines (kept out of legend)
-  geom_vline(
-    xintercept = as.Date(c("2022-01-03","2022-01-24","2022-02-25","2022-03-17")),
-    colour = "purple", linetype = 4, linewidth = 1
-  ) +
+  data = dplyr::mutate(
+           period_summary,
+           x_lab = if_else(x_end == max(x_end, na.rm = TRUE), x_mid - 3, x_mid)  # 3 days earlier only for last
+         ),
+  aes(x = x_lab, y = mean_ratio, label = label_txt),
+  inherit.aes = FALSE, vjust = -0.6, size = 7, fontface = "bold", na.rm = TRUE
+) +
+
+  # daily ratio curve
+  geom_line(aes(color = "Daily ratio"), linewidth = 1.2, na.rm = TRUE,show.legend = FALSE) +
+  geom_point(aes(color = "Daily ratio"), size = 2, na.rm = TRUE,show.legend = FALSE) +
+  # vertical cut lines (all but the last break)
+  geom_vline(xintercept = t_breaks[-length(t_breaks)],colour = "gold4", linetype = 4, linewidth = 1.5) +
+  annotate("text", x = as.Date("2021-12-25"), y = 10, label = "T1", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-01-18"), y = 10, label = "T2", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-02-15"), y = 10, label = "T3", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-03-15"), y = 10, label = "T4", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
+  annotate("text", x = as.Date("2022-04-25"), y = 10, label = "T5", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
   labs(
-    x = "Date",
     y = "Underreporting ratio (estimated / reported)",
-    title = "Underreporting ratio over time with testing period means",
+    title = "Underreporting ratio over time",
     fill = NULL, color = NULL
   ) +
-  scale_x_date(expand = c(0, 0), date_breaks = "2 week", date_labels = "%b %d") +
+  scale_x_date(expand = c(0,0), date_breaks = "2 week", date_labels = "%b %d") +
   scale_y_continuous(limits = c(0, ylim_top)) +
-  # legend entries and colors
-  scale_fill_manual(values = c("Testing period mean" = "pink4")) +
-  scale_color_manual(values = c("Daily ratio" = "blue")) +
-  # make the bar legend patch translucent like the plot
-  guides(
-    fill = guide_legend(override.aes = list(alpha = 0.18, linetype = 0)),
-    color = guide_legend(override.aes = list(size = 2))
-  ) +
+  scale_color_manual(values = c("Daily ratio" = "blue"), guide = "none") +
+  guides(color = guide_legend(override.aes = list(size = 2))) +
   theme_clean() +
   theme(
-    axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 20),
+    axis.text.x = element_text(size = 12),
+    axis.title.x = element_blank(),
     axis.text.y = element_text(size = 20),
     axis.title.y = element_text(size = 20),
-    plot.title  = element_text(size = 20, hjust = 0.5, face = "plain"),
-    legend.position = "bottom",
-    legend.text = element_text(size = 20),
-    legend.background = element_rect(color = NA),
+    plot.title  = element_text(size = 24, hjust = 0.5, face = "plain"),
     plot.background = element_blank()
   )
-
-
 
 # --- combine panels and export ------------------------------------------------
 
@@ -228,6 +218,6 @@ gg <- cowplot::plot_grid(
 
 print(gg)
 
-png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-gg
-dev.off()
+# png("../figures/Figure_4.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# gg
+# dev.off()

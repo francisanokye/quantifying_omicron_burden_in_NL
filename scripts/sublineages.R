@@ -2,15 +2,15 @@
 library(readr); library(dplyr); library(lubridate)
 library(ggplot2); library(tidyr); library(ggthemes)
 
-# ---- load and window data ----
-dat <- read_tsv("~/Desktop/BA.1.tsv", show_col_types = FALSE)
-names(dat) <- sub("%\\s*", "pct_", tolower(names(dat)))  # now: date, lineage, frequency, pct_frequency
+# load and window data ----
+dat <- read_tsv("../data/BA.1.tsv", show_col_types = FALSE)
+names(dat) <- sub("%\\s*", "pct_", tolower(names(dat)))  
 
 dat <- dat |>
   mutate(date = ymd(date)) |>
   filter(date >= ymd("2021-12-10"), date <= ymd("2022-06-10"))
 
-# ---- collapse specified ba.1 sublineages into "BA.1"; keep ba.1.20 and ba.1.3; others -> "other lineages" ----
+# collapse specified ba.1 sublineages into "BA.1"; keep ba.1.20 and ba.1.3; others -> "other lineages" 
 collapse_list <- c("BA.1","BA.1.1","BA.1.1.10","BA.1.1.16",
                    "BA.1.1.18","BA.1.1.6","BA.1.14","BA.1.15",
                    "BA.1.17","BA.1.17.2","BA.1.20","BA.1.3")
@@ -26,7 +26,7 @@ dat <- dat |>
     week     = floor_date(date, "week", week_start = 1)
   )
 
-# ---- aggregate to week × lineage and normalize so each week sums to 1 ----
+# aggregate to week × lineage and normalize so each week sums to 1 ----
 wk <- dat |>
   group_by(week, lineage = lineage2) |>
   summarize(frac = mean(frac_raw, na.rm = TRUE), .groups = "drop") |>

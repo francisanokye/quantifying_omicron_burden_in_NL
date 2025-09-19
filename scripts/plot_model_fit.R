@@ -17,7 +17,7 @@ options(macpan2_log_dir = ".")
 loadEnvironments()
 
 # set simulation period
-start_date <- as.Date("2022-01-01") - offset0 #as.Date("2021-12-15") - offset0
+start_date <- as.Date("2021-12-15") - offset0 #as.Date("2021-12-15") - offset0
 last_date <- "2022-05-22"
 
 # read inputs
@@ -28,28 +28,28 @@ upper_plot_time <- 300
 
 # fill missing dates
 seroprevdata <- seroprevdata %>%
-  complete(date = seq.Date(from = as.Date("2022-01-01"), to = max(date), by = "1 day")) %>%
+  complete(date = seq.Date(from = as.Date("2021-12-15"), to = max(date), by = "1 day")) %>%
   select(date, value) %>%
-  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
+  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 # get trajectory for seroprevalence
 sims <- calibrator %>%
   mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE) %>%
   filter(time >= offset0, matrix == c("serop")) %>%
-  mutate(date = seq.Date(from = as.Date("2022-01-01"), by = "1 day", length.out = n())) %>%
-  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
+  mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) %>%
+  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 # define als phase shading
 als_shading <- tibble(
-  xmin = as.Date(c("2022-01-01", "2022-01-08", "2022-02-07", "2022-03-14")),
-  xmax = as.Date(c("2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-3", "ALS-4", "ALS-3", "No-ALS"),
-  fill_lab = c("ALS-3", "ALS-4", "ALS-3", "No-ALS")
+  xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
+  xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 als_data <- tibble(
-  date = as.Date(c("2021-01-01", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c( "ALS-3", "ALS-4", "ALS-3", "No-ALS")
+  date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
+  phase = c( "ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
 # define fill colors
@@ -58,11 +58,20 @@ fill_colors <- c(
   "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
   "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.6),
   "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
-  "No-ALS" = adjustcolor("#D3D3D3", alpha.f = 0.6)
+  "No-ALS" = adjustcolor("pink", alpha.f = 0.6)
 )
 
 # generate plot
 model_fit <- ggplot() +
+  geom_rect(
+  data = data.frame(xmin = as.Date("2021-12-15"), xmax = as.Date("2022-01-01"), ymin = -Inf,ymax =  Inf),
+  aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+  inherit.aes = FALSE,
+  fill = "grey20",
+  alpha = 0.35,
+  show.legend = FALSE
+)+
+
   geom_rect(
     data = als_shading,
     aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill_lab),
@@ -117,10 +126,7 @@ model_fit <- ggplot() +
     values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "Mod-ALS-3" = "dashed", "No-ALS" = "solid"),
     guide = "none"
   ) +
-  labs(
-    x = "Date",
-    y = "Cumulative % infected with SARS-CoV-2"
-  ) +
+  labs(y = "Cumulative % infected with SARS-CoV-2") +
   scale_x_date(
     expand = c(0, 0),
     date_breaks = "2 week",
@@ -129,7 +135,7 @@ model_fit <- ggplot() +
   theme_clean() +
   theme(
     axis.text.x = element_text(size = 20, angle = 0, hjust = 0.85),
-    axis.title.x = element_text(size = 22, color = "black"),
+    axis.title.x = element_blank(),
     axis.text.y = element_text(size = 20),
     axis.title.y = element_text(size = 22, color = "black"),
     plot.title = element_text(size = 22, color = "black", hjust = 0.5),
@@ -145,6 +151,6 @@ model_fit <- ggplot() +
 
 print(model_fit)
 
-png("../figures/Figure_2.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-model_fit
-dev.off()
+# png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# model_fit
+# dev.off()

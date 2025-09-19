@@ -14,20 +14,21 @@ rpcall("beta_plot.Rout beta_plot.R calibrate_inc.rds params.rda")
 loadEnvironments()
 set.seed(2025)
 
-start_date <- as.Date("2022-01-01") - offset0
+start_date <- as.Date("2021-12-15") - offset0
 calibrator <- rdsRead("calibrate.rds")
 
 # ==== Extract beta(t) over study window ====
 fitted_data <- mp_trajectory_sd(calibrator, conf.int = TRUE) %>%
   mutate(date = as.Date(start_date) + time - 1) %>%
   filter(matrix == "beta_thing",
-         date >= as.Date("2022-01-01"),
+         date >= as.Date("2021-12-15"),
          date <= as.Date("2022-05-22")) %>%
   transmute(date, beta_thing = value)
 
 # ==== Map dates to ALS phases ====
 fitted_data <- fitted_data %>%
   mutate(alert_level = case_when(
+    date >= as.Date("2021-12-15") & date <= as.Date("2021-12-31") ~ "Early",
     date >= as.Date("2022-01-01") & date <= as.Date("2022-01-03") ~ "ALS-3",
     date >= as.Date("2022-01-04") & date <= as.Date("2022-02-07") ~ "ALS-4",
     date >= as.Date("2022-02-08") & date <= as.Date("2022-03-14") ~ "ALS-3",
@@ -53,9 +54,9 @@ mult_const     <- bracket_term * susceptibility
 r0_data <- beta_summary %>%
   mutate(R0_mean = mean_value * mult_const,
          R0_sd   = sd_value   * mult_const) %>%
-  mutate(chrono  = factor(alert_level, levels = c("ALS-4","ALS-3","No-ALS")))
+  mutate(chrono  = factor(alert_level, levels = c("Early","ALS-4","ALS-3","No-ALS")))
 
-als_colors <- c("ALS-4"="#FFD580", "ALS-3"="#87CEFA", "No-ALS"="#D3D3D3")
+als_colors <- c("Early" = "gray","ALS-4"="#FFD580", "ALS-3"="#87CEFA", "No-ALS"="pink")
 
 # for label offsets
 y_min_ci <- min(r0_data$R0_mean - 1.96*r0_data$R0_sd, na.rm = TRUE)
@@ -70,9 +71,9 @@ gg_main <- ggplot(r0_data, aes(x = chrono, y = R0_mean, color = chrono)) +
                 width = 0.2, linewidth = 0.9) +
   geom_text(aes(label = sprintf("%.2f", R0_mean),
                 y = R0_mean + 0.06*y_span),
-            size = 9, color = "black", hjust = 1.3, vjust = 2.8) +
+            size = 9, color = "black", hjust = 1.1, vjust = 1.0) +
   scale_color_manual(values = als_colors, guide = "none") +
-  labs(title = "Estimated Basic Reproduction Number by ALS Phase",
+  labs(title = "Estimated basic reproduction number for alert levels",
        y = expression(R[0]*"(t)"), x = NULL) +
   theme_clean() + 
   theme(axis.text.x = element_text(size = 25), 
@@ -86,18 +87,21 @@ gg_main <- ggplot(r0_data, aes(x = chrono, y = R0_mean, color = chrono)) +
         plot.background = element_blank())
 
 # ==== Arrow strip with extra space ====
-n_levels <- length(levels(r0_data$chrono))
+# start arrow at first non-"Early" level; end at the last level
+lvl      <- levels(r0_data$chrono)
+x_start  <- if ("ALS-4" %in% lvl) match("ALS-4", lvl) else min(which(lvl != "Early"))
+x_end    <- length(lvl)
+
 gg_arrow <- ggplot() +
   annotate("segment",
-           x = 1, xend = n_levels, y = 0, yend = 0,
-           arrow = arrow(length = unit(0.25, "inches"),
-                         ends = "last", type = "closed"),
+           x = x_start, xend = x_end, y = 0, yend = 0,
+           arrow = arrow(length = unit(0.25, "inches"), ends = "last", type = "closed"),
            linewidth = 1.5, color = "black") +
   annotate("text",
-           x = (1 + n_levels)/2, y = -0.5,
+           x = (x_start + x_end)/2, y = -0.5,
            label = "decreasing strictness", size = 11, color = "black") +
-  xlim(1, n_levels) +
-  ylim(-1, 1) + # more vertical room
+  xlim(1, x_end) +
+  ylim(-1, 1) +
   theme_void()
 
 # ==== Stack and save ====
@@ -105,6 +109,6 @@ final_plot <- gg_main / gg_arrow + plot_layout(heights = c(12, 2)) # more bottom
 
 print(final_plot)
 
-#png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-#final_plot
-#dev.off()
+# png("../figures/als_R0.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# final_plot
+# dev.off()

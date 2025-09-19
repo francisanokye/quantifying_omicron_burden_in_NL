@@ -25,60 +25,71 @@ upper_plot_time <- 300
 
 # ==== prepare seroprevalence data ====
 seroprevdata <- seroprevdata %>%
-  complete(date = seq.Date(from = as.Date("2022-01-01"), to = max(date), by = "1 day")) %>%
+  complete(date = seq.Date(from = as.Date("2021-12-15"), to = max(date), by = "1 day")) %>%
   select(date, value) %>%
-  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
+  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 # ==== extract beta(t) with uncertainty ====
 sims <- calibrator %>%
   mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE) %>%
   filter(time >= offset0, matrix == "beta_thing") %>%
-  mutate(date = seq.Date(from = as.Date("2022-01-01"), by = "1 day", length.out = n())) %>%
-  filter(date >= as.Date("2022-01-01") & date <= as.Date("2022-05-22"))
+  mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) %>%
+  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 
 # ==== define ALS shading periods ====
+
 als_shading <- tibble(
-  xmin     = as.Date(c("2022-01-01", "2022-01-04", "2022-02-07", "2022-03-14")),
-  xmax     = as.Date(c("2022-01-04", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase    = c("ALS-3", "ALS-4", "ALS-3", "No-ALS"),
-  fill_lab = c("ALS-3", "ALS-4", "ALS-3", "No-ALS")
+  xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
+  xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
+  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
-# ==== ALS phase lines ====
 als_data <- tibble(
-  date  = as.Date(c("2022-01-04", "2022-02-07", "2022-03-14")),
-  phase = c("ALS-4", "ALS-3", "No-ALS")
+  date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
+  phase = c( "ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
 )
 
-# ==== fill color scale ====
+# define fill colors
 fill_colors <- c(
-  "95% CI" = "violet",
-  "ALS-3"  = adjustcolor("#87CEFA", alpha.f = 0.6),
-  "ALS-4"  = adjustcolor("#FFD580", alpha.f = 0.4),
-  "No-ALS" = adjustcolor("#D3D3D3", alpha.f = 0.6)
+  "95% CI" = "red",
+  "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
+  "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.6),
+  "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
+  "No-ALS" = adjustcolor("pink", alpha.f = 0.6)
 )
 
 # ==== annotations for beta(t) ====
 beta_annot <- tibble(
-  x      = as.Date(c("2022-01-02", "2022-02-02", "2022-03-07", "2022-04-28")),
-  y      = c(0.15, 0.12, 0.12, 0.12),
-  label  = c("ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  x      = as.Date(c("2021-12-24","2022-01-05", "2022-02-02", "2022-03-07", "2022-04-28")),
+  y      = c(0.12,0.12, 0.12, 0.12, 0.12),
+  label  = c("ALS-2","ALS-3", "ALS-4", "ALS-3", "No-ALS"),
   matrix = "beta"
 )
 
-# ==== define K–12 bracket regions ====
+# --- define K–12 bracket regions 
 bracket_df <- tibble(
-  xmin       = as.Date(c("2022-01-01", "2022-01-25")),
-  xmax       = as.Date(c("2022-01-25", "2022-05-22")),
-  sch_label  = c("K-12 School\nClosed", "K-12 Schools Open")
+  xmin      = as.Date(c("2021-12-15","2021-12-20","2022-01-26")),
+  xmax      = as.Date(c("2021-12-19","2022-01-25","2022-05-22")),
+  sch_label = c("K-12\nSch.\nOpen","K-12 Schools Closed","K-12 Schools Open"),
+  seg_col   = c("navy","red","navy"),
+  lab_col   = c("navy","red","navy")
 ) %>%
-  mutate(x_label = as.Date((as.numeric(xmin) + as.numeric(xmax)) / 2, origin = "1970-01-01"))
+  mutate(x_label = as.Date((as.numeric(xmin) + as.numeric(xmax))/2, origin = "1970-01-01"))
 
 # ==== K–12 transition lines ====
-k12_lines <- tibble(date = as.Date(c("2022-01-01", "2022-01-25")))
+k12_lines <- tibble(date = as.Date(c("2021-12-20", "2022-01-25")))
 
 # ==== plot 1: Beta(t) with CI and ALS overlays ====
 p1 <- ggplot() +
+	geom_rect(
+  data = data.frame(xmin = as.Date("2021-12-15"), xmax = as.Date("2022-01-01"), ymin = -Inf,ymax =  Inf),
+  aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+  inherit.aes = FALSE,
+  fill = "grey20",
+  alpha = 0.35,
+  show.legend = FALSE
+)+
   geom_rect(
     data = als_shading,
     aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill_lab),
@@ -96,10 +107,10 @@ p1 <- ggplot() +
   ) +
   geom_text(
     data = filter(beta_annot, x < as.Date("2022-01-10")),
-    aes(x = x, y = y + 0.15, label = label),
+    aes(x = x, y = y + 0.2, label = label),
     parse = TRUE,
     size = 8,
-    angle = 90,
+    angle = 45,
     hjust = 1,
     color = "black",
     face = "bold"
@@ -126,7 +137,7 @@ p1 <- ggplot() +
     aes(xintercept = date),
     linetype = "dotted",
     color = "red",
-    linewidth = 1
+    linewidth = 1.5
   ) +
   scale_color_manual(
     name = NULL,
@@ -138,15 +149,15 @@ p1 <- ggplot() +
   ) +
   scale_linetype_manual(
     name = "ALS Phases",
-    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "No-ALS" = "solid")
+    values = c("ALS-2","ALS-3" = "dashed", "ALS-4" = "dashed", "No-ALS" = "solid")
   ) +
   scale_x_date(
-    limits = c(as.Date("2022-01-01"), as.Date("2022-05-22")),
-    date_breaks = "1 month",
-    date_labels = "%b %d"
+    limits = c(as.Date("2021-12-15"), as.Date("2022-05-22")),
+    date_breaks = "2 week",
+    date_labels = "%b %d", expand = c(0, 0.5)
   ) +
   labs(
-    title = expression("Time-varying Transmission Rate ("*beta*")"),
+    title = expression("Time-varying Transmission Rate"),
     y = "Transmission Rate",
     x = NULL
   ) +
@@ -170,20 +181,20 @@ p2 <- ggplot() +
   geom_segment(
     data = bracket_df,
     aes(x = xmin, xend = xmax, y = 1, yend = 1),
-    colour = c("red", "navy"),
+    colour = c("navy","red", "navy"),
     size = 1.5,
     arrow = arrow(angle = 90, ends = "both", length = unit(0.5, "cm"))
   ) +
   geom_text(
     data = bracket_df,
     aes(x = x_label, y = 0.0, label = sch_label),
-    colour = c("red", "navy"),
-    size = 10
+    colour = c("navy","red", "navy"),
+    size = 5
   ) +
   scale_x_date(
-    limits = c(as.Date("2022-01-01"), as.Date("2022-05-22")),
+    limits = c(as.Date("2021-12-15"), as.Date("2022-05-22")),
     date_breaks = "2 week",
-    date_labels = "%b %d"
+    date_labels = "%b %d",expand = c(0, 0.5)
   ) +
   ylim(-1, 1) +
   theme_void() +
@@ -202,6 +213,14 @@ gg <- p1_noleg / p2 / wrap_elements(legend_grob) +
 
 print(gg)
 
-#png("../figures/Figure_4.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-#gg
-#dev.off()
+# png("../figures/Figure_5.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# gg
+# dev.off()
+
+
+
+
+
+
+
+
