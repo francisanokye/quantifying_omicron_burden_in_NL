@@ -1,5 +1,5 @@
-### Code and data for quantifying Omicron hidden burden in NL
-This repository contains the code to reproduce the main results of the manuscript [Quantifying Omicron’s spread and the impact of non-pharmaceutical interventions in Newfoundland and Labrador](https://). 
+### Code and data to reproduce results, and figures:
+This repository contains the code to reproduce the main results of the manuscript [Quantifying SARS-CoV-2 Omicron’s spread and the impact of non-pharmaceutical interventions in Newfoundland and Labrador, Canada](https://). 
 
 ### Notes on the code
 The .R files contain the code to recreate the figures and main statistical analyses. All the code was written in the R programming language using `version 2.3.4` of the [macpan2](https://github.com/canmod/macpan2) package on 1.6 GHz Dual-Core Intel Core i5, 8 GB memory MacBook Air computer. All other packages used in this work can be installed by running the requirement.txt file.
