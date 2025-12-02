@@ -1,0 +1,8 @@
+# Dec 1st 2025
+
+Here is the link to the reviews comments.
+https://docs.google.com/document/d/1nwMQoMvMUzrqjxjd36SdA-B3cb7jOmiFNKzhJciXeVU/edit?usp=sharing
+
+ML will work on task 1 about setting up the seroprevalence data
+
+

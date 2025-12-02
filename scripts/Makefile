@@ -12,7 +12,7 @@ vim_session:
 ### Makestuff
 
 Sources += Makefile
-Sources += $(wildcard *.R)
+Sources += $(wildcard *.R) notes.md
 
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv 
 	$(pipeR)
