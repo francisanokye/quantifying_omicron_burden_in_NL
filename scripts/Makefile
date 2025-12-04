@@ -74,7 +74,14 @@ R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
 R1_calibrate.Rout: R1_calibrate.R R1_timevar_spec.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
 	$(pipeR)
 
-R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
+R1_bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds
+	$(pipeR)
+
+R1_als_R0.Rout: R1_als_R0.R R1_fitsero.rds params.rda R1_calibrate.rds
+	$(pipeR)
+
+R1_plot_model_fit.Rout: R1_plot_model_fit.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds
+	$(pipeR)
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff

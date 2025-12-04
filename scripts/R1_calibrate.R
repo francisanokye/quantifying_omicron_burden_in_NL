@@ -36,7 +36,7 @@ upper_plot_time = 300
 
 # construct spline basis for beta(t)
 if (spline_beta) {
- 	basis_cols = 4
+ 	basis_cols = 11
  	basis_rows = time_steps
  	X = splines::ns(1:basis_rows
  		, basis_cols
@@ -78,7 +78,7 @@ calibrator = mp_tmb_calibrator(
 		|> mutate(matrix = "log_newR", value = log(value))
 	)
 	, time = mp_sim_bounds(1, time_steps)
-	, traj = list(log_newR = mp_normal(sd = mp_fit(1)))
+	, traj = list(log_newR = mp_normal(sd = mp_fit(0.1)))
 	, par = priors
 	, outputs = c("log_beta_thing", "log_inc", "log_newR","logit_serop_total")
 )
