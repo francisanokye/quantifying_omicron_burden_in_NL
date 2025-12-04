@@ -6,11 +6,16 @@ loadEnvironments()
 
 serodat <- rdsRead()
 
+
+start_date <- "2021-12-15"
+last_date  <- "2022-07-15"  # "2022-05-26"
+
 newdat <- data.frame(time = (min(serodat$time)-1):max(serodat$time))
 #newdat <- data.frame(time = 1:400)
 
 dat <- (serodat
 	|> transmute(NULL
+		, date
 		, time
 		, value
 		, cumInc = value*params[["N"]]
@@ -37,11 +42,27 @@ gg <- (ggplot()
 print(gg)
 
 incdat <- (newdat
-	|> mutate(predInc = round(diff(c(NA,predcumInc))))
+	|> mutate(predInc = round(diff(c(12800,predcumInc))) ## 12780 hacking the first point
+		, date = as.Date(start_date) - offset0 - 1 + time
+	)
 )
 
 print(plot(x=incdat$time,y=incdat$predInc))
 
-rdsSave(incdat)
+
+# convert to seroprevalence matrix format for modeling
+fitdat <- (incdat
+	|>transmute(NULL
+		, date
+		, time = as.numeric(date - as.Date(start_date)) + 1 + offset0
+		, matrix = "newR"
+		, value  = predInc
+  ) 
+  |> filter(between(date, as.Date(start_date), as.Date(last_date)))
+)
+
+print(fitdat)
+
+rdsSave(fitdat)
 
 

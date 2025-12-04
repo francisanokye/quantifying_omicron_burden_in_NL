@@ -29,6 +29,7 @@ flows <- list(foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N
 	, R ~ R1 + R2 + R3
 
 	, inc ~ incS + incv2 + incv3
+	, newR_total ~ asymp_recov1 + asymp_recov2 + asymp_recov3 + symp_recov1 + symp_recov2 + symp_recov3
 	, sero_inc_total ~ inc
 	, serop_total ~ R / N
 	, beta_thing ~ beta

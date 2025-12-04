@@ -28,7 +28,7 @@ serodat <- (seroprevalence
 	|>transmute(NULL
 		, date
 		, time = as.numeric(date - as.Date(start_date)) + 1 + offset0
-		, matrix = "serop"
+		, matrix = "serop_total"
 		, value  = pct_mean
   ) 
   |> filter(between(date, as.Date(start_date), as.Date(last_date)))

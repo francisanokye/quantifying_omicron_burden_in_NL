@@ -35,7 +35,7 @@ fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
 	$(pipeR)
 
 calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
-	$(pipeRcall)
+	$(pipeR)
 
 bettas.Rout: bettas.R seroprevdata.rds fitsero.rds params.rda calibrate.rds
 	$(pipeR)
@@ -68,8 +68,13 @@ R1_seroprevdata.Rout: R1_seroprevdata.R params.rda ../data/raw_citf_data.csv
 R1_fitsero.Rout: R1_fitsero.R R1_seroprevdata.rds params.rda
 	$(pipeR)
 
+R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
+	$(pipeR)
 
-calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
+R1_calibrate.Rout: R1_calibrate.R R1_timevar_spec.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
+	$(pipeR)
+
+R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff
