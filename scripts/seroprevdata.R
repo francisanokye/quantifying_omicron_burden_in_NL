@@ -35,5 +35,7 @@ serodat <- seroprevalence |>
   ) |>
   filter(between(date, as.Date(start_date), as.Date(last_date)))
 
+print(serodat)
+
 # save formatted matrix
 rdsSave(serodat)

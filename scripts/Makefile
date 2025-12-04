@@ -1,4 +1,4 @@
-## This is [project.Makefile] …
+## This is NL Omicron
 
 current: target
 -include target.mk
@@ -56,7 +56,20 @@ stack_transmission_R0_plot.Rout: stack_transmission_R0_plot.R ../figures/als_R0.
 	$(pipeR)
 
 timeline.Rout: timeline.R 
-        $(pipeR)
+	$(pipeR)
+
+#######################################################################
+
+## Revision 1
+
+R1_seroprevdata.Rout: R1_seroprevdata.R params.rda ../data/raw_citf_data.csv    
+	$(pipeR)
+
+R1_fitsero.Rout: R1_fitsero.R R1_seroprevdata.rds params.rda
+	$(pipeR)
+
+
+calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
 
 Ignore += makestuff
 msrepo = https://github.com/dushoff
