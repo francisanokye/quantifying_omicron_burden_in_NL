@@ -71,7 +71,20 @@ R1_fitsero.Rout: R1_fitsero.R R1_seroprevdata.rds params.rda
 R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
 	$(pipeR)
 
+muzeta.Rout: muzeta.R params.rda
+	$(pipeR)
+
+pipeRimplicit += newspecs
+# muzeta.newspecs.Rout: newspecs.R
+%.newspecs.Rout: newspecs.R R1_timevar_spec.rds %.rda
+	$(pipeR)
+
 R1_calibrate.Rout: R1_calibrate.R R1_timevar_spec.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
+	$(pipeR)
+
+pipeRimplicit += R1_calibrate
+# R1_muzeta.calibrate.Rout: R1_calibrate.R
+R1_%.calibrate.Rout: R1_calibrate.R %.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
 	$(pipeR)
 
 R1_bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds

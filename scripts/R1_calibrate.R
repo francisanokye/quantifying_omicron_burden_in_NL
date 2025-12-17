@@ -22,7 +22,7 @@ loadEnvironments()
 spline_beta = TRUE
 
 # load input data
-timevar_spec <- rdsRead("timevar_spec.rds")
+timevar_spec <- rdsRead("muzeta.newspecs.rds")
 seroprevdata <- rdsRead("R1_seroprevdata.rds")
 fitserodata <- rdsRead("R1_fitsero.rds")
 time_steps = max(seroprevdata$time)

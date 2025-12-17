@@ -1,3 +1,8 @@
+# Dec 16 2025
+
+Will wait for Francis and Amy to come up with different parameter values/grid for to test different parameter.
+MLi will work on the code to update different parameters.
+
 # Dec 3rd 2025
 
 Created the new R data from seroprevalence. The next step is the create newR box and calibrate to it.
