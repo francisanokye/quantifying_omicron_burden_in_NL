@@ -80,7 +80,9 @@ calibrator = mp_tmb_calibrator(
 	, time = mp_sim_bounds(1, time_steps)
 	, traj = list(log_newR = mp_normal(sd = mp_fit(0.1)))
 	, par = priors
-	, outputs = c("log_beta_thing", "log_inc", "log_newR","logit_serop_total")
+	, outputs = c("log_beta_thing", "log_inc", "log_newR","logit_serop_total"
+		,"gamma_a","gamma_i","kappa2","kappa3","sigma"
+	)
 )
 
 # optimize fit
