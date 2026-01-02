@@ -1,3 +1,7 @@
+# Jan 2 2026
+
+Need to refactor all the R1 code!
+
 # Dec 16 2025
 
 Will wait for Francis and Amy to come up with different parameter values/grid for to test different parameter.

@@ -38,6 +38,9 @@ if (!any(booster_vac_changepoints == 0)) {
   booster_vac_values = c(0, booster_vac_values)
 }
 
+print(booster_vac_values)
+
+
 expr2 = list(vac2 ~ time_var(double_vac_values, double_vac_changepoints))
 expr3 = list(vac3 ~ time_var(booster_vac_values, booster_vac_changepoints))
 

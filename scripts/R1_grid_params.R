@@ -4,18 +4,24 @@ library(shellpipes)
 
 calib_list <- rdsRead()
 
-print((calib_list[[1]]))
+## cal_spec$default[["mu"]]
 
-quit()
-
-
-df <- (mp_tmb_coef(calib_list[[1]])
-	|> filter(mat %in% c("gamma_a","gamma_i","kappa2","kappa3","sigma"))
-	|> transmute(NULL
-		, mat
-		, estimate
-		, std.error
+dflist <- lapply(calib_list,function(x){
+	df <- (mp_tmb_coef(x)
+		|> filter(mat %in% c("gamma_a","gamma_i","kappa2","kappa3","sigma"))
+		|> transmute(NULL
+			, mat
+			, estimate
+			, std.error
+			, mu = x$cal_spec$default[["mu"]]
+			, zeta = x$cal_spec$default[["zeta"]]
+		)
 	)
+	}
 )
 
-print(df)
+grid_df <- bind_rows(dflist)
+
+print(grid_df)
+
+rdsSave(grid_df)

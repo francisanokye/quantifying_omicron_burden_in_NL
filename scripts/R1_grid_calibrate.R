@@ -30,8 +30,8 @@ upper_plot_time = 300
 
 ### 
 
-params_grid <- expand.grid(mu = seq(0.45, 0.85, length=2)
-	, zeta = seq(0.4,1,length = 2)
+params_grid <- expand.grid(mu = seq(0.45, 0.85, length=5)
+	, zeta = seq(0.4,1,length = 5)
 )
 
 print(params_grid)
