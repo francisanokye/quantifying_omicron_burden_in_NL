@@ -10,6 +10,7 @@ library(minpack.lm)
 library(xtable)
 library(mgcv)
 library(shellpipes)
+rpcall("fitsero.Rout fitsero.R ../data/raw_citf_data.csv params.rda")
 
 loadEnvironments()
 

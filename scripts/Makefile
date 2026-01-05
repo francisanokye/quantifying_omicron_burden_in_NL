@@ -15,24 +15,24 @@ Sources += Makefile
 Sources += $(wildcard *.R) notes.md
 
 vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv 
-	$(pipeR)
+	$(pipeRcall)
 
 params.Rout: params.R vacdat.rda
 	$(pipeRcall)
 
 flows.Rout: flows.R params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 ## Con't refactoring here next time
 
 timevar_spec.Rout: timevar_spec.R flows.rda vacdat.rda params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 seroprevdata.Rout: seroprevdata.R params.rda ../data/raw_citf_data.csv    
-	$(pipeR)
+	$(pipeRcall)
 
 fitsero.Rout: fitsero.R ../data/raw_citf_data.csv params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 calibrate.Rout: calibrate.R timevar_spec.rds seroprevdata.rds fitsero.rds params.rda
 	$(pipeR)

@@ -2,6 +2,7 @@ library(macpan2)
 library(dplyr)
 library(zoo)
 library(shellpipes)
+rpcall("timevar_spec.Rout timevar_spec.R flows.rda vacdat.rda params.rda")
 loadEnvironments()
 
 

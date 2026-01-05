@@ -1,5 +1,6 @@
 library(macpan2)
 library(shellpipes)
+rpcall("flows.Rout flows.R params.rda")
 
 # this describes the model flow of how individuals transition across compartments and cohorts
 flows <- list(foi ~ beta * (zeta * (A1 + A2 + A3) + (I1 + I2 + I3)) / N

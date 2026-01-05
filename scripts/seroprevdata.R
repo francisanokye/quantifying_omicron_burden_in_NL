@@ -1,5 +1,6 @@
 # load libraries
 library(shellpipes)
+rpcall("seroprevdata.Rout seroprevdata.R params.rda ../data/raw_citf_data.csv")
 library(zoo)
 library(tidyverse)
 
