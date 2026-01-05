@@ -18,7 +18,7 @@ vacdat.Rout: vacdat.R ../data/vaccination-coverage-map.csv
 	$(pipeR)
 
 params.Rout: params.R vacdat.rda
-	$(pipeR)
+	$(pipeRcall)
 
 flows.Rout: flows.R params.rda
 	$(pipeR)

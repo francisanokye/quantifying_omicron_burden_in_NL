@@ -1,4 +1,5 @@
 library(shellpipes)
+rpcall("params.Rout params.R vacdat.rda")
 set.seed(2024)
 
 loadEnvironments()
