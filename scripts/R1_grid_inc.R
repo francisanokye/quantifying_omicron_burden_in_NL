@@ -20,11 +20,14 @@ set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
 
-calib_list   <- rdsRead()
+calib_list   <- rdsRead("R1_grid_calibrate.rds")
+fitserodata <- rdsRead("R1_fitsero.rds")
+
+print(fitserodata)
 
 simlist <- lapply(calib_list,function(x){
 	df <- (mp_trajectory_sd(x,conf.int = TRUE, back_transform = TRUE)
-  		|> filter(time >= offset0, matrix == "beta_thing")
+  		|> filter(time >= offset0, matrix == "newR")
   		|> mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n()))
   		|> filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
 		|> mutate(NULL
@@ -35,13 +38,17 @@ simlist <- lapply(calib_list,function(x){
 	}
 )
 
-grid_df <- bind_rows(simlist)
+grid_df <- (bind_rows(simlist)
+	|> filter(date > as.Date("2021-12-17"))
+)
 
-gg <- (ggplot(grid_df,aes(date,value,group=interaction(mu,zeta)))
-	+ geom_line(aes(color=interaction(mu,zeta)))
-	+ geom_ribbon(aes(ymin=conf.low,ymax=conf.high,fill=interaction(mu,zeta)),alpha=0.2)
-#	+ facet_grid(mu~zeta)
-	+ geom_hline(aes(yintercept=0.5),color="red")
+print(grid_df)
+
+gg <- (ggplot(grid_df,aes(date,value))
+	+ geom_line(aes(color=interaction(mu,zeta),group=interaction(mu,zeta)))
+	+ geom_ribbon(aes(ymin=conf.low,ymax=conf.high,fill=interaction(mu,zeta),group=interaction(mu,zeta)),alpha=0.2)
+	+ facet_grid(mu~zeta)
+	+ geom_point(data=fitserodata,aes(x=date,y=value),size=0.2)
 )
 
 print(gg)

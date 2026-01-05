@@ -99,6 +99,9 @@ R1_grid_params_plot.Rout: R1_grid_params_plot.R R1_grid_params.rds
 R1_grid_betas.Rout: R1_grid_betas.R R1_grid_calibrate.rds vacdat.rda
 	$(pipeR)
 
+R1_grid_inc.Rout: R1_grid_inc.R R1_grid_calibrate.rds R1_fitsero.rds vacdat.rda
+	$(pipeR)
+
 pipeRimplicit += R1_bettas.Rout
 # R1_muzeta.bettas.Rout: R1_bettas.R
 R1_%.bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_%.calibrate.rds
