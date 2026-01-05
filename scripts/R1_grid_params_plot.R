@@ -1,5 +1,6 @@
 library(tidyverse); theme_set(theme_bw())
 library(shellpipes)
+rpcall("R1_grid_params_plot.Rout R1_grid_params_plot.R R1_grid_params.rds")
 
 df <- rdsRead()
 

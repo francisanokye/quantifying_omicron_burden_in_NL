@@ -1,6 +1,7 @@
 library(tidyverse)
 library(splines)
 library(shellpipes)
+rpcall("R1_fitsero.Rout R1_fitsero.R R1_seroprevdata.rds params.rda")
 
 loadEnvironments()
 

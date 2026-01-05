@@ -1,5 +1,6 @@
 library(macpan2)
 library(shellpipes)
+rpcall("R1_muzeta.calibrate.Rout R1_calibrate.R muzeta.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda")
 library(conflicted)
 library(tidyverse)
 library(dplyr)

@@ -1,4 +1,5 @@
 library(shellpipes)
+rpcall("muzeta.Rout muzeta.R params.rda")
 
 loadEnvironments()
 

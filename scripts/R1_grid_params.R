@@ -1,6 +1,7 @@
 library(macpan2)
 library(dplyr)
 library(shellpipes)
+rpcall("R1_grid_params.Rout R1_grid_params.R R1_grid_calibrate.rds")
 
 calib_list <- rdsRead()
 

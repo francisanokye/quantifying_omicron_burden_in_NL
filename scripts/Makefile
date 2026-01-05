@@ -63,54 +63,49 @@ timeline.Rout: timeline.R
 ## Revision 1
 
 R1_seroprevdata.Rout: R1_seroprevdata.R params.rda ../data/raw_citf_data.csv    
-	$(pipeR)
+	$(pipeRcall)
 
 R1_fitsero.Rout: R1_fitsero.R R1_seroprevdata.rds params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 R1_timevar_spec.Rout: R1_timevar_spec.R flows.rda vacdat.rda params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 muzeta.Rout: muzeta.R params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 pipeRimplicit += newspecs
 # muzeta.newspecs.Rout: newspecs.R
-%.newspecs.Rout: newspecs.R R1_timevar_spec.rds %.rda
-	$(pipeR)
+muzeta.newspecs.Rout: newspecs.R R1_timevar_spec.rds muzeta.rda
+	$(pipeRcall)
 
 R1_calibrate.Rout: R1_calibrate.R R1_timevar_spec.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 pipeRimplicit += R1_calibrate
 # R1_muzeta.calibrate.Rout: R1_calibrate.R
-R1_%.calibrate.Rout: R1_calibrate.R %.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
-	$(pipeR)
+R1_muzeta.calibrate.Rout: R1_calibrate.R muzeta.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
+	$(pipeRcall)
 
 R1_grid_calibrate.Rout: R1_grid_calibrate.R muzeta.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda
-	$(pipeR)
+	$(pipeRcall)
 
 R1_grid_params.Rout: R1_grid_params.R R1_grid_calibrate.rds
-	$(pipeR)
+	$(pipeRcall)
 
 R1_grid_params_plot.Rout: R1_grid_params_plot.R R1_grid_params.rds
-	$(pipeR)
+	$(pipeRcall)
 
 R1_grid_betas.Rout: R1_grid_betas.R R1_grid_calibrate.rds vacdat.rda
-	$(pipeR)
+	$(pipeRcall)
 
 R1_grid_inc.Rout: R1_grid_inc.R R1_grid_calibrate.rds R1_fitsero.rds vacdat.rda
-	$(pipeR)
+	$(pipeRcall)
 
 pipeRimplicit += R1_bettas.Rout
 # R1_muzeta.bettas.Rout: R1_bettas.R
-R1_%.bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_%.calibrate.rds
-	$(pipeR)
-
-pipeRimplicit += R1_posterior.Rout
-# R1_muzeta.posterior.Rout: R1_posterior.R 
-R1_%.posterior.Rout: R1_posterior.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_%.calibrate.rds
-	$(pipeR)
+R1_muzeta.bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_muzeta.calibrate.rds
+	$(pipeRcall)
 
 R1_als_R0.Rout: R1_als_R0.R R1_fitsero.rds params.rda R1_calibrate.rds
 	$(pipeR)
