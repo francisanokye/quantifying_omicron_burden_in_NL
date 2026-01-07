@@ -135,10 +135,10 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
   geom_errorbar(
     data = spec_data_ci,
     aes(ymin = R0_mean - 1.96*R0_sd, ymax = R0_mean + 1.96*R0_sd),
-    width = 0.2, linewidth = 1
+    width = 0.7, linewidth = 1.50
   ) +
   geom_text(aes(label = sprintf("%.2f", R0_mean), y = R0_mean + 0.03*y_top),
-            size = 9, hjust = 1.1, vjust = 1.0) +
+            size = 12, hjust = 1.1, vjust = 1.5) +
   # group mean lines (always drawn)
   geom_segment(
     data = group_bands,
@@ -153,19 +153,24 @@ gg <- ggplot(spec_data, aes(x = chrono, y = R0_mean)) +
   scale_color_identity() +
   scale_fill_identity() +
   labs(
-    title = "Estimated basic reproduction number for alert level and school closure combinations",
-    y = expression(R[0]*"(t)"), x = NULL
+    title = "Estimated effective reproduction number for alert levels and school status",
+    y = expression(R[e]*"(t)"), x = NULL
   ) +
-  theme_clean(base_size = 16) +
+  theme_clean() +
   theme(
-    axis.text.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    plot.title  = element_text(size = 25, hjust = 0.5, face = "plain"),
+    axis.text.x = element_text(size = 27),
+    axis.text.y = element_text(size = 27),
+    axis.title.y = element_text(size = 30),
+    plot.title  = element_text(size = 30, hjust = 0.5, face = "plain"),
     legend.position = "none",
     plot.background = element_blank()
+  )+
+  labs(tag = "A") +
+  theme(
+    plot.tag = element_text(size = 35, face = "bold", colour = "black"),
+    plot.tag.position = c(0.01, 0.98)   # top-left inside panel
   )
 
-# png("../figures/reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# print(gg)
-# dev.off()
+png("../figures/R1_reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+print(gg)
+dev.off()

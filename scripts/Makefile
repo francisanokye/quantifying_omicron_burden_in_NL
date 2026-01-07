@@ -107,12 +107,24 @@ pipeRimplicit += R1_bettas.Rout
 R1_muzeta.bettas.Rout: R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_muzeta.calibrate.rds
 	$(pipeRcall)
 
+R1_grid_effreprod.Rout: R1_grid_effreprod.R R1_grid_calibrate.rds vacdat.rda
+	$(pipeRcall)
+
+R1_effreprod.Rout: R1_effreprod.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds
+	$(pipeRcall)
+
 R1_als_R0.Rout: R1_als_R0.R R1_fitsero.rds params.rda R1_calibrate.rds
 	$(pipeR)
 
 R1_plot_model_fit.Rout: R1_plot_model_fit.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds
 	$(pipeR)
 
+R1_reprod_numb.Rout: R1_reprod_numb.R R1_fitsero.rds params.rda R1_calibrate.rds
+	$(pipeR)
+	
+R1_sensitivity_plot.Rout: R1_sensitivity_plot.R R1_grid_params.rds R1_grid_calibrate.rds params.rda
+	$(pipeRcall)
+	
 sirtest.Rout: sirtest.R
 	$(pipeR)
 

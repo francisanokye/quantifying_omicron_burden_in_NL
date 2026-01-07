@@ -11,6 +11,7 @@ library(cowplot)
 library(patchwork)
 library(fuzzyjoin)
 library(shellpipes)
+rpcall("R1_muzeta.bettas.Rout R1_bettas.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_muzeta.calibrate.rds")
 library(tidyverse)
 library(macpan2)
 

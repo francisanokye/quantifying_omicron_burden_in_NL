@@ -47,12 +47,31 @@ print(grid_df)
 
 gg <- (ggplot(grid_df,aes(date,value))
 	+ geom_line(aes(color=interaction(mu,zeta),group=interaction(mu,zeta)))
-	+ geom_ribbon(aes(ymin=conf.low,ymax=conf.high,fill=interaction(mu,zeta),group=interaction(mu,zeta)),alpha=0.2)
+	+ geom_ribbon(aes(ymin=conf.low,ymax=conf.high,fill=interaction(mu,zeta),group=interaction(mu,zeta)),alpha=0.4)
 	+ facet_grid(mu~zeta)
-	+ geom_point(data=fitserodata,aes(x=date,y=value),size=0.2)
+	+ geom_point(data=fitserodata,aes(x=date,y=value),size= 1.5)
+	+ theme_clean() 
+	+ theme(
+	  axis.text.x       = element_text(size = 25,  hjust = 1, margin = margin(t = 8)),
+	  axis.text.y       = element_text(size = 25),
+	  axis.title.x      = element_text(size = 25),
+	  axis.title.y      = element_text(size = 25),
+	  plot.title        = element_text(size = 25, hjust = 0.5, face = "plain"),
+	  strip.text        = element_text(size = 25, face = "plain", hjust = 0.5),
+	  strip.background  = element_blank(),
+	  legend.position   = "top",
+	  legend.direction  = "horizontal",
+	  legend.box        = "horizontal",
+	  legend.spacing.x  = unit(1.2, "cm"),
+	  legend.spacing.y  = unit(0.5, "cm"),
+	  legend.background = element_blank(),
+	  legend.text       = element_text(size = 25, face = "plain"),
+	  panel.spacing     = unit(1.5, "cm"),
+	  plot.background   = element_blank()
+	)
 )
 
+png("../figures/inc_plot.png", width = 7500, height = 5000, res = 300, bg = "white", type = "cairo")
 print(gg)
-
-
+dev.off()
 

@@ -213,9 +213,9 @@ gg <- p1_noleg / p2 / wrap_elements(legend_grob) +
 
 print(gg)
 
-# png("../figures/Figure_5.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# gg
-# dev.off()
+png("../figures/R1_Figure_5.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+gg
+dev.off()
 
 
 

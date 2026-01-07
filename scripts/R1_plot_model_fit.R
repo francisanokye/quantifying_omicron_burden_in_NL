@@ -1,7 +1,7 @@
+
 library(dplyr)
 library(lubridate)
 library(ggplot2)
-library(RColorBrewer)
 library(tidyr)
 library(zoo)
 library(ggthemes)
@@ -16,141 +16,166 @@ set.seed(2025)
 options(macpan2_log_dir = ".")
 loadEnvironments()
 
-# set simulation period
-start_date <- as.Date("2021-12-15") - offset0 #as.Date("2021-12-15") - offset0
-last_date <- "2022-05-22"
+# --- config ----------------------------------------------------------------
+date_start <- as.Date("2021-12-15")
+date_end   <- as.Date("2022-05-22")
 
-# read inputs
-calibrator <- rdsRead("R1_calibrate.rds")
-seroprevdata <- rdsRead("R1_fitsero.rds")
-time_steps <- max(seroprevdata$time)
-upper_plot_time <- 300
+# --- inputs ----------------------------------------------------------------
+calibrator   <- rdsRead("R1_calibrate.rds")
+fitserodata <- rdsRead("R1_fitsero.rds")
+# correct first value by replacing with the second
+fitserodata$value[1] <- fitserodata$value[2]
 
-# fill missing dates
-seroprevdata <- seroprevdata %>%
-  complete(date = seq.Date(from = as.Date("2021-12-15"), to = max(date), by = "1 day")) %>%
+# --- seroincidence (daily; filled) ----------------------------------------
+fitserodata <- fitserodata %>%
+  complete(date = seq.Date(from = date_start, to = date_end, by = "1 day")) %>%
   select(date, value) %>%
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  filter(date >= date_start, date <= date_end) 
 
-# get trajectory for seroprevalence
+# --- model trajectory (if needed later; kept) ------------------------------
 sims <- calibrator %>%
-  mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE) %>%
-  filter(time >= offset0, matrix == c("newR")) %>%
-  mutate(date = seq.Date(from = as.Date("2021-12-15"), by = "1 day", length.out = n())) %>%
-  filter(date >= as.Date("2021-12-15") & date <= as.Date("2022-05-22"))
+  mp_trajectory_sd(conf.int = TRUE, back_transform = TRUE, conf.level = 0.99) %>%
+  filter(time >= offset0, matrix == "newR") %>% #   "serop_total"
+  mutate(date = seq.Date(from = date_start, by = "1 day", length.out = n())) %>%
+  filter(date >= date_start, date <= date_end)
 
-# define als phase shading
+stopifnot(nrow(sims) > 0)
+
+# --- als shading + phase lines ---------------------------------------------
 als_shading <- tibble(
-  xmin = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  xmax = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
-  phase = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS"),
+  xmin     = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
+  xmax     = as.Date(c("2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14", "2022-05-22")),
   fill_lab = c("ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
+) %>%
+  mutate(fill_lab = factor(fill_lab, levels = c("ALS-2","ALS-3","ALS-4","No-ALS")))
+
+als_lines <- tibble(
+  date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14"))
 )
 
-als_data <- tibble(
-  date = as.Date(c("2021-12-15", "2021-12-24", "2022-01-08", "2022-02-07", "2022-03-14")),
-  phase = c( "ALS-2", "ALS-3", "ALS-4", "ALS-3", "No-ALS")
+als_fill_colors <- c(
+  "ALS-2"  = "#66D1B5",
+  "ALS-3"  = "#87CEFA",
+  "ALS-4"  = "#FFD580",
+  "No-ALS" = "pink"
 )
 
-# define fill colors
-fill_colors <- c(
-  "95% CI" = "red",
-  "ALS-2" = adjustcolor("#66D1B5", alpha.f = 0.4),
-  "ALS-3" = adjustcolor("#87CEFA", alpha.f = 0.6),
-  "ALS-4" = adjustcolor("#FFD580", alpha.f = 0.4),
-  "No-ALS" = adjustcolor("pink", alpha.f = 0.6)
-)
+facet_lab <- c("newR" = "Seroincidence estimates in NL")
 
-# generate plot
-model_fit <- ggplot() +
+# --- core plot --------------------------------------------------------------
+p <- ggplot() +
   geom_rect(
-  data = data.frame(xmin = as.Date("2021-12-15"), xmax = as.Date("2022-01-01"), ymin = -Inf,ymax =  Inf),
-  aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-  inherit.aes = FALSE,
-  fill = "grey20",
-  alpha = 0.35,
-  show.legend = FALSE
-)+
-
+    data = tibble(xmin = date_start, xmax = as.Date("2022-01-01"),
+                  ymin = -Inf, ymax = Inf),
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "grey20", alpha = 0.50, show.legend = FALSE
+  ) +
   geom_rect(
     data = als_shading,
     aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill_lab),
     inherit.aes = FALSE,
-    alpha = 0.3,
-    show.legend = FALSE
+    alpha = 0.30,
+    show.legend = TRUE
   ) +
   geom_point(
-    data = seroprevdata,
+    data = fitserodata,
     aes(x = date, y = value, color = "Data"),
-    size = 3,
-    show.legend = TRUE
+    size = 3.5, show.legend = TRUE
   ) +
   geom_ribbon(
     data = sims,
     aes(x = date, ymin = conf.low, ymax = conf.high),
-    fill = "red",
-    alpha = 0.3,
-    show.legend = FALSE
+    fill = "red", alpha = 0.40, show.legend = FALSE
   ) +
   geom_line(
     data = sims,
     aes(x = date, y = value, color = "Model"),
-    linewidth = 1,
-    show.legend = TRUE
+    linewidth = 1.5, show.legend = TRUE
   ) +
   geom_vline(
-    data = als_data,
-    aes(xintercept = date, linetype = phase),
-    color = "gold4",
-    linewidth = 0.8,
+    data = als_lines,
+    aes(xintercept = date),
+    colour = "gold4", linewidth = 0.8,
     show.legend = FALSE
   ) +
   facet_wrap(
-    ~matrix,
-    scales = "free_y",
-    ncol = 1,
-    labeller = labeller(matrix = c(serop = "SEAIR model fit to seroprevalence estimates in NL"))
+    ~matrix, scales = "free_y", ncol = 1,
+    labeller = labeller(matrix = facet_lab)
   ) +
-  scale_color_manual(
-    name = NULL,
+  scale_colour_manual(
+    name   = NULL,
     values = c("Data" = "black", "Model" = "red"),
-    labels = c("Data", "Model")
+    breaks = c("Data", "Model"),
+    labels = c("Data", "Model"),
+    guide  = guide_legend(override.aes = list(linetype = c(0, 1), shape = c(16, NA), size = c(4, 4)))
   ) +
   scale_fill_manual(
-    name = NULL,
-    values = fill_colors,
-    guide = "none"
+    name   = "ALS level",
+    values = als_fill_colors,
+    breaks = c("ALS-2","ALS-3","ALS-4","No-ALS"),
+    guide  = guide_legend(override.aes = list(alpha = 0.80, shape = NA, colour = NA))
   ) +
-  scale_linetype_manual(
-    name = "ALS Phases",
-    values = c("ALS-3" = "dashed", "ALS-4" = "dashed", "Mod-ALS-3" = "dashed", "No-ALS" = "solid"),
-    guide = "none"
+  labs(
+    y = "Infection-induced serological prevalence",
+    title = "Estimated infection-induced serological prevalence in NL"
   ) +
-  labs(y = "New Recovered infected with SARS-CoV-2") +
   scale_x_date(
-    expand = c(0, 0),
+    limits = c(date_start, date_end + days(2)),
+    expand = expansion(mult = c(0.00, 0.01)),
     date_breaks = "2 week",
     date_labels = "%b %d"
   ) +
   theme_clean() +
   theme(
-    axis.text.x = element_text(size = 20, angle = 0, hjust = 0.85),
     axis.title.x = element_blank(),
-    axis.text.y = element_text(size = 20),
-    axis.title.y = element_text(size = 22, color = "black"),
-    plot.title = element_text(size = 22, color = "black", hjust = 0.5),
-    strip.text = element_text(size = 20, color = "black"),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 20),
-    legend.background = element_rect(color = NA),
-    legend.margin = margin(0, 0, 0, 0),
-    plot.background = element_blank(),
-    legend.position = c(0.2, 0.8)
-  ) +
-  guides(fill = "none", linetype = "none")
+    axis.text.x  = element_text(size = 22, hjust = 0.85),
+    axis.text.y  = element_text(size = 22),
+    axis.title.y = element_text(size = 22, colour = "black"),
+    strip.text   = element_text(size = 0, colour = "black"),  
+    strip.background = element_blank(),
+    plot.title   = element_text(size = 22, hjust = 0.5, face = "plain"),
+    legend.title = element_text(size = 18),
+    legend.position = c(0.20, 0.80), 
+    legend.text  = element_text(size = 22),
+    legend.key            = element_blank(),
+    legend.key.background = element_blank(),
+    legend.background     = element_blank(),
+    plot.background   = element_blank()
+  )
 
-print(model_fit)
+# --- legend to overlay (Data+Model only) -----------------------------------
+p_inside_leg <- p +
+  guides(fill = "none") +                 
+  theme(
+    legend.position = "right",            
+    legend.box.margin = margin(0, 0, 0, 0),
+    legend.key            = element_blank(),
+    legend.key.background = element_blank(),
+    legend.background     = element_blank()
+  )
 
-# png("../figures/Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
-# model_fit
-# dev.off()
+inside_leg <- cowplot::get_legend(p_inside_leg)
+
+# --- base plot (ALS legend bottom only) ------------------------------------
+p_base <- p +
+  guides(colour = "none") +               
+  theme(
+    legend.position  = "bottom",
+    legend.direction = "horizontal",
+    legend.box       = "horizontal",
+    legend.key = element_blank(),
+    legend.key.background = element_blank(),
+    legend.background = element_blank(),
+    legend.box.background = element_blank()
+  )
+
+final_plot <- cowplot::ggdraw(p_base) +
+  cowplot::draw_grob(inside_leg, x = 0.12, y = 0.62, width = 0.30, height = 0.22)
+
+print(final_plot)
+
+
+png("../figures/R1_Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+final_plot
+dev.off()

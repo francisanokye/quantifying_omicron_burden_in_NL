@@ -1,6 +1,7 @@
 library(macpan2)
 library(shellpipes)
 rpcall("R1_muzeta.calibrate.Rout R1_calibrate.R muzeta.newspecs.rds R1_seroprevdata.rds R1_fitsero.rds params.rda")
+rpcall("R1_calibrate.Rout R1_calibrate.R R1_timevar_spec.rds R1_seroprevdata.rds R1_fitsero.rds params.rda")
 library(conflicted)
 library(tidyverse)
 library(dplyr)
@@ -23,9 +24,9 @@ loadEnvironments()
 spline_beta = TRUE
 
 # load input data
-timevar_spec <- rdsRead("muzeta.newspecs.rds")
-seroprevdata <- rdsRead("R1_seroprevdata.rds")
-fitserodata <- rdsRead("R1_fitsero.rds")
+timevar_spec <- readRDS("muzeta.newspecs.rds")
+seroprevdata <- readRDS("R1_seroprevdata.rds")
+fitserodata <- readRDS("R1_fitsero.rds")
 time_steps = max(seroprevdata$time)
 upper_plot_time = 300
 
