@@ -112,6 +112,9 @@ R1_grid_effreprod.Rout: R1_grid_effreprod.R R1_grid_calibrate.rds vacdat.rda
 
 R1_effreprod.Rout: R1_effreprod.R R1_seroprevdata.rds R1_fitsero.rds params.rda R1_calibrate.rds
 	$(pipeRcall)
+	
+R1_true_vs_reported_plot.Rout: R1_true_vs_reported_plot.R R1_calibrate.rds R1_fitsero.rds ../data/serop_avgcase_data.csv params.rda 
+	$(pipeR)
 
 R1_als_R0.Rout: R1_als_R0.R R1_fitsero.rds params.rda R1_calibrate.rds
 	$(pipeR)
@@ -124,6 +127,13 @@ R1_reprod_numb.Rout: R1_reprod_numb.R R1_fitsero.rds params.rda R1_calibrate.rds
 	
 R1_sensitivity_plot.Rout: R1_sensitivity_plot.R R1_grid_params.rds R1_grid_calibrate.rds params.rda
 	$(pipeRcall)
+	
+	
+R1_prior_posterior_plot.Rout: R1_prior_posterior_plot.R R1_grid_calibrate.rds params.rda
+	$(pipeRcall)
+
+R1_timeline.Rout: R1_timeline.R 
+	$(pipeR)
 	
 sirtest.Rout: sirtest.R
 	$(pipeR)

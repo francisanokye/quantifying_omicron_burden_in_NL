@@ -29,7 +29,7 @@ upper_plot_time <- 300
 anchor_start <- as.Date("2021-12-15")
 anchor_end   <- as.Date("2022-05-22")
 
-# ==== constants for Re(t) scaling (replace with params if desired) ====
+# ==== constants for Rc(t) scaling (replace with params if desired) ====
 kappa1 <- 1; kappa2 <- 0.91; kappa3 <- 0.3
 gamma_i <- 1/7; gamma_a <- 1/10; mu <- 0.678; zeta <- 0.75
 p1 <- 0.15; p2 <- 0.85; p3 <- 0
@@ -128,8 +128,8 @@ bracket_df <- tibble(
 
 # ==== K–12 transition lines ====
 k12_lines <- tibble(date = as.Date(c("2021-12-20", "2022-01-25")))
-
-# ==== plot 1: Re(t) with CI and ALS overlays (kept structure; sims now is Re(t)) ====
+print(sims)
+# ==== plot 1: Rc(t) with CI and ALS overlays (kept structure; sims now is Re(t)) ====
 p1 <- ggplot() +
   geom_rect(
     data = data.frame(
@@ -160,8 +160,8 @@ p1 <- ggplot() +
   ) +
   geom_line(
     data = sims,
-    aes(x = date, y = value, color = "Effective reproduction number"),
-    linewidth = 1.5
+    aes(x = date, y = value, color = "Control reproduction number"),
+    linewidth = 2
   ) +
   geom_hline(yintercept = 1, linetype = "dashed", linewidth = 2.0, color = "black") +
   geom_vline(
@@ -186,7 +186,7 @@ p1 <- ggplot() +
   ) +
   scale_color_manual(
     name = NULL,
-    values = c("Effective reproduction number" = "black")
+    values = c("Control reproduction number" = "black")
   ) +
   scale_fill_manual(
     name   = "ALS level",
@@ -201,24 +201,24 @@ p1 <- ggplot() +
     expand = c(0, 0.5)
   ) +
   labs(
-    title = expression("Time-varying effective reproduction number across alert-level phases and school closure"),
-    y = expression(R[e]*"(t)"),
+    title = expression("Time-varying control reproduction number across alert levels and school closure"),
+    y = expression(R[c]*"(t)"),
     x = NULL
   ) +
   theme_clean() +
   theme(
     axis.text.x      = element_blank(),
     axis.ticks.x     = element_blank(),
-    axis.text.y      = element_text(size = 25),
-    axis.title.y     = element_text(size = 25, color = "black"),
+    axis.text.y      = element_text(size = 30),
+    axis.title.y     = element_text(size = 30, color = "black"),
     legend.position  = c(0.83, 0.18),
     legend.justification = c(0.5, 0.5),
     legend.direction = "horizontal",
     legend.box       = "horizontal",
-    legend.title     = element_text(size = 22),
-    legend.text      = element_text(size = 22),
+    legend.title     = element_text(size = 25),
+    legend.text      = element_text(size = 25),
     legend.background = element_blank(),
-    plot.title       = element_text(size = 25, color = "black", hjust = 0.5),
+    plot.title       = element_text(size = 30, color = "black", hjust = 0.5),
     plot.background  = element_blank()
   )
 
@@ -235,18 +235,18 @@ p2 <- ggplot() +
     data = bracket_df,
     aes(x = x_label, y = 0.0, label = sch_label),
     colour = c("navy", "red", "navy"),
-    size = 5
+    size = 7
   ) +
   scale_x_date(
     limits = c(anchor_start, anchor_end),
     date_breaks = "2 week",
-    date_labels = "%b %d",
+    date_labels = "%b",
     expand = c(0, 0.5)
   ) +
   ylim(-1, 1) +
   theme_void() +
   theme(
-    axis.text.x = element_text(size = 20),
+    axis.text.x = element_text(size = 30),
     plot.margin = margin(0, 0, 0, 0)
   )
 

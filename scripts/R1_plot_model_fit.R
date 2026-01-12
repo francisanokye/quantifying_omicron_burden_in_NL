@@ -80,7 +80,7 @@ p <- ggplot() +
   ) +
   geom_point(
     data = fitserodata,
-    aes(x = date, y = value, color = "Data"),
+    aes(x = date, y = value, color = "serosurveillance"),
     size = 3.5, show.legend = TRUE
   ) +
   geom_ribbon(
@@ -90,7 +90,7 @@ p <- ggplot() +
   ) +
   geom_line(
     data = sims,
-    aes(x = date, y = value, color = "Model"),
+    aes(x = date, y = value, color = "model"),
     linewidth = 1.5, show.legend = TRUE
   ) +
   geom_vline(
@@ -105,9 +105,9 @@ p <- ggplot() +
   ) +
   scale_colour_manual(
     name   = NULL,
-    values = c("Data" = "black", "Model" = "red"),
-    breaks = c("Data", "Model"),
-    labels = c("Data", "Model"),
+    values = c("serosurveillance" = "black", "model" = "red"),
+    breaks = c("serosurveillance", "Model"),
+    labels = c("serosurveillance", "Model"),
     guide  = guide_legend(override.aes = list(linetype = c(0, 1), shape = c(16, NA), size = c(4, 4)))
   ) +
   scale_fill_manual(
@@ -117,8 +117,8 @@ p <- ggplot() +
     guide  = guide_legend(override.aes = list(alpha = 0.80, shape = NA, colour = NA))
   ) +
   labs(
-    y = "Infection-induced serological prevalence",
-    title = "Estimated infection-induced serological prevalence in NL"
+    y = "Number of infection incidence",
+    title = "Infection incidence estimated from seroprevalence and model fit"
   ) +
   scale_x_date(
     limits = c(date_start, date_end + days(2)),
@@ -129,15 +129,15 @@ p <- ggplot() +
   theme_clean() +
   theme(
     axis.title.x = element_blank(),
-    axis.text.x  = element_text(size = 22, hjust = 0.85),
-    axis.text.y  = element_text(size = 22),
-    axis.title.y = element_text(size = 22, colour = "black"),
+    axis.text.x  = element_text(size = 25, hjust = 0.85),
+    axis.text.y  = element_text(size = 28),
+    axis.title.y = element_text(size = 25, colour = "black"),
     strip.text   = element_text(size = 0, colour = "black"),  
     strip.background = element_blank(),
-    plot.title   = element_text(size = 22, hjust = 0.5, face = "plain"),
-    legend.title = element_text(size = 18),
+    plot.title   = element_text(size = 30, hjust = 0.5, face = "plain"),
+    legend.title = element_text(size = 25),
     legend.position = c(0.20, 0.80), 
-    legend.text  = element_text(size = 22),
+    legend.text  = element_text(size = 25),
     legend.key            = element_blank(),
     legend.key.background = element_blank(),
     legend.background     = element_blank(),

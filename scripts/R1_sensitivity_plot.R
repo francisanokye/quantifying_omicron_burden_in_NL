@@ -22,10 +22,19 @@ calib_list <- readRDS("R1_grid_calibrate.rds")
 anchor_start <- as.Date("2021-12-15")
 anchor_end   <- as.Date("2022-05-22")
 
-# fixed parameters 
-kappa1 <- 1; kappa2 <- 0.91; kappa3 <- 0.3
-gamma_i <- 1/7; gamma_a <- 1/10
+# fixed (as in your manuscript structure)
+kappa1 <- 1
 p1 <- 0.15; p2 <- 0.85; p3 <- 0
+
+# ---- helper: safely pull a fitted coefficient from mp_tmb_coef() ----
+get_fit <- function(fit_obj, par_name) {
+  out <- mp_tmb_coef(fit_obj) %>%
+    dplyr::filter(mat == par_name) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(estimate)
+  if (length(out) == 0 || is.na(out)) stop("Missing fitted parameter: ", par_name)
+  as.numeric(out)
+}
 
 # build trajectories for each draw ----
 grid_ts <- purrr::imap_dfr(calib_list, function(x, i){
@@ -33,8 +42,15 @@ grid_ts <- purrr::imap_dfr(calib_list, function(x, i){
   mu_x   <- x$cal_spec$default[["mu"]]
   zeta_x <- x$cal_spec$default[["zeta"]]
   
-  bracket_term   <- (mu_x/gamma_i) + ((1 - mu_x) * zeta_x / gamma_a)
-  susceptibility <- p1*kappa1 + p2*kappa2 + p3*kappa3
+  # fitted parameters per draw (from your model fit)
+  gamma_i_hat <- get_fit(x, "gamma_i")
+  gamma_a_hat <- get_fit(x, "gamma_a")
+  kappa2_hat  <- get_fit(x, "kappa2")
+  kappa3_hat  <- get_fit(x, "kappa3")
+  
+  # multiplier for Rc(t)
+  bracket_term   <- (mu_x / gamma_i_hat) + ((1 - mu_x) * zeta_x / gamma_a_hat)
+  susceptibility <- p1*kappa1 + p2*kappa2_hat + p3*kappa3_hat
   mult_const     <- bracket_term * susceptibility
   
   mp_trajectory_sd(x, conf.int = TRUE, back_transform = TRUE) %>%
@@ -46,7 +62,7 @@ grid_ts <- purrr::imap_dfr(calib_list, function(x, i){
       mu = mu_x,
       zeta = zeta_x,
       date,
-      Re_t = value * mult_const
+      Rc_t = value * mult_const
     )
 })
 
@@ -66,7 +82,7 @@ grid_ts <- grid_ts %>%
 # mean Re(t) per draw x phase
 phase_means <- grid_ts %>%
   group_by(draw, mu, zeta, phase) %>%
-  summarise(mean_Re = mean(Re_t, na.rm = TRUE), .groups = "drop")
+  summarise(mean_Re = mean(Rc_t, na.rm = TRUE), .groups = "drop")
 
 # differences vs Early (reference) 
 diffs <- phase_means %>%
@@ -88,7 +104,7 @@ diffs_A <- diffs %>%
 pA <- ggplot(diffs_A, aes(x = k12, y = diff_vs_early)) +
   geom_hline(yintercept = 0, linetype = 2, linewidth = 0.8) +
   geom_boxplot(outlier.size = 0.5, linewidth = 0.4, fatten = 0.5) +
-  labs(x = NULL, y = expression(Delta~mean~R[e](t)~"vs Early"), title = expression(
+  labs(x = NULL, y = expression(Delta~mean~R[c](t)~"vs Early"), title = expression(
     "Effect of school status on "~Delta~mean~R[e](t)~" across sensitivity draws"
   )) +
   theme_clean() + 
@@ -125,7 +141,7 @@ pB <- ggplot(diffs_B, aes(x = als, y = diff_vs_early)) +
   geom_hline(yintercept = 0, linetype = 2, linewidth = 0.8) +
   geom_boxplot(outlier.size = 0.5, linewidth = 0.4, fatten = 0.5) +
   labs(x = NULL, y = expression(Delta~mean~R[e](t)~"vs Early"), title = expression(
-    "Effect of ALS level on "~Delta~mean~R[e](t)~" relative to Early period"
+    "Effect of ALS level on "~Delta~mean~R[c](t)~" relative to Early period"
   ))+
   theme_clean() + 
   theme(
