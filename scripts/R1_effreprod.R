@@ -120,7 +120,7 @@ re_annot <- tibble(
 bracket_df <- tibble(
   xmin      = as.Date(c("2021-12-15","2021-12-20","2022-01-26")),
   xmax      = as.Date(c("2021-12-19","2022-01-25","2022-05-22")),
-  sch_label = c("K-12\nSch.\nOpen","K-12 Schools Closed","K-12 Schools Open"),
+  sch_label = c("","K-12 Schools Closed","K-12 Schools Open"),
   seg_col   = c("navy","red","navy"),
   lab_col   = c("navy","red","navy")
 ) %>%
@@ -235,7 +235,7 @@ p2 <- ggplot() +
     data = bracket_df,
     aes(x = x_label, y = 0.0, label = sch_label),
     colour = c("navy", "red", "navy"),
-    size = 7
+    size = 10
   ) +
   scale_x_date(
     limits = c(anchor_start, anchor_end),

@@ -137,14 +137,15 @@ remade_vax_data = (list(
 	)
 	) 
 	|> bind_rows(.id = "matrix")
+	##|> dplyr::filter(time >= offset0)
 )
 
 # plot vaccination coverage over time
-print(calibrator
+vac_plot <- (calibrator
 	|> mp_optimized_spec("modified")
 	|> mp_simulator(time_steps, outputs = c("double_vac","booster_shot"))
 	|> mp_trajectory()
-	|> lim_dat()
+	|> dplyr::filter(time >= offset0)
 	|> ggplot()
 		+ aes(time, value)
 		+ geom_line()
@@ -152,6 +153,11 @@ print(calibrator
 		+ facet_wrap(~matrix, scales = "free")
 		+ theme_bw()
 )
+
+# png("../figures/vac_plot.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+# vac_plot
+# dev.off()
+
 
 # extract fitted coefficients
 model_estimates = mp_tmb_coef(calibrator, conf.int = TRUE) |> dplyr::select(-term, -col, -type) |> mutate(mat = abbreviate(mat, minlength = 15))

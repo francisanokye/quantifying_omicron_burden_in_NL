@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
   library(macpan2)
   library(shellpipes)
   library(grid)   # unit()
+  library(scales) # rescale()
 })
 
 # ==== Initialize ====
@@ -20,7 +21,7 @@ anchor_start <- as.Date("2021-12-15")
 anchor_end   <- as.Date("2022-05-22")
 calibrator   <- rdsRead("calibrate.rds")
 
-# ==== Fixed constants for Rc(t) scaling (use manuscript values) ====
+# fixed parameters for Rc(t) scaling (use manuscript values) 
 kappa1 <- 1; kappa2 <- 0.91; kappa3 <- 0.3
 gamma_i <- 1/7; gamma_a <- 1/10; mu <- 0.678; zeta <- 0.75
 p1 <- 0.15; p2 <- 0.85; p3 <- 0
@@ -29,7 +30,8 @@ bracket_term   <- (mu/gamma_i) + ((1 - mu) * zeta / gamma_a)
 susceptibility <- p1*kappa1 + p2*kappa2 + p3*kappa3
 mult_const     <- bracket_term * susceptibility
 
-# ==== Extract beta(t) mean + CI, convert to Rc(t) mean + CI (daily) ====
+# extract beta(t) mean + CI, convert to Rc(t) mean + CI (daily) 
+# Keep beta_mean/beta_low/beta_high so we can aggregate
 fitted_daily <- mp_trajectory_sd(calibrator, conf.int = TRUE) %>%
   dplyr::filter(matrix == "beta_thing") %>%
   dplyr::mutate(date = anchor_start + (time - offset0)) %>%
@@ -38,13 +40,10 @@ fitted_daily <- mp_trajectory_sd(calibrator, conf.int = TRUE) %>%
     date,
     beta_mean = as.numeric(value),
     beta_low  = as.numeric(conf.low),
-    beta_high = as.numeric(conf.high),
-    Rc_mean   = as.numeric(value)     * mult_const,
-    Rc_low    = as.numeric(conf.low)  * mult_const,
-    Rc_high   = as.numeric(conf.high) * mult_const
+    beta_high = as.numeric(conf.high)
   )
 
-# ==== Phase labels (same cutpoints as your figure logic) ====
+# ==== Phase labels ====
 fitted_daily <- fitted_daily %>%
   mutate(
     alert_level = case_when(
@@ -66,18 +65,33 @@ fitted_daily <- fitted_daily %>%
     )
   )
 
-# ==== Phase summaries: mean Rc + matching mean of fitted CI bounds ====
+# ==== Phase summaries (APPROACH THAT MATCHES YOUR OTHER PLOT) ====
+# 1) average beta within phase
+# 2) multiply by mult_const to get Rc
 spec_data <- fitted_daily %>%
   group_by(chrono, alert_level, k12_status) %>%
   summarise(
-    Rc_mean = mean(Rc_mean, na.rm = TRUE),
-    Rc_low  = mean(Rc_low,  na.rm = TRUE),
-    Rc_high = mean(Rc_high, na.rm = TRUE),
-    .groups = "drop"
+    n_days   = dplyr::n(),
+    beta_m   = mean(beta_mean, na.rm = TRUE),
+    beta_lo  = mean(beta_low,  na.rm = TRUE),
+    beta_hi  = mean(beta_high, na.rm = TRUE),
+    .groups  = "drop"
+  ) %>%
+  mutate(
+    Rc_mean = beta_m  * mult_const,
+    Rc_low  = beta_lo * mult_const,
+    Rc_high = beta_hi * mult_const
   ) %>%
   arrange(k12_status, chrono)
 
-# group mean lines + group CI bands 
+# ==== cap width depends on days ====
+spec_data <- spec_data %>%
+  mutate(
+    x     = as.numeric(chrono),
+    cap_w = scales::rescale(n_days, to = c(0.15, 0.95))
+  )
+
+# ==== Group mean lines + group CI bands ====
 group_stats <- spec_data %>%
   group_by(k12_status) %>%
   summarise(
@@ -89,64 +103,62 @@ group_stats <- spec_data %>%
   )
 
 group_bands <- spec_data %>%
-  mutate(idx = as.numeric(chrono)) %>%
   group_by(k12_status) %>%
-  summarise(xmin = min(idx) - 0.5, xmax = max(idx) + 0.5, .groups = "drop") %>%
+  summarise(xmin = min(x) - 0.5, xmax = max(x) + 0.5, .groups = "drop") %>%
   left_join(group_stats, by = "k12_status")
 
-# colors 
+# ==== Colors ====
 col_map <- c(
   "Early"       = "grey40",
-  "K-12 Closed" = "red",  # vermillion
-  "K-12 Open"   = "blue"   # blue
+  "K-12 Closed" = "red",
+  "K-12 Open"   = "blue"
 )
 
-# plot 
+# ==== Plot ====
 y_top <- max(spec_data$Rc_high, na.rm = TRUE)
 
-mean_labels <- group_stats %>%
-  mutate(label = sprintf("%s: %.2f [%.2f–%.2f]", k12_status, mean, lower, upper)) %>%
-  left_join(group_bands %>% select(k12_status, xmin, xmax),by = "k12_status") %>%
-  mutate(x = 1.5,y = y_top - 0.05 * y_top * (row_number() - 1),hjust = 0,vjust = 1)
+# do NOT draw the mean line for Early
+group_bands_no_early <- group_bands %>% filter(k12_status != "Early")
 
-gg <- ggplot(spec_data, aes(x = chrono, y = Rc_mean)) +
-  # group CI bands 
+gg <- ggplot(spec_data, aes(x = x, y = Rc_mean)) +
+  # group CI bands
   geom_rect(
     data = group_bands,
     aes(xmin = xmin, xmax = xmax, ymin = lower, ymax = upper, fill = k12_status),
     inherit.aes = FALSE,
     alpha = 0.06
   ) +
-  # phase points
   geom_point(aes(color = k12_status), size = 5) +
-  # phase error bars from fitted daily CI (aggregated within each phase)
-  geom_errorbar(
-    aes(ymin = Rc_low, ymax = Rc_high, color = k12_status),
-    width = 0.65, linewidth = 1.2
+  geom_segment(
+    aes(xend = x, y = Rc_low, yend = Rc_high, color = k12_status),
+    linewidth = 1.2
   ) +
-  # numeric labels (mean)
+  geom_segment(
+    aes(x = x - cap_w/2, xend = x + cap_w/2, y = Rc_low,  yend = Rc_low,  color = k12_status),
+    linewidth = 1.2
+  ) +
+  geom_segment(
+    aes(x = x - cap_w/2, xend = x + cap_w/2, y = Rc_high, yend = Rc_high, color = k12_status),
+    linewidth = 1.2
+  ) +
   geom_text(
     aes(label = sprintf("%.2f", Rc_mean), color = k12_status),
-    y = spec_data$Rc_mean + 0.03 * y_top, hjust = 1.25, vjust = 1.5,
+    y = spec_data$Rc_mean + 0.03 * y_top,
+    hjust = 1.25, vjust = 1.25,
     size = 10, show.legend = FALSE
   ) +
-  # group mean lines
   geom_segment(
-    data = group_bands,
+    data = group_bands_no_early,
     aes(x = xmin, xend = xmax, y = mean, yend = mean, color = k12_status),
     inherit.aes = FALSE,
     linewidth = 1.2
   ) +
-  # geom_text(
-  #   data = mean_labels,
-  #   aes(x = x, y = y, label = label, color = k12_status),
-  #   inherit.aes = FALSE,
-  #   size = 6.5,
-  #   fontface = "plain",
-  #   show.legend = FALSE
-  # )+
   scale_color_manual(values = col_map, guide = "none") +
   scale_fill_manual(values = col_map, guide = "none") +
+  scale_x_continuous(
+    breaks = sort(unique(spec_data$x)),
+    labels = levels(spec_data$chrono)
+  ) +
   labs(
     x = NULL,
     y = expression(R[c](t)),
@@ -155,7 +167,7 @@ gg <- ggplot(spec_data, aes(x = chrono, y = Rc_mean)) +
   theme_clean() +
   theme(
     plot.title   = element_text(size = 32, hjust = 0.5, face = "plain"),
-    axis.text.x  = element_text(size = 30),
+    axis.text.x  = element_text(size = 28),
     axis.text.y  = element_text(size = 30),
     axis.title.y = element_text(size = 30),
     panel.grid.major.y = element_line(color = "grey85"),
@@ -167,6 +179,6 @@ gg <- ggplot(spec_data, aes(x = chrono, y = Rc_mean)) +
     plot.tag.position = c(0.01, 0.98)
   )
 
-png("../figures/R1_reprod_numb.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/R1_reprod_numb.png", width = 5000, height = 2000, res = 300, bg = "white", type = "cairo")
 print(gg)
 dev.off()

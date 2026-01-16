@@ -118,7 +118,7 @@ p <- ggplot() +
     plot.title = element_text(hjust = 0.5, size = 30, margin = margin(b = -90)),
     plot.margin = margin(2, 6, 6, 6),
     legend.position = "none")+
-  labs(title = "Timeline for Alert levels, K–12 school closure and testing eligibility changes")
+  labs(title = "Timeline for alert levels, K–12 school closure and testing eligibility changes")
 
 print(p)
 

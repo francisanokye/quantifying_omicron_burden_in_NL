@@ -81,19 +81,19 @@ combined_case_plot <- ggplot(allcases, aes(x = date)) +
   annotate("text", x = as.Date("2022-03-15"), y = 1000, label = "T4", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
   annotate("text", x = as.Date("2022-04-25"), y = 1000, label = "T5", colour = "purple",size = 7, hjust = 1, fontface = "bold") +
   theme_clean() +
-  theme(axis.text.x   = element_text(size = 16),
+  theme(axis.text.x   = element_text(size = 15),
         axis.title.x  = element_blank(),
-        axis.text.y   = element_text(size = 18),
-        axis.title.y  = element_text(size = 20),
-        plot.title    = element_text(size = 20, hjust = 0.5, face = "plain"),
+        axis.text.y   = element_text(size = 16),
+        axis.title.y  = element_text(size = 16),
+        plot.title    = element_text(size = 16, hjust = 0.5, face = "plain"),
         legend.position = c(0.30,0.9),
-        legend.text   = element_text(size = 20),
+        legend.text   = element_text(size = 16),
         legend.background = element_rect(color = NA),
         plot.background   = element_blank()
         )+
   labs(tag = "A") +
   theme(
-    plot.tag = element_text(size = 24, face = "bold", colour = "black"),
+    plot.tag = element_text(size = 20, face = "bold", colour = "black"),
     plot.tag.position = c(0.01, 0.98)   
   )
 
@@ -187,16 +187,16 @@ const_cum <- ggplot(underreporting_df, aes(x = date, y = ratio)) +
   guides(color = guide_legend(override.aes = list(size = 2))) +
   theme_clean() +
   theme(
-    axis.text.x = element_text(size = 16),
+    axis.text.x = element_text(size = 15),
     axis.title.x = element_blank(),
-    axis.text.y = element_text(size = 18),
-    axis.title.y = element_text(size = 20),
-    plot.title  = element_text(size = 20, hjust = 0.5, face = "plain"),
+    axis.text.y = element_text(size = 16),
+    axis.title.y = element_text(size = 16),
+    plot.title  = element_text(size = 16, hjust = 0.5, face = "plain"),
     plot.background = element_blank()
   ) +
   labs(tag = "B") +
   theme(
-    plot.tag = element_text(size = 24, face = "bold", colour = "black"),
+    plot.tag = element_text(size = 20, face = "bold", colour = "black"),
     plot.tag.position = c(0.01, 0.98)   
   )
 
@@ -214,3 +214,14 @@ print(gg)
 png("../figures/R1_Figure_4.png", width = 3000, height = 3000, res = 300, bg = "white", type = "cairo")
 gg
 dev.off()
+
+# tiff(
+#   "../figures/Figure4.tiff",
+#   width = 8.6,
+#   height = 8.6,
+#   units = "in",
+#   res = 300,
+#   compression = "none"
+# )
+# print(gg)
+# dev.off()
