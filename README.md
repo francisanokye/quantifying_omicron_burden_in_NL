@@ -69,14 +69,14 @@ This pipeline helps to generate the figures for the results used in the paper. I
 
 - **Fit model to data and plot (Figure_1)**  
 ```bash
-make scripts\plot_model_fit.Rout 
+make scripts\R1_plot_model_fit.Rout 
 ```
 
 - **True infections vrs reported cases plot (cumulative) (Figure_2)**  
 Compare the cumulative estimated true infections and the reported cases.
 
 ```bash
-make scripts/true_vs_reported_plot.Rout   
+make scripts/R1_true_vs_reported_plot.Rout   
 ``
 
 ```
@@ -84,7 +84,7 @@ make scripts/true_vs_reported_plot.Rout
 Generates the transmission rate plot.
 
 ```bash
-make scripts/bettas.Rout   
+make scripts/R1_effreprod.Rout   
 ``
 
 ```
@@ -92,18 +92,18 @@ make scripts/bettas.Rout
 Generates the stack of the above two plots.
 
 ```bash
-make scripts/reprod_numb.Rout   
+make scripts/R1_reprod_numb.Rout   
 ``
 
 ```
 - **Generate ALS plots (Figure_4)**  
 ```bash
-make scripts/als_R0.Rout   
+make scripts/R1_als_R0.Rout   
 ``
 ```
 - **Stacks transmission rate and error bar to generate (Figure_3)**  
 
 ```bash
-make scripts/stack_transmission_R0_plot.Rout   
+make scripts/R1_stack_transmission_R0_plot.Rout   
 ``
 
