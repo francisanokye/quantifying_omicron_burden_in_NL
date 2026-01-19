@@ -31,7 +31,7 @@ kappa1 <- 1; p1 <- 0.15; p2 <- 0.85; p3 <- 0
 get_draw_params <- function(fit) {
   cf <- mp_tmb_coef(fit) %>%
     filter(mat %in% pars_keep) %>%
-    transmute(param = mat, estimate = round(as.numeric(estimate), 2) ) %>%
+    transmute(param = mat, estimate = as.numeric(estimate)) %>%
     distinct(param, .keep_all = TRUE)
   
   # sanity check
@@ -136,7 +136,7 @@ png("../figures/R1_sen_effreprod_facets.png",width = 7500, height = 5000, res = 
 print(p_facets)
 dev.off()
 
-# ==== Optional: per-draw parameter table you can save/use in text ====
+# per-draw parameter table 
 draw_params_tbl <- grid_df %>%
   distinct(draw, mu, zeta, gamma_a, gamma_i, sigma, kappa2, kappa3) %>%
   arrange(draw)
