@@ -3,7 +3,10 @@ library(readr); library(dplyr); library(lubridate)
 library(ggplot2); library(tidyr); library(ggthemes)
 
 # load and window data ----
-dat <- read_tsv("../data/BA.1.tsv", show_col_types = FALSE)
+# dat <- read_tsv("../data/BA.1.tsv", show_col_types = FALSE)
+dat <- read_tsv("C:/Users/fanok/Documents/quantifying_omicron_burden_in_NL/data/BA.1.tsv", show_col_types = FALSE)
+
+
 names(dat) <- sub("%\\s*", "pct_", tolower(names(dat)))  
 
 dat <- dat |>
@@ -42,8 +45,8 @@ wk <- dat |>
 
 # ---- color-blind–friendly palette (okabe–ito); ba.1 is red ----
 cols <- c(
-  "BA.1"            = "red",  
-  "other lineages"  = "blue"   
+  "BA.1"            = "blue",  
+  "other lineages"  = "red"   
 )
 
 # ---- plot: fraction scale 0–1, plain title, larger font ----
@@ -56,23 +59,27 @@ p <- ggplot(wk, aes(week, frac, fill = lineage)) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b\n%Y") +
   scale_fill_manual(values = cols, drop = FALSE) +
   labs(
-    title = "sublineage composition by week (canada)",
+    title = "sublineage composition by week (Canada)",
     x = "date",
     y = "weekly lineage share (fraction)",
     fill = "lineages"
   ) +
   theme_clean() +
   theme(
-    plot.title      = element_text(face = "plain", size = 14, hjust = 0.5),
-    axis.title.x    = element_text(size = 10),
-    axis.title.y    = element_text(size = 10),
-    axis.text.x     = element_text(size = 10),
-    axis.text.y     = element_text(size = 10),
+    plot.title      = element_text(face = "plain", size = 18, hjust = 0.5),
+    axis.title.x    = element_blank(),
+    axis.title.y    = element_text(size = 14),
+    axis.text.x     = element_text(size = 14),
+    axis.text.y     = element_text(size = 14),
     legend.position = "bottom",
     legend.title    = element_text(size = 0),
-    legend.text     = element_text(size = 10),
+    legend.text     = element_text(size = 14),
     plot.background = element_blank(),
     legend.background = element_blank()
   )
 
 p
+
+png("../figures/sublineages.png",width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+print(p)
+dev.off()

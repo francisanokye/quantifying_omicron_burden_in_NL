@@ -106,9 +106,9 @@ p <- ggplot() +
   scale_colour_manual(
     name   = NULL,
     values = c("serosurveillance" = "black", "model" = "red"),
-    breaks = c("serosurveillance", "Model"),
-    labels = c("serosurveillance", "Model"),
-    guide  = guide_legend(override.aes = list(linetype = c(0, 1), shape = c(16, NA), size = c(4, 4)))
+    breaks = c("serosurveillance", "model"),
+    labels = c("serosurveillance", "model"),
+    guide  = guide_legend(override.aes = list(linetype = c(0, 1), shape = c(16, NA), linewidth  = c(0, 1.2)))
   ) +
   scale_fill_manual(
     name   = "ALS level",
@@ -118,7 +118,7 @@ p <- ggplot() +
   ) +
   labs(
     y = "Number of infection incidence",
-    title = "Infection incidence estimated from seroprevalence and model fit"
+    title = "Infection incidence estimated from serosurveillance and model fit"
   ) +
   scale_x_date(
     limits = c(date_start, date_end + days(2)),

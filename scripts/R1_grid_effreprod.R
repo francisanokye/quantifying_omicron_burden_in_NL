@@ -96,6 +96,7 @@ grid_df <- grid_df %>%
   mutate(muzeta = factor(muzeta, levels = unique(muzeta)))
 
 p_combined <- ggplot(grid_df, aes(x = date, y = Rc_t, group = muzeta, colour = muzeta)) +
+  geom_ribbon(aes(ymin = Rc_low, ymax = Rc_high), alpha = 0.1, colour = NA) +
   geom_line(show.legend = FALSE) +
   geom_hline(yintercept = 1.0, linewidth = 0.9, linetype = 2) +
   labs(title = "Time-varying control reproduction number across sensitivity draws", x = NULL,y = expression(R[c](t))) +

@@ -74,7 +74,7 @@ priors = list(log_beta = mp_normal(log(0.25), log(1))
 # fit model using seroprevalence data
 calibrator = mp_tmb_calibrator(
 	spec = timevar_spec |> mp_rk4()
-	, data = (fitserodata##  seroprevdata                   ## change here?!? 
+	, data = (fitserodata
 		|> select(-date) 
 		|> dplyr::filter(matrix == "newR") 
 		|> mutate(matrix = "log_newR", value = log(value))
