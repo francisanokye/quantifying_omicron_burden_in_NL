@@ -134,7 +134,15 @@ R1_prior_posterior_plot.Rout: R1_prior_posterior_plot.R R1_grid_calibrate.rds pa
 
 R1_timeline.Rout: R1_timeline.R 
 	$(pipeR)
-	
+
+## SUPP
+
+supp1.Rout: supp1.R
+	$(pipeR)
+
+sublineages.Rout: sublineages.R
+	$(pipeR)
+
 sirtest.Rout: sirtest.R
 	$(pipeR)
 

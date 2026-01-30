@@ -3,8 +3,8 @@ library(readr); library(dplyr); library(lubridate)
 library(ggplot2); library(tidyr); library(ggthemes)
 
 # load and window data ----
-# dat <- read_tsv("../data/BA.1.tsv", show_col_types = FALSE)
-dat <- read_tsv("C:/Users/fanok/Documents/quantifying_omicron_burden_in_NL/data/BA.1.tsv", show_col_types = FALSE)
+#dat <- read_tsv("../data/BA.1.tsv", show_col_types = FALSE)
+ dat <- read_tsv("C:/Users/fanok/Documents/quantifying_omicron_burden_in_NL/data/BA.1.tsv", show_col_types = FALSE)
 
 
 names(dat) <- sub("%\\s*", "pct_", tolower(names(dat)))  
@@ -39,25 +39,28 @@ wk <- dat |>
   ungroup() |>
   transmute(
     week,
-    lineage = factor(lineage, levels = c("BA.1","BA.1.20","BA.1.3","other lineages")),
+ #   lineage = factor(lineage, levels = c("BA.1","BA.1.20","BA.1.3","other lineages")),
+    lineage = factor(lineage, levels = c("other lineages","BA.1")),
     frac    = pmin(pmax(as.numeric(frac), 0), 1)
   )
 
 # ---- color-blind–friendly palette (okabe–ito); ba.1 is red ----
 cols <- c(
-  "BA.1"            = "blue",  
-  "other lineages"  = "red"   
+  "BA.1"            = "red",  
+  "other lineages"  = "blue"   
 )
+
+print(wk)
 
 # ---- plot: fraction scale 0–1, plain title, larger font ----
 p <- ggplot(wk, aes(week, frac, fill = lineage)) +
-  geom_col(width = 6) +
+  geom_col(width = 6,position="stack") +
   scale_y_continuous(limits = c(0, 1),
                      breaks = seq(0, 1, 0.1),
                      labels = scales::number_format(accuracy = 0.1),
                      expand = expansion(mult = c(0, 0))) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b\n%Y") +
-  scale_fill_manual(values = cols, drop = FALSE) +
+  scale_fill_manual(values = cols, drop = FALSE, breaks=c("BA.1","other lineages")) +
   labs(
     title = "sublineage composition by week (Canada)",
     x = "date",
@@ -79,6 +82,7 @@ p <- ggplot(wk, aes(week, frac, fill = lineage)) +
   )
 
 p
+
 
 png("../figures/sublineages.png",width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
 print(p)
