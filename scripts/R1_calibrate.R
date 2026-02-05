@@ -30,12 +30,6 @@ fitserodata <- readRDS("R1_fitsero.rds")
 time_steps = max(seroprevdata$time)
 upper_plot_time = 300
 
-## convert cumulative to weekly incidence
-#fitserodata = (seroprevdata 
-#	|> mutate(value = timevar_spec$default$N * (value - dplyr::lag(value)) / 7)
-#	|> mutate(matrix = "inc")
-#)
-
 # construct spline basis for beta(t)
 if (spline_beta) {
  	basis_cols = 11

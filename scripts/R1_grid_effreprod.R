@@ -95,8 +95,8 @@ grid_df <- purrr::imap_dfr(calib_list, function(fit, draw_id){
 grid_df <- grid_df %>%
   mutate(muzeta = factor(muzeta, levels = unique(muzeta)))
 
-p_combined <- ggplot(grid_df, aes(x = date, y = Rc_t, group = muzeta, colour = muzeta)) +
-  geom_ribbon(aes(ymin = Rc_low, ymax = Rc_high), alpha = 0.1, colour = NA) +
+p_combined <- ggplot(grid_df, aes(x = date, y = Rc_t, group = muzeta, color = muzeta, fill = muzeta)) +
+  geom_ribbon(aes(ymin = Rc_low, ymax = Rc_high), alpha = 0.01, color = NA) +
   geom_line(show.legend = FALSE) +
   geom_hline(yintercept = 1.0, linewidth = 0.9, linetype = 2) +
   labs(title = "Time-varying control reproduction number across sensitivity draws", x = NULL,y = expression(R[c](t))) +
@@ -107,7 +107,8 @@ p_combined <- ggplot(grid_df, aes(x = date, y = Rc_t, group = muzeta, colour = m
     axis.title.y      = element_text(size = 10),
     plot.title        = element_text(size = 15, hjust = 0.5, face = "plain"),
     plot.background   = element_blank(),
-    legend.text = element_blank()
+    legend.text = element_blank(),
+    legend.position = "none"
   )
 
 png("../figures/R1_sen_effreprod_noCI.png",width = 2500, height = 1000, res = 300, bg = "white", type = "cairo")
@@ -115,8 +116,8 @@ print(p_combined)
 dev.off()
 
 # Facets (with credible bands) 
-p_facets <- ggplot(grid_df, aes(x = date, y = Rc_t)) +
-  geom_ribbon(aes(ymin = Rc_low, ymax = Rc_high), alpha = 0.18, colour = NA) +
+p_facets <- ggplot(grid_df, aes(x = date, y = Rc_t, fill = muzeta)) +
+  geom_ribbon(aes(ymin = Rc_low, ymax = Rc_high), alpha = 0.1, color = NA) +
   geom_line(linewidth = 0.7) +
   geom_hline(yintercept = 1.0, linewidth = 0.9, linetype = 2) +
   facet_wrap(~ muzeta, ncol = 5, scales = "free_y") +

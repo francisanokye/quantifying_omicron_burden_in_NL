@@ -44,13 +44,10 @@ wk <- dat |>
     frac    = pmin(pmax(as.numeric(frac), 0), 1)
   )
 
-# ---- color-blind–friendly palette (okabe–ito); ba.1 is red ----
-cols <- c(
-  "BA.1"            = "red",  
-  "other lineages"  = "blue"   
-)
+cols <- c("BA.1" = "red", "other lineages" = "blue")
 
-print(wk)
+wk <- wk |>
+  mutate(lineage = factor(lineage, levels = c("other lineages", "BA.1")))
 
 # ---- plot: fraction scale 0–1, plain title, larger font ----
 p <- ggplot(wk, aes(week, frac, fill = lineage)) +
@@ -83,7 +80,11 @@ p <- ggplot(wk, aes(week, frac, fill = lineage)) +
 
 p
 
+<<<<<<< HEAD
 
 png("../figures/sublineages.png",width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+=======
+png("C:/Users/fanok/Documents/quantifying_omicron_burden_in_NL/figures/sublineages.png",width = 2500, height = 1500, res = 300, bg = "white", type = "cairo")
+>>>>>>> 7eb8f78 (release code)
 print(p)
 dev.off()
