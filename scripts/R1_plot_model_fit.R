@@ -176,6 +176,6 @@ final_plot <- cowplot::ggdraw(p_base) +
 print(final_plot)
 
 
-png("../figures/R1_Figure_3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/Fig3.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 final_plot
 dev.off()

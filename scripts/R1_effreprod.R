@@ -262,6 +262,6 @@ gg <- (p1 / p2) +
 
 print(gg)
 
-png("../figures/R1_Figure_5.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
+png("../figures/Fig5.png", width = 5000, height = 2500, res = 300, bg = "white", type = "cairo")
 gg
 dev.off()

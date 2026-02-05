@@ -52,14 +52,14 @@ The script folder should contain the following files in the table
 | `scripts/params.R`                         | Defines model parameter values                                                    | 
 | `scripts/flows.R`                          | Computes compartmental flows                                                      | 
 | `scripts/spec.R`                           | Builds model specifications                                                       | 
-| `scripts/timevar_spec.R`                   | Builds model specifications  & defines time-varying parameters (e.g., beta)       | 
-| `scripts/seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
-| `scripts/calibrate.R`                      | Calibrates the model to data                                                      | 
-| `scripts/plot_model_plot.R`                | Plots model fit                                                                   | 
-| `scripts/true_vs_reported_plot.R`          | Plots the incidence reported cases vs estimated infections and the underreporting|
-| `scripts/bettas.R`                         | Plots the underlying time-varying transmission rates                              |
-| `scripts/reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS with K--12 status       | 
-| `scripts/als_R0.R`                         | Plots the errorbar comparing the different reproduction numbers for the ALS only       | 
+| `scripts/R1_timevar_spec.R`                   | Builds model specifications  & defines time-varying parameters (e.g., beta)       | 
+| `scripts/R1_seroprevdata.R`                   | Loads or processes seroprevalence data                                            | 
+| `scripts/R1_calibrate.R`                      | Calibrates the model to data                                                      | 
+| `scripts/R1_plot_model_plot.R`                | Plots model fit                                                                   | 
+| `scripts/R1_true_vs_reported_plot.R`          | Plots the incidence reported cases vs estimated infections and the underreporting|
+| `scripts/R1_effreprod.R`                         | Plots the underlying time-varying control reproduction number                              |
+| `scripts/R1_reprod_numb.R`                    | Plots the errorbar comparing the different reproduction numbers for the ALS with K--12 status       | 
+| `scripts/R1_als_R0.R`                         | Plots the errorbar comparing the different reproduction numbers for the ALS only       | 
 | `stack_transmission_R0_plot.Rout.R`| Stacks the transmission plot on top of the errorbar                               | 
 | `Makefile`                         | Streamlines entire analysis pipeline from data to results                         |
 --------------------------------------------------------------------------------------------------------------------------
@@ -80,8 +80,8 @@ make scripts/R1_true_vs_reported_plot.Rout
 ``
 
 ```
-- **Time-varying transmission rate**  
-Generates the transmission rate plot.
+- **Time-varying control reproduction number**  
+Generates the control reproduction number plot.
 
 ```bash
 make scripts/R1_effreprod.Rout   

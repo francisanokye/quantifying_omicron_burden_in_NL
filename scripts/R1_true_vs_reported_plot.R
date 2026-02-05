@@ -211,7 +211,7 @@ gg <- plot_grid(
 
 print(gg)
 
-png("../figures/R1_Figure_4.png", width = 3000, height = 3000, res = 300, bg = "white", type = "cairo")
+png("../figures/Fig4.png", width = 3000, height = 3000, res = 300, bg = "white", type = "cairo")
 gg
 dev.off()
 

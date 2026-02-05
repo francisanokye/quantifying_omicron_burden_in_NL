@@ -15,6 +15,6 @@ gg <- plot_grid(
 
 print(gg)
 
-png("../figures/R1_Figure_6.png", width = 20, height = 16,units = "in", res = 300, bg = "white", type = "cairo")
+png("../figures/Fig6.png", width = 20, height = 16,units = "in", res = 300, bg = "white", type = "cairo")
 gg
 dev.off()
