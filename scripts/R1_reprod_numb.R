@@ -65,7 +65,7 @@ fitted_daily <- fitted_daily %>%
     )
   )
 
-# ==== Phase summaries (APPROACH THAT MATCHES YOUR OTHER PLOT) ====
+# ==== Phase summaries  ====
 # 1) average beta within phase
 # 2) multiply by mult_const to get Rc
 spec_data <- fitted_daily %>%
@@ -182,3 +182,4 @@ gg <- ggplot(spec_data, aes(x = x, y = Rc_mean)) +
 png("../figures/R1_reprod_numb.png", width = 5000, height = 2000, res = 300, bg = "white", type = "cairo")
 print(gg)
 dev.off()
+
